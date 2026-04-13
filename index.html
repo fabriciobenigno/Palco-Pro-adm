@@ -2,16 +2,22 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#020409" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <title>Palco Pro Admin</title>
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
       --bg-1: #020409;
       --bg-2: #08111e;
       --bg-3: #04070d;
@@ -33,18 +39,28 @@
       --shadow: 0 26px 70px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.05);
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
     html, body {
       margin: 0;
+      width: 100%;
+      height: 100%;
       min-height: 100%;
+      overflow: hidden;
       background:
         radial-gradient(circle at 50% -10%, rgba(79,140,255,0.22), transparent 28%),
         radial-gradient(circle at 50% 12%, rgba(255,255,255,0.04), transparent 34%),
         linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 42%, var(--bg-3) 100%);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      overflow: hidden;
+    }
+
+    body {
+      position: fixed;
+      inset: 0;
     }
 
     button, input, textarea { font: inherit; }
@@ -74,24 +90,31 @@
       inset: 0;
       z-index: 40;
       display: none;
+      width: 100vw;
+      height: 100dvh;
+      min-height: 100dvh;
       padding:
-        calc(var(--safe-top) + 10px)
-        10px
-        calc(var(--safe-bottom) + 12px);
+        var(--safe-top)
+        var(--safe-right)
+        var(--safe-bottom)
+        var(--safe-left);
       background:
         radial-gradient(circle at 50% -10%, rgba(79,140,255,0.18), transparent 28%),
-        linear-gradient(180deg, rgba(2,4,9,0.98), rgba(8,17,30,0.98), rgba(4,7,13,0.99));
+        linear-gradient(180deg, rgba(2,4,9,0.995), rgba(8,17,30,0.995), rgba(4,7,13,1));
+      overflow: hidden;
     }
 
     .screen.active { display: block; }
 
     .shell {
+      width: 100%;
       height: 100%;
-      border-radius: 28px;
-      border: 1px solid rgba(255,255,255,0.10);
+      min-height: 100%;
       background: linear-gradient(180deg, var(--card-1), var(--card-2));
       box-shadow: var(--shadow);
       overflow: hidden;
+      border: 0;
+      border-radius: 0;
     }
 
     .login-shell {
@@ -209,9 +232,29 @@
       padding: 16px;
     }
 
-    .menu-grid {
+    .menu-content {
       width: 100%;
       max-width: 360px;
+      display: grid;
+      gap: 14px;
+      align-content: center;
+    }
+
+    .menu-title {
+      display: grid;
+      gap: 4px;
+      text-align: center;
+    }
+
+    .menu-title h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.04;
+      letter-spacing: -0.04em;
+    }
+
+    .menu-grid {
+      width: 100%;
       display: grid;
       gap: 10px;
     }
@@ -467,7 +510,7 @@
       inset: 0;
       z-index: 70;
       display: none;
-      padding: calc(var(--safe-top) + 10px) 12px calc(var(--safe-bottom) + 12px);
+      padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
       background: rgba(1, 3, 8, 0.72);
       backdrop-filter: blur(10px);
     }
@@ -476,13 +519,13 @@
 
     .modal-card {
       height: 100%;
-      border-radius: 28px;
-      border: 1px solid rgba(255,255,255,0.10);
       background: linear-gradient(180deg, rgba(13,19,31,0.98), rgba(7,11,19,0.96));
       box-shadow: var(--shadow);
       display: grid;
       grid-template-rows: auto 1fr auto;
       overflow: hidden;
+      border-radius: 0;
+      border: 0;
     }
 
     .modal-head {
@@ -540,7 +583,6 @@
     }
 
     .form-grid { display: grid; gap: 12px; }
-    .hidden { display: none !important; }
 
     @keyframes flow {
       0% { background-position: 0% 50%; }
@@ -581,11 +623,16 @@
 
   <div id="menuScreen" class="screen">
     <div class="shell menu-shell">
-      <div class="menu-grid">
-        <button id="openPendingBtn" type="button" class="btn btn-primary menu-btn">Músicas pendentes</button>
-        <button id="openApprovedBtn" type="button" class="btn btn-primary menu-btn">Músicas aprovadas</button>
-        <button id="openInactiveBtn" type="button" class="btn btn-primary menu-btn">Músicas inativas</button>
-        <button id="openUsersBtn" type="button" class="btn btn-primary menu-btn">Usuários</button>
+      <div class="menu-content">
+        <div class="menu-title">
+          <h1>Palco Pro Adm</h1>
+        </div>
+        <div class="menu-grid">
+          <button id="openPendingBtn" type="button" class="btn btn-primary menu-btn">Músicas pendentes</button>
+          <button id="openApprovedBtn" type="button" class="btn btn-primary menu-btn">Músicas aprovadas</button>
+          <button id="openInactiveBtn" type="button" class="btn btn-primary menu-btn">Músicas inativas</button>
+          <button id="openUsersBtn" type="button" class="btn btn-primary menu-btn">Usuários</button>
+        </div>
       </div>
     </div>
   </div>
@@ -603,7 +650,7 @@
         </div>
       </div>
       <div class="panel-tools">
-        <input id="pendingSearch" type="text" placeholder="Buscar por música, artista, estilo ou conta" />
+        <input id="pendingSearch" class="search-input" type="text" placeholder="Buscar por música, artista, estilo ou conta" />
       </div>
       <div id="pendingList" class="list-area"></div>
       <div id="pendingStatus" class="panel-footer"></div>
@@ -623,7 +670,7 @@
         </div>
       </div>
       <div class="panel-tools">
-        <input id="approvedSearch" type="text" placeholder="Buscar por música, artista ou estilo" />
+        <input id="approvedSearch" class="search-input" type="text" placeholder="Buscar por música, artista ou estilo" />
       </div>
       <div id="approvedList" class="list-area"></div>
       <div id="approvedStatus" class="panel-footer"></div>
@@ -643,7 +690,7 @@
         </div>
       </div>
       <div class="panel-tools">
-        <input id="inactiveSearch" type="text" placeholder="Buscar por música, artista ou estilo" />
+        <input id="inactiveSearch" class="search-input" type="text" placeholder="Buscar por música, artista ou estilo" />
       </div>
       <div id="inactiveList" class="list-area"></div>
       <div id="inactiveStatus" class="panel-footer"></div>
@@ -663,7 +710,7 @@
         </div>
       </div>
       <div class="panel-tools">
-        <input id="usersSearch" type="text" placeholder="Buscar por e-mail" />
+        <input id="usersSearch" class="search-input" type="text" placeholder="Buscar por e-mail" />
       </div>
       <div id="usersList" class="list-area"></div>
       <div id="usersStatus" class="panel-footer"></div>
@@ -801,6 +848,7 @@
     }
 
     function setAuthStatus(message) { authStatus.textContent = message || ''; }
+
     function setPanelStatus(panel, message) {
       if (panel === 'pending') pendingStatus.textContent = message || '';
       if (panel === 'approved') approvedStatus.textContent = message || '';
@@ -809,7 +857,11 @@
     }
 
     function normalizeText(value) { return String(value || '').trim(); }
-    function sanitizeLyrics(value) { return String(value || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim(); }
+    function sanitizeLyrics(value) { return String(value || '').replace(/
+/g, '
+').replace(/
+/g, '
+').trim(); }
     function escapeHtml(value) {
       return String(value || '')
         .replace(/&/g, '&amp;')
@@ -952,16 +1004,7 @@
         button.type = 'button';
         button.className = 'swipe-row';
         button.style.cursor = 'pointer';
-        button.innerHTML = `
-          <div class="swipe-content" style="transform:none;">
-            <div class="row-main">
-              <div class="row-top">
-                <h3 class="row-title">${escapeHtml(user.email)}</h3>
-                <span class="mini-badge ${user.is_admin ? 'success' : 'warning'}">${user.is_admin ? 'Admin' : 'Usuário'}</span>
-              </div>
-              <div class="row-meta">${userSongCount} música${userSongCount !== 1 ? 's' : ''} cadastrada${userSongCount !== 1 ? 's' : ''}</div>
-            </div>
-          </div>`;
+        button.innerHTML = `<div class="swipe-content" style="transform:none;"><div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(user.email)}</h3><span class="mini-badge ${user.is_admin ? 'success' : 'warning'}">${user.is_admin ? 'Admin' : 'Usuário'}</span></div><div class="row-meta">${userSongCount} música${userSongCount !== 1 ? 's' : ''} cadastrada${userSongCount !== 1 ? 's' : ''}</div></div></div>`;
         button.addEventListener('click', () => openUserSongs(user));
         usersList.appendChild(button);
       });
@@ -993,15 +1036,7 @@
       const content = document.createElement('button');
       content.type = 'button';
       content.className = 'swipe-content';
-      content.innerHTML = `
-        <div class="row-main">
-          <div class="row-top">
-            <h3 class="row-title">${escapeHtml(title)}</h3>
-            ${badge || ''}
-          </div>
-          <div class="row-meta">${escapeHtml(meta || '')}</div>
-          ${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}
-        </div>`;
+      content.innerHTML = `<div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(title)}</h3>${badge || ''}</div><div class="row-meta">${escapeHtml(meta || '')}</div>${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}</div>`;
       content.addEventListener('click', () => {
         if (row.classList.contains('revealed')) {
           closeAllSwipes();
@@ -1093,24 +1128,12 @@
 
     function openSongDetail(song) {
       const existing = getSuggestionBySongId(song.id);
-      const html = `
-        <div class="detail-block"><label>Nome da música</label><div>${escapeHtml(song.song_title || 'Sem título')}</div></div>
-        <div class="detail-block"><label>Artista</label><div>${escapeHtml(song.artist || 'Sem artista')}</div></div>
-        <div class="detail-block"><label>Estilo</label><div>${escapeHtml(song.style || 'Sem estilo')}</div></div>
-        <div class="detail-block"><label>Conta</label><div>${escapeHtml(getUserEmail(song.user_id))}</div></div>
-        <div class="detail-block"><label>Status</label><div>${existing ? (existing.active ? 'Já aprovada e ativa.' : 'Existe aprovada, mas está inativa.') : 'Pendente de aprovação.'}</div></div>
-        <div class="detail-block"><label>Letra</label><div>${escapeHtml(sanitizeLyrics(song.lyrics || '') || 'Sem letra cadastrada.')}</div></div>`;
+      const html = `<div class="detail-block"><label>Nome da música</label><div>${escapeHtml(song.song_title || 'Sem título')}</div></div><div class="detail-block"><label>Artista</label><div>${escapeHtml(song.artist || 'Sem artista')}</div></div><div class="detail-block"><label>Estilo</label><div>${escapeHtml(song.style || 'Sem estilo')}</div></div><div class="detail-block"><label>Conta</label><div>${escapeHtml(getUserEmail(song.user_id))}</div></div><div class="detail-block"><label>Status</label><div>${existing ? (existing.active ? 'Já aprovada e ativa.' : 'Existe aprovada, mas está inativa.') : 'Pendente de aprovação.'}</div></div><div class="detail-block"><label>Letra</label><div>${escapeHtml(sanitizeLyrics(song.lyrics || '') || 'Sem letra cadastrada.')}</div></div>`;
       openDetailModal('Detalhes da música', html);
     }
 
     function openSuggestionDetail(item, type) {
-      const html = `
-        <div class="detail-block"><label>Nome da música</label><div>${escapeHtml(item.song_title || 'Sem título')}</div></div>
-        <div class="detail-block"><label>Artista</label><div>${escapeHtml(item.artist || 'Sem artista')}</div></div>
-        <div class="detail-block"><label>Estilo</label><div>${escapeHtml(item.style || 'Sem estilo')}</div></div>
-        <div class="detail-block"><label>Status</label><div>${type === 'approved' ? 'Aprovada e ativa.' : 'Aprovada, mas inativa.'}</div></div>
-        <div class="detail-block"><label>Origem</label><div>${escapeHtml(getOriginEmailBySongId(item.source_song_id))}</div></div>
-        <div class="detail-block"><label>Letra</label><div>${escapeHtml(sanitizeLyrics(item.lyrics || '') || 'Sem letra cadastrada.')}</div></div>`;
+      const html = `<div class="detail-block"><label>Nome da música</label><div>${escapeHtml(item.song_title || 'Sem título')}</div></div><div class="detail-block"><label>Artista</label><div>${escapeHtml(item.artist || 'Sem artista')}</div></div><div class="detail-block"><label>Estilo</label><div>${escapeHtml(item.style || 'Sem estilo')}</div></div><div class="detail-block"><label>Status</label><div>${type === 'approved' ? 'Aprovada e ativa.' : 'Aprovada, mas inativa.'}</div></div><div class="detail-block"><label>Origem</label><div>${escapeHtml(getOriginEmailBySongId(item.source_song_id))}</div></div><div class="detail-block"><label>Letra</label><div>${escapeHtml(sanitizeLyrics(item.lyrics || '') || 'Sem letra cadastrada.')}</div></div>`;
       openDetailModal('Detalhes da música', html);
     }
 
