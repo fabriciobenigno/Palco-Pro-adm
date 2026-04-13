@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#020409" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Palco Pro Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --bg-1: #020409;
+      --bg-2: #08111e;
+      --bg-3: #04070d;
+      --card-1: rgba(13,19,31,0.88);
+      --card-2: rgba(7,11,19,0.84);
+      --line: rgba(255,255,255,0.12);
+      --text: #f7f9ff;
+      --muted: rgba(255,255,255,0.74);
+      --soft: rgba(255,255,255,0.56);
+      --blue-1: rgba(118,203,255,0.98);
+      --blue-2: rgba(76,150,255,0.96);
+      --blue-3: rgba(137,216,255,0.94);
+      --green-1: rgba(72,214,138,0.98);
+      --green-2: rgba(27,168,94,0.95);
+      --red-1: rgba(255,111,111,0.98);
+      --red-2: rgba(238,65,65,0.94);
+      --amber-1: rgba(255,204,104,0.98);
+      --amber-2: rgba(233,166,44,0.94);
+      --shadow: 0 26px 70px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.05);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 18px;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 50% -10%, rgba(79,140,255,0.22), transparent 28%),
+        radial-gradient(circle at 50% 12%, rgba(255,255,255,0.04), transparent 34%),
+        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 42%, var(--bg-3) 100%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      padding:
+        calc(var(--safe-top) + 16px)
+        14px
+        calc(var(--safe-bottom) + 22px);
+    }
+
+    .app {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      display: grid;
+      gap: 14px;
+    }
+
+    .surface {
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg, var(--card-1), var(--card-2));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+    }
+
+    .hero {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(26px, 7vw, 34px);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.86);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .badge.success { background: rgba(72,214,138,0.16); color: #9ef1c4; border-color: rgba(72,214,138,0.28); }
+    .badge.warning { background: rgba(255,204,104,0.16); color: #ffd992; border-color: rgba(255,204,104,0.28); }
+    .badge.danger { background: rgba(255,111,111,0.16); color: #ffc2c2; border-color: rgba(255,111,111,0.28); }
+
+    .auth-card, .panel {
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .panel-title {
+      display: grid;
+      gap: 4px;
+    }
+
+    .panel-title h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field label {
+      color: rgba(255,255,255,0.8);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    input, textarea, button, select {
+      font: inherit;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      border-radius: 18px;
+      padding: 13px 14px;
+      outline: none;
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: rgba(255,255,255,0.42);
+    }
+
+    .password-wrap {
+      position: relative;
+      display: grid;
+      gap: 10px;
+    }
+
+    .toggle-password-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .toggle-password-row input {
+      width: 18px;
+      height: 18px;
+      accent-color: #6cb7ff;
+      margin: 0;
+    }
+
+    .btn {
+      border: 0;
+      color: #fff;
+      cursor: pointer;
+      min-height: 46px;
+      border-radius: 18px;
+      padding: 12px 16px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      transition: transform .18s ease, opacity .18s ease, border-color .18s ease;
+      box-shadow: 0 18px 36px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:disabled { opacity: .58; cursor: default; transform: none; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--blue-1), var(--blue-2), var(--blue-3));
+      background-size: 220% 220%;
+      animation: flow 7.5s ease-in-out infinite;
+      border: 1px solid rgba(169,229,255,0.36);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .btn-success {
+      background: linear-gradient(180deg, var(--green-1), var(--green-2));
+      border: 1px solid rgba(115,229,166,0.26);
+    }
+
+    .btn-danger {
+      background: linear-gradient(180deg, var(--red-1), var(--red-2));
+      border: 1px solid rgba(255,159,159,0.22);
+    }
+
+    .toolbar {
+      display: grid;
+      gap: 10px;
+    }
+
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat {
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: grid;
+      gap: 4px;
+    }
+
+    .stat strong {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .search-box {
+      display: grid;
+      gap: 10px;
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      min-height: 36px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.82);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      background: linear-gradient(180deg, rgba(91,176,255,0.24), rgba(52,131,248,0.2));
+      border-color: rgba(124,176,255,0.34);
+      color: #fff;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+      max-height: 44vh;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .song-card {
+      border-radius: 22px;
+      background: rgba(18,22,30,0.94);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+      cursor: pointer;
+      transition: border-color .18s ease, transform .18s ease;
+    }
+
+    .song-card.active {
+      border-color: rgba(124,176,255,0.42);
+      box-shadow: 0 0 0 1px rgba(124,176,255,0.22) inset;
+    }
+
+    .song-card:hover { transform: translateY(-1px); }
+
+    .song-main {
+      display: grid;
+      gap: 8px;
+    }
+
+    .song-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .song-title {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .song-meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .detail {
+      display: grid;
+      gap: 12px;
+    }
+
+    .detail-box {
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: grid;
+      gap: 8px;
+    }
+
+    .detail-box label {
+      color: var(--soft);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .detail-box div {
+      color: #fff;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .action-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .status-line {
+      min-height: 20px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .empty {
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px dashed rgba(255,255,255,0.12);
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .hidden { display: none !important; }
+
+    .sticky-account {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 14px 16px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .sticky-account strong {
+      display: block;
+      font-size: 14px;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .sticky-account span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    @keyframes flow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @media (min-width: 900px) {
+      .desktop-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .list { max-height: 62vh; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="surface hero">
+      <div class="hero-top">
+        <div>
+          <h1>Palco Pro Admin</h1>
+          <p>Painel administrativo mobile-first para revisar músicas dos usuários, aprovar sugestões e controlar o que fica ativo no app principal.</p>
+        </div>
+        <div id="heroBadge" class="badge warning">Aguardando login</div>
+      </div>
+    </section>
+
+    <section id="authCard" class="surface auth-card">
+      <div class="panel-title">
+        <h2>Entrar como administrador</h2>
+        <p>Faça login para liberar o painel. Depois do login, esta área desaparece e fica apenas a opção de sair da conta.</p>
+      </div>
+
+      <div class="field">
+        <label for="emailInput">E-mail</label>
+        <input id="emailInput" type="email" inputmode="email" autocomplete="email" placeholder="Seu e-mail" />
+      </div>
+
+      <div class="field password-wrap">
+        <label for="passwordInput">Senha</label>
+        <input id="passwordInput" type="password" autocomplete="current-password" placeholder="Sua senha" />
+        <label class="toggle-password-row" for="showPasswordToggle">
+          <input id="showPasswordToggle" type="checkbox" />
+          <span>Mostrar senha</span>
+        </label>
+      </div>
+
+      <button id="loginBtn" type="button" class="btn btn-primary">Entrar</button>
+      <div id="authStatus" class="status-line"></div>
+    </section>
+
+    <section id="adminPanel" class="surface panel hidden">
+      <div class="sticky-account">
+        <div>
+          <strong id="accountLabel">Conta conectada</strong>
+          <span>Painel liberado para administração</span>
+        </div>
+        <button id="logoutBtn" type="button" class="btn btn-secondary">Sair da conta</button>
+      </div>
+
+      <div class="toolbar">
+        <div class="quick-stats">
+          <div class="stat">
+            <strong id="statAll">0</strong>
+            <span>Total de músicas</span>
+          </div>
+          <div class="stat">
+            <strong id="statApproved">0</strong>
+            <span>Aprovadas</span>
+          </div>
+          <div class="stat">
+            <strong id="statPending">0</strong>
+            <span>Pendentes</span>
+          </div>
+          <div class="stat">
+            <strong id="statInactive">0</strong>
+            <span>Inativas</span>
+          </div>
+        </div>
+
+        <div class="search-box">
+          <input id="searchInput" type="text" placeholder="Buscar por música, artista, estilo ou trecho da letra" />
+          <div class="chips">
+            <button type="button" class="chip active" data-filter="all">Todas</button>
+            <button type="button" class="chip" data-filter="pending">Pendentes</button>
+            <button type="button" class="chip" data-filter="approved">Aprovadas</button>
+            <button type="button" class="chip" data-filter="inactive">Inativas</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="desktop-grid">
+        <section class="detail">
+          <div class="panel-title">
+            <h2>Músicas cadastradas</h2>
+            <p id="listSummary">Toque em uma música para ver detalhes e administrar a sugestão.</p>
+          </div>
+          <div id="songsList" class="list"></div>
+        </section>
+
+        <section class="detail">
+          <div class="panel-title">
+            <h2>Detalhes da música</h2>
+            <p id="detailSummary">Selecione uma música para aprovar, reativar ou desativar.</p>
+          </div>
+
+          <div id="emptyDetail" class="empty">Nenhuma música selecionada ainda.</div>
+
+          <div id="detailContent" class="hidden">
+            <div class="detail-box">
+              <label>Título</label>
+              <div id="detailTitle"></div>
+            </div>
+            <div class="detail-box">
+              <label>Artista</label>
+              <div id="detailArtist"></div>
+            </div>
+            <div class="detail-box">
+              <label>Estilo</label>
+              <div id="detailStyle"></div>
+            </div>
+            <div class="detail-box">
+              <label>Conta</label>
+              <div id="detailUser"></div>
+            </div>
+            <div class="detail-box">
+              <label>Status da sugestão</label>
+              <div id="detailStatus"></div>
+            </div>
+            <div class="detail-box">
+              <label>Letra</label>
+              <div id="detailLyrics"></div>
+            </div>
+
+            <div class="action-grid">
+              <button id="approveBtn" type="button" class="btn btn-success">Aprovar como sugestão</button>
+              <button id="reactivateBtn" type="button" class="btn btn-primary hidden">Reativar sugestão</button>
+              <button id="deactivateBtn" type="button" class="btn btn-danger hidden">Desativar sugestão</button>
+              <button id="refreshBtn" type="button" class="btn btn-secondary">Atualizar lista</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div id="panelStatus" class="status-line"></div>
+    </section>
+  </main>
+
+  <script>
+    const SUPABASE_URL = 'https://dlcjcsbdabjupsiwlncd.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2JU7mYP9oeeUvzncDuZMRw_8p3lzGfT';
+
+    const state = {
+      supabase: null,
+      currentUser: null,
+      currentProfile: null,
+      songs: [],
+      suggestions: [],
+      selectedSongId: null,
+      filter: 'all',
+      query: ''
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    const heroBadge = $('heroBadge');
+    const authCard = $('authCard');
+    const adminPanel = $('adminPanel');
+    const emailInput = $('emailInput');
+    const passwordInput = $('passwordInput');
+    const showPasswordToggle = $('showPasswordToggle');
+    const loginBtn = $('loginBtn');
+    const logoutBtn = $('logoutBtn');
+    const authStatus = $('authStatus');
+    const accountLabel = $('accountLabel');
+    const songsList = $('songsList');
+    const panelStatus = $('panelStatus');
+    const searchInput = $('searchInput');
+    const chipButtons = Array.from(document.querySelectorAll('.chip'));
+    const statAll = $('statAll');
+    const statApproved = $('statApproved');
+    const statPending = $('statPending');
+    const statInactive = $('statInactive');
+    const listSummary = $('listSummary');
+    const detailSummary = $('detailSummary');
+    const emptyDetail = $('emptyDetail');
+    const detailContent = $('detailContent');
+    const detailTitle = $('detailTitle');
+    const detailArtist = $('detailArtist');
+    const detailStyle = $('detailStyle');
+    const detailUser = $('detailUser');
+    const detailStatus = $('detailStatus');
+    const detailLyrics = $('detailLyrics');
+    const approveBtn = $('approveBtn');
+    const reactivateBtn = $('reactivateBtn');
+    const deactivateBtn = $('deactivateBtn');
+    const refreshBtn = $('refreshBtn');
+
+    function createSupabaseClient() {
+      if (!window.supabase) throw new Error('Supabase não carregou.');
+      if (!state.supabase) {
+        state.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+      }
+      return state.supabase;
+    }
+
+    function setAuthStatus(message) {
+      authStatus.textContent = message || '';
+    }
+
+    function setPanelStatus(message) {
+      panelStatus.textContent = message || '';
+    }
+
+    function normalizeText(value) {
+      return String(value || '').trim();
+    }
+
+    function sanitizeLyrics(value) {
+      return String(value || '')
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n')
+        .trim();
+    }
+
+    function shortUserId(value) {
+      const raw = String(value || '').trim();
+      if (!raw) return 'Não informado';
+      return raw.length > 16 ? `${raw.slice(0, 8)}...${raw.slice(-6)}` : raw;
+    }
+
+    function getSuggestionBySongId(songId) {
+      return state.suggestions.find((item) => item.source_song_id === songId) || null;
+    }
+
+    function getSongStatus(song) {
+      const suggestion = getSuggestionBySongId(song.id);
+      if (!suggestion) return 'pending';
+      return suggestion.active ? 'approved' : 'inactive';
+    }
+
+    function getStatusLabel(status) {
+      if (status === 'approved') return 'Aprovada e ativa';
+      if (status === 'inactive') return 'Aprovada, mas inativa';
+      return 'Pendente de aprovação';
+    }
+
+    function getStatusBadge(status) {
+      if (status === 'approved') return '<span class="badge success">Aprovada</span>';
+      if (status === 'inactive') return '<span class="badge danger">Inativa</span>';
+      return '<span class="badge warning">Pendente</span>';
+    }
+
+    function getFilteredSongs() {
+      let songs = state.songs.slice();
+      if (state.filter !== 'all') {
+        songs = songs.filter((song) => getSongStatus(song) === state.filter);
+      }
+      const query = state.query.trim().toLowerCase();
+      if (query) {
+        songs = songs.filter((song) => {
+          const haystack = [song.song_title, song.artist, song.style, song.lyrics].filter(Boolean).join(' ').toLowerCase();
+          return haystack.includes(query);
+        });
+      }
+      songs.sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' }));
+      return songs;
+    }
+
+    function updateStats() {
+      const all = state.songs.length;
+      const approved = state.songs.filter((song) => getSongStatus(song) === 'approved').length;
+      const inactive = state.songs.filter((song) => getSongStatus(song) === 'inactive').length;
+      const pending = all - approved - inactive;
+      statAll.textContent = String(all);
+      statApproved.textContent = String(approved);
+      statPending.textContent = String(pending);
+      statInactive.textContent = String(inactive);
+    }
+
+    function ensureSelection() {
+      const filtered = getFilteredSongs();
+      if (!filtered.length) {
+        state.selectedSongId = null;
+        return;
+      }
+      if (!filtered.some((song) => song.id === state.selectedSongId)) {
+        state.selectedSongId = filtered[0].id;
+      }
+    }
+
+    function renderSongs() {
+      updateStats();
+      ensureSelection();
+      const filtered = getFilteredSongs();
+      listSummary.textContent = filtered.length
+        ? `${filtered.length} música${filtered.length > 1 ? 's' : ''} encontrada${filtered.length > 1 ? 's' : ''}. Toque em uma música para administrar.`
+        : 'Nenhuma música encontrada com esse filtro.';
+      songsList.innerHTML = '';
+      if (!filtered.length) {
+        songsList.innerHTML = '<div class="empty">Nenhuma música apareceu nesta busca ou filtro.</div>';
+        renderDetail();
+        return;
+      }
+      filtered.forEach((song) => {
+        const status = getSongStatus(song);
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `song-card${song.id === state.selectedSongId ? ' active' : ''}`;
+        button.innerHTML = `
+          <div class="song-main">
+            <div class="song-title-row">
+              <h3 class="song-title">${escapeHtml(song.song_title || 'Sem título')}</h3>
+              ${getStatusBadge(status)}
+            </div>
+            <div class="song-meta">${escapeHtml([song.artist || 'Sem artista', song.style || 'Sem estilo'].join(' • '))}</div>
+          </div>
+        `;
+        button.addEventListener('click', () => {
+          state.selectedSongId = song.id;
+          renderSongs();
+        });
+        songsList.appendChild(button);
+      });
+      renderDetail();
+    }
+
+    function renderDetail() {
+      const song = state.songs.find((item) => item.id === state.selectedSongId) || null;
+      if (!song) {
+        emptyDetail.classList.remove('hidden');
+        detailContent.classList.add('hidden');
+        detailSummary.textContent = 'Selecione uma música para aprovar, reativar ou desativar.';
+        return;
+      }
+      const suggestion = getSuggestionBySongId(song.id);
+      const status = getSongStatus(song);
+      emptyDetail.classList.add('hidden');
+      detailContent.classList.remove('hidden');
+      detailTitle.textContent = song.song_title || 'Sem título';
+      detailArtist.textContent = song.artist || 'Sem artista';
+      detailStyle.textContent = song.style || 'Sem estilo';
+      detailUser.textContent = shortUserId(song.user_id);
+      detailStatus.textContent = getStatusLabel(status);
+      detailLyrics.textContent = sanitizeLyrics(song.lyrics || '') || 'Sem letra cadastrada.';
+      detailSummary.textContent = `Status atual: ${getStatusLabel(status)}.`;
+      approveBtn.classList.toggle('hidden', status !== 'pending');
+      reactivateBtn.classList.toggle('hidden', status !== 'inactive');
+      deactivateBtn.classList.toggle('hidden', status !== 'approved');
+      approveBtn.disabled = false;
+      reactivateBtn.disabled = false;
+      deactivateBtn.disabled = false;
+      approveBtn.dataset.songId = song.id;
+      reactivateBtn.dataset.songId = song.id;
+      deactivateBtn.dataset.songId = song.id;
+      approveBtn.dataset.suggestionId = suggestion?.id || '';
+      reactivateBtn.dataset.suggestionId = suggestion?.id || '';
+      deactivateBtn.dataset.suggestionId = suggestion?.id || '';
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    async function requireAdminProfile(userId) {
+      const supabase = createSupabaseClient();
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, email, is_admin')
+        .eq('id', userId)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data || data.is_admin !== true) {
+        throw new Error('Esta conta não está autorizada como administradora.');
+      }
+      state.currentProfile = data;
+      return data;
+    }
+
+    async function loadSongsAndSuggestions() {
+      const supabase = createSupabaseClient();
+      setPanelStatus('Carregando músicas e sugestões...');
+
+      const [{ data: songs, error: songsError }, { data: suggestions, error: suggestionsError }] = await Promise.all([
+        supabase
+          .from('songs')
+          .select('id, user_id, song_title, artist, style, lyrics, created_at, updated_at')
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('approved_suggestions')
+          .select('id, source_song_id, song_title, artist, style, lyrics, active, approved_by, created_at')
+          .order('created_at', { ascending: false })
+      ]);
+
+      if (songsError) throw songsError;
+      if (suggestionsError) throw suggestionsError;
+
+      state.songs = Array.isArray(songs) ? songs : [];
+      state.suggestions = Array.isArray(suggestions) ? suggestions : [];
+      if (!state.selectedSongId && state.songs.length) {
+        state.selectedSongId = state.songs[0].id;
+      }
+      setPanelStatus(state.songs.length
+        ? 'Painel atualizado. Toque em uma música para administrar a sugestão.'
+        : 'Nenhuma música cadastrada foi encontrada.');
+      renderSongs();
+    }
+
+    async function handleLogin() {
+      const email = normalizeText(emailInput.value);
+      const password = passwordInput.value;
+      if (!email || !password) {
+        setAuthStatus('Preencha e-mail e senha para entrar.');
+        return;
+      }
+      try {
+        loginBtn.disabled = true;
+        setAuthStatus('Entrando...');
+        const supabase = createSupabaseClient();
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        await applySession(data.session || null);
+        setAuthStatus('');
+      } catch (error) {
+        setAuthStatus(error.message || 'Não foi possível fazer login agora.');
+      } finally {
+        loginBtn.disabled = false;
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        logoutBtn.disabled = true;
+        const supabase = createSupabaseClient();
+        await supabase.auth.signOut();
+        resetAdminView();
+      } catch (error) {
+        setPanelStatus(error.message || 'Não foi possível sair agora.');
+      } finally {
+        logoutBtn.disabled = false;
+      }
+    }
+
+    function resetAdminView() {
+      state.currentUser = null;
+      state.currentProfile = null;
+      state.songs = [];
+      state.suggestions = [];
+      state.selectedSongId = null;
+      authCard.classList.remove('hidden');
+      adminPanel.classList.add('hidden');
+      heroBadge.textContent = 'Aguardando login';
+      heroBadge.className = 'badge warning';
+      accountLabel.textContent = 'Conta conectada';
+      setPanelStatus('');
+      renderSongs();
+    }
+
+    async function applySession(session) {
+      if (!session?.user) {
+        resetAdminView();
+        return;
+      }
+      const profile = await requireAdminProfile(session.user.id);
+      state.currentUser = session.user;
+      accountLabel.textContent = profile.email || session.user.email || 'Administrador';
+      authCard.classList.add('hidden');
+      adminPanel.classList.remove('hidden');
+      heroBadge.textContent = 'Administrador conectado';
+      heroBadge.className = 'badge success';
+      await loadSongsAndSuggestions();
+    }
+
+    async function upsertSuggestion(songId, active) {
+      const supabase = createSupabaseClient();
+      const song = state.songs.find((item) => item.id === songId);
+      if (!song) throw new Error('Música não encontrada.');
+      const existing = getSuggestionBySongId(songId);
+      const payload = {
+        source_song_id: song.id,
+        approved_by: state.currentUser.id,
+        song_title: song.song_title || 'Sem título',
+        artist: song.artist || '',
+        style: song.style || '',
+        lyrics: sanitizeLyrics(song.lyrics || ''),
+        active
+      };
+
+      if (existing) {
+        const { error } = await supabase
+          .from('approved_suggestions')
+          .update(payload)
+          .eq('id', existing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('approved_suggestions')
+          .insert(payload);
+        if (error) throw error;
+      }
+      await loadSongsAndSuggestions();
+    }
+
+    async function handleApprove() {
+      const songId = approveBtn.dataset.songId;
+      if (!songId) return;
+      try {
+        approveBtn.disabled = true;
+        setPanelStatus('Aprovando sugestão...');
+        await upsertSuggestion(songId, true);
+        setPanelStatus('Sugestão aprovada com sucesso.');
+      } catch (error) {
+        setPanelStatus(error.message || 'Não foi possível aprovar a sugestão.');
+      } finally {
+        approveBtn.disabled = false;
+      }
+    }
+
+    async function handleReactivate() {
+      const songId = reactivateBtn.dataset.songId;
+      if (!songId) return;
+      try {
+        reactivateBtn.disabled = true;
+        setPanelStatus('Reativando sugestão...');
+        await upsertSuggestion(songId, true);
+        setPanelStatus('Sugestão reativada com sucesso.');
+      } catch (error) {
+        setPanelStatus(error.message || 'Não foi possível reativar a sugestão.');
+      } finally {
+        reactivateBtn.disabled = false;
+      }
+    }
+
+    async function handleDeactivate() {
+      const suggestionId = deactivateBtn.dataset.suggestionId;
+      if (!suggestionId) return;
+      try {
+        deactivateBtn.disabled = true;
+        setPanelStatus('Desativando sugestão...');
+        const supabase = createSupabaseClient();
+        const { error } = await supabase
+          .from('approved_suggestions')
+          .update({ active: false })
+          .eq('id', suggestionId);
+        if (error) throw error;
+        await loadSongsAndSuggestions();
+        setPanelStatus('Sugestão desativada com sucesso.');
+      } catch (error) {
+        setPanelStatus(error.message || 'Não foi possível desativar a sugestão.');
+      } finally {
+        deactivateBtn.disabled = false;
+      }
+    }
+
+    async function bootstrap() {
+      try {
+        const supabase = createSupabaseClient();
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        if (data?.session?.user) {
+          try {
+            await applySession(data.session);
+          } catch (error) {
+            setAuthStatus(error.message || 'Não foi possível validar esta conta.');
+            resetAdminView();
+          }
+        }
+
+        supabase.auth.onAuthStateChange(async (_event, session) => {
+          try {
+            if (session?.user) {
+              await applySession(session);
+            } else {
+              resetAdminView();
+            }
+          } catch (error) {
+            setAuthStatus(error.message || 'Não foi possível validar esta conta.');
+            resetAdminView();
+          }
+        });
+      } catch (error) {
+        setAuthStatus(error.message || 'Falha ao iniciar o painel.');
+      }
+    }
+
+    loginBtn.addEventListener('click', handleLogin);
+    logoutBtn.addEventListener('click', handleLogout);
+    refreshBtn.addEventListener('click', async () => {
+      try {
+        refreshBtn.disabled = true;
+        await loadSongsAndSuggestions();
+      } catch (error) {
+        setPanelStatus(error.message || 'Não foi possível atualizar agora.');
+      } finally {
+        refreshBtn.disabled = false;
+      }
+    });
+    approveBtn.addEventListener('click', handleApprove);
+    reactivateBtn.addEventListener('click', handleReactivate);
+    deactivateBtn.addEventListener('click', handleDeactivate);
+
+    searchInput.addEventListener('input', () => {
+      state.query = searchInput.value || '';
+      renderSongs();
+    });
+
+    chipButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        chipButtons.forEach((item) => item.classList.remove('active'));
+        button.classList.add('active');
+        state.filter = button.dataset.filter || 'all';
+        renderSongs();
+      });
+    });
+
+    showPasswordToggle.addEventListener('change', () => {
+      passwordInput.type = showPasswordToggle.checked ? 'text' : 'password';
+    });
+
+    passwordInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') handleLogin();
+    });
+    emailInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') handleLogin();
+    });
+
+    bootstrap();
+  </script>
+</body>
+</html>
