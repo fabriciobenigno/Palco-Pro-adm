@@ -554,7 +554,7 @@
 
     async function requireAdminProfile(userId) {
       const supabase = createSupabaseClient();
-      const { data, error } = await supabase.from('profiles').select('id, email, is_admin').eq('id', userId).maybeSingle();
+      const { data, error } = await supabase.schema('public').from('profiles').select('id, email, is_admin').eq('id', userId).maybeSingle();
       if (error) throw error;
       if (!data || data.is_admin !== true) throw new Error('Esta conta não está autorizada como administradora.');
       state.currentProfile = data;
@@ -564,9 +564,9 @@
     async function loadAllData() {
       const supabase = createSupabaseClient();
       const [songsRes, suggestionsRes, usersRes] = await Promise.all([
-        supabase.from('songs').select('id, created_at, user_id, song_title, artist, style, lyrics, updated_at').order('created_at', { ascending: false }),
-        supabase.from('approved_suggestions').select('id, created_at, source_song_id, approved_by, song_title, artist, style, lyrics, active').order('created_at', { ascending: false }),
-        supabase.from('profiles').select('id, email, is_admin').order('email', { ascending: true })
+        supabase.schema('public').from('songs').select('id, created_at, user_id, song_title, artist, style, lyrics, updated_at').order('created_at', { ascending: false }),
+        supabase.schema('public').from('approved_suggestions').select('id, created_at, source_song_id, approved_by, song_title, artist, style, lyrics, active').order('created_at', { ascending: false }),
+        supabase.schema('public').from('profiles').select('id, email, is_admin').order('email', { ascending: true })
       ]);
       if (songsRes.error) throw songsRes.error; if (suggestionsRes.error) throw suggestionsRes.error; if (usersRes.error) throw usersRes.error;
       state.songs = Array.isArray(songsRes.data) ? songsRes.data : []; state.suggestions = Array.isArray(suggestionsRes.data) ? suggestionsRes.data : []; state.users = Array.isArray(usersRes.data) ? usersRes.data : [];
@@ -602,15 +602,42 @@
       const supabase = createSupabaseClient(); const song = state.songs.find((item) => item.id === songId); if (!song) throw new Error('Música não encontrada.');
       const existing = getSuggestionBySongId(songId);
       const payload = { source_song_id: song.id, approved_by: state.currentUser.id, song_title: song.song_title || 'Sem título', artist: song.artist || '', style: song.style || '', lyrics: sanitizeLyrics(song.lyrics || ''), active };
-      if (existing) { const { error } = await supabase.from('approved_suggestions').update(payload).eq('id', existing.id); if (error) throw error; }
-      else { const { error } = await supabase.from('approved_suggestions').insert(payload); if (error) throw error; }
+      if (existing) {
+        const { data, error } = await supabase.schema('public').from('approved_suggestions').update(payload).eq('id', existing.id).select('id, created_at, source_song_id, approved_by, song_title, artist, style, lyrics, active').single();
+        if (error) throw error;
+        return data || { ...existing, ...payload };
+      }
+      const { data, error } = await supabase.schema('public').from('approved_suggestions').insert(payload).select('id, created_at, source_song_id, approved_by, song_title, artist, style, lyrics, active').single();
+      if (error) throw error;
+      return data || payload;
     }
 
-    async function handleApproveSong(songId) { try { setPanelStatus('pending', 'Aprovando música...'); await upsertSuggestionFromSong(songId, true); await loadAllData(); setPanelStatus('pending', 'Música aprovada com sucesso.'); } catch (error) { setPanelStatus('pending', error.message || 'Não foi possível aprovar a música.'); } }
-    async function handleActivateSuggestion(suggestionId) { try { const supabase = createSupabaseClient(); setPanelStatus(state.activePanel || 'inactive', 'Ativando música...'); const { error } = await supabase.from('approved_suggestions').update({ active: true, approved_by: state.currentUser.id }).eq('id', suggestionId); if (error) throw error; await loadAllData(); setPanelStatus(state.activePanel || 'inactive', 'Música ativada com sucesso.'); } catch (error) { setPanelStatus(state.activePanel || 'inactive', error.message || 'Não foi possível ativar a música.'); } }
-    async function handleDisableSuggestion(suggestionId) { try { const supabase = createSupabaseClient(); setPanelStatus(state.activePanel || 'approved', 'Desabilitando música...'); const { error } = await supabase.from('approved_suggestions').update({ active: false }).eq('id', suggestionId); if (error) throw error; await loadAllData(); setPanelStatus(state.activePanel || 'approved', 'Música desabilitada com sucesso.'); } catch (error) { setPanelStatus(state.activePanel || 'approved', error.message || 'Não foi possível desabilitar a música.'); } }
-    async function handleDeleteSuggestion(suggestionId) { const item = getSuggestionById(suggestionId); const name = item?.song_title || 'esta música'; if (!window.confirm(`Deseja realmente apagar \"${name}\"?`)) return; try { const supabase = createSupabaseClient(); setPanelStatus(state.activePanel || 'inactive', 'Apagando música...'); const { error } = await supabase.from('approved_suggestions').delete().eq('id', suggestionId); if (error) throw error; await loadAllData(); setPanelStatus(state.activePanel || 'inactive', 'Música apagada com sucesso.'); } catch (error) { setPanelStatus(state.activePanel || 'inactive', error.message || 'Não foi possível apagar a música.'); } }
-    async function handleSaveEdit() { if (!state.editSuggestionId) return; try { saveEditBtn.disabled = true; editStatus.textContent = 'Salvando alterações...'; const supabase = createSupabaseClient(); const payload = { song_title: normalizeText(editTitle.value) || 'Sem título', artist: normalizeText(editArtist.value), style: normalizeText(editStyle.value), lyrics: sanitizeLyrics(editLyrics.value) }; const { error } = await supabase.from('approved_suggestions').update(payload).eq('id', state.editSuggestionId); if (error) throw error; await loadAllData(); closeEditModal(); } catch (error) { editStatus.textContent = error.message || 'Não foi possível salvar as alterações.'; } finally { saveEditBtn.disabled = false; } }
+    function upsertSuggestionInState(suggestion) {
+      if (!suggestion) return;
+      const index = state.suggestions.findIndex((item) => item.id === suggestion.id || item.source_song_id === suggestion.source_song_id);
+      if (index >= 0) state.suggestions[index] = { ...state.suggestions[index], ...suggestion };
+      else state.suggestions.unshift(suggestion);
+    }
+
+    async function handleApproveSong(songId) {
+      try {
+        setPanelStatus('pending', 'Aprovando música...');
+        const savedSuggestion = await upsertSuggestionFromSong(songId, true);
+        upsertSuggestionInState({ ...savedSuggestion, active: true });
+        closeAllSwipes();
+        renderPendingList();
+        renderApprovedList();
+        setPanelStatus('pending', 'Música aprovada com sucesso. Ela saiu de pendentes e foi enviada para Sugestões dos usuários.');
+        setPanelStatus('approved', 'Lista atualizada com a música aprovada ativa.');
+        await loadAllData();
+      } catch (error) {
+        setPanelStatus('pending', error.message || 'Não foi possível aprovar a música.');
+      }
+    }
+    async function handleActivateSuggestion(suggestionId) { try { const supabase = createSupabaseClient(); setPanelStatus(state.activePanel || 'inactive', 'Ativando música...'); const { error } = await supabase.schema('public').from('approved_suggestions').update({ active: true, approved_by: state.currentUser.id }).eq('id', suggestionId); if (error) throw error; await loadAllData(); setPanelStatus(state.activePanel || 'inactive', 'Música ativada com sucesso.'); } catch (error) { setPanelStatus(state.activePanel || 'inactive', error.message || 'Não foi possível ativar a música.'); } }
+    async function handleDisableSuggestion(suggestionId) { try { const supabase = createSupabaseClient(); setPanelStatus(state.activePanel || 'approved', 'Desabilitando música...'); const { error } = await supabase.schema('public').from('approved_suggestions').update({ active: false }).eq('id', suggestionId); if (error) throw error; await loadAllData(); setPanelStatus(state.activePanel || 'approved', 'Música desabilitada com sucesso.'); } catch (error) { setPanelStatus(state.activePanel || 'approved', error.message || 'Não foi possível desabilitar a música.'); } }
+    async function handleDeleteSuggestion(suggestionId) { const item = getSuggestionById(suggestionId); const name = item?.song_title || 'esta música'; if (!window.confirm(`Deseja realmente apagar \"${name}\"?`)) return; try { const supabase = createSupabaseClient(); setPanelStatus(state.activePanel || 'inactive', 'Apagando música...'); const { error } = await supabase.schema('public').from('approved_suggestions').delete().eq('id', suggestionId); if (error) throw error; await loadAllData(); setPanelStatus(state.activePanel || 'inactive', 'Música apagada com sucesso.'); } catch (error) { setPanelStatus(state.activePanel || 'inactive', error.message || 'Não foi possível apagar a música.'); } }
+    async function handleSaveEdit() { if (!state.editSuggestionId) return; try { saveEditBtn.disabled = true; editStatus.textContent = 'Salvando alterações...'; const supabase = createSupabaseClient(); const payload = { song_title: normalizeText(editTitle.value) || 'Sem título', artist: normalizeText(editArtist.value), style: normalizeText(editStyle.value), lyrics: sanitizeLyrics(editLyrics.value) }; const { error } = await supabase.schema('public').from('approved_suggestions').update(payload).eq('id', state.editSuggestionId); if (error) throw error; await loadAllData(); closeEditModal(); } catch (error) { editStatus.textContent = error.message || 'Não foi possível salvar as alterações.'; } finally { saveEditBtn.disabled = false; } }
     async function refreshCurrentPanel(panel) { try { setPanelStatus(panel, 'Atualizando lista...'); await loadAllData(); setPanelStatus(panel, 'Lista atualizada.'); } catch (error) { setPanelStatus(panel, error.message || 'Não foi possível atualizar a lista.'); } }
 
     function bindSearches() {
