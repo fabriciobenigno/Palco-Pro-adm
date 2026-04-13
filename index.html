@@ -21,22 +21,22 @@
       --bg-1: #020409;
       --bg-2: #08111e;
       --bg-3: #04070d;
-      --card-1: rgba(13,19,31,0.96);
-      --card-2: rgba(7,11,19,0.94);
-      --line: rgba(255,255,255,0.12);
+      --card-1: rgba(13, 19, 31, 0.96);
+      --card-2: rgba(7, 11, 19, 0.94);
+      --line: rgba(255, 255, 255, 0.12);
       --text: #f7f9ff;
-      --muted: rgba(255,255,255,0.72);
-      --soft: rgba(255,255,255,0.54);
-      --blue-1: rgba(118,203,255,0.98);
-      --blue-2: rgba(76,150,255,0.96);
-      --blue-3: rgba(137,216,255,0.94);
-      --green-1: rgba(72,214,138,0.98);
-      --green-2: rgba(27,168,94,0.95);
-      --red-1: rgba(255,111,111,0.98);
-      --red-2: rgba(238,65,65,0.94);
-      --amber-1: rgba(255,204,104,0.98);
-      --amber-2: rgba(233,166,44,0.94);
-      --shadow: 0 26px 70px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.05);
+      --muted: rgba(255, 255, 255, 0.72);
+      --soft: rgba(255, 255, 255, 0.54);
+      --blue-1: rgba(118, 203, 255, 0.98);
+      --blue-2: rgba(76, 150, 255, 0.96);
+      --blue-3: rgba(137, 216, 255, 0.94);
+      --green-1: rgba(72, 214, 138, 0.98);
+      --green-2: rgba(27, 168, 94, 0.95);
+      --red-1: rgba(255, 111, 111, 0.98);
+      --red-2: rgba(238, 65, 65, 0.94);
+      --amber-1: rgba(255, 204, 104, 0.98);
+      --amber-2: rgba(233, 166, 44, 0.94);
+      --shadow: 0 26px 70px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
 
     * {
@@ -44,15 +44,15 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       width: 100%;
       height: 100%;
-      min-height: 100%;
       overflow: hidden;
       background:
-        radial-gradient(circle at 50% -10%, rgba(79,140,255,0.22), transparent 28%),
-        radial-gradient(circle at 50% 12%, rgba(255,255,255,0.04), transparent 34%),
+        radial-gradient(circle at 50% -10%, rgba(79, 140, 255, 0.22), transparent 28%),
+        radial-gradient(circle at 50% 12%, rgba(255, 255, 255, 0.04), transparent 34%),
         linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 42%, var(--bg-3) 100%);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -63,58 +63,41 @@
       inset: 0;
     }
 
-    button, input, textarea { font: inherit; }
-    button { border: 0; }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 28px;
-      padding: 6px 11px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.06);
-      color: rgba(255,255,255,0.86);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
+    button,
+    input,
+    textarea {
+      font: inherit;
     }
 
-    .badge.success { background: rgba(72,214,138,0.16); color: #9ef1c4; border-color: rgba(72,214,138,0.28); }
-    .badge.warning { background: rgba(255,204,104,0.16); color: #ffd992; border-color: rgba(255,204,104,0.28); }
-    .badge.danger { background: rgba(255,111,111,0.16); color: #ffc2c2; border-color: rgba(255,111,111,0.28); }
+    button {
+      border: 0;
+    }
 
     .screen {
       position: fixed;
       inset: 0;
-      z-index: 40;
+      z-index: 20;
       display: none;
       width: 100vw;
       height: 100dvh;
       min-height: 100dvh;
-      padding:
-        var(--safe-top)
-        var(--safe-right)
-        var(--safe-bottom)
-        var(--safe-left);
+      padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
       background:
-        radial-gradient(circle at 50% -10%, rgba(79,140,255,0.18), transparent 28%),
-        linear-gradient(180deg, rgba(2,4,9,0.995), rgba(8,17,30,0.995), rgba(4,7,13,1));
+        radial-gradient(circle at 50% -10%, rgba(79, 140, 255, 0.18), transparent 28%),
+        linear-gradient(180deg, rgba(2, 4, 9, 0.995), rgba(8, 17, 30, 0.995), rgba(4, 7, 13, 1));
       overflow: hidden;
     }
 
-    .screen.active { display: block; }
+    .screen.active {
+      display: block;
+    }
 
     .shell {
       width: 100%;
       height: 100%;
-      min-height: 100%;
       background: linear-gradient(180deg, var(--card-1), var(--card-2));
       box-shadow: var(--shadow);
       overflow: hidden;
-      border: 0;
-      border-radius: 0;
     }
 
     .login-shell {
@@ -123,7 +106,7 @@
     }
 
     .login-head {
-      padding: 16px 16px 10px;
+      padding: 16px;
       display: grid;
       gap: 6px;
     }
@@ -131,15 +114,15 @@
     .login-head h1 {
       margin: 0;
       font-size: 26px;
-      line-height: 1.05;
+      line-height: 1.04;
       letter-spacing: -0.04em;
     }
 
     .login-head p {
       margin: 0;
-      font-size: 13px;
-      line-height: 1.5;
       color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
     }
 
     .login-body {
@@ -155,15 +138,16 @@
     }
 
     .field label {
-      color: rgba(255,255,255,0.8);
+      color: rgba(255, 255, 255, 0.82);
       font-size: 13px;
       font-weight: 600;
     }
 
-    input, textarea {
+    input,
+    textarea {
       width: 100%;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.06);
       color: #fff;
       border-radius: 18px;
       padding: 12px 14px;
@@ -175,7 +159,10 @@
       resize: vertical;
     }
 
-    input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.42); }
+    input::placeholder,
+    textarea::placeholder {
+      color: rgba(255, 255, 255, 0.42);
+    }
 
     .toggle-password-row {
       display: flex;
@@ -200,23 +187,30 @@
       padding: 11px 15px;
       font-weight: 700;
       letter-spacing: 0.01em;
-      transition: transform .18s ease, opacity .18s ease;
-      box-shadow: 0 18px 36px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.05);
+      transition: transform 0.18s ease, opacity 0.18s ease;
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
 
-    .btn:hover { transform: translateY(-1px); }
-    .btn:disabled { opacity: .58; cursor: default; transform: none; }
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.58;
+      cursor: default;
+      transform: none;
+    }
 
     .btn-primary {
       background: linear-gradient(135deg, var(--blue-1), var(--blue-2), var(--blue-3));
       background-size: 220% 220%;
       animation: flow 7.5s ease-in-out infinite;
-      border: 1px solid rgba(169,229,255,0.36);
+      border: 1px solid rgba(169, 229, 255, 0.36);
     }
 
     .btn-secondary {
-      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06));
-      border: 1px solid rgba(255,255,255,0.14);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+      border: 1px solid rgba(255, 255, 255, 0.14);
     }
 
     .status-line {
@@ -224,6 +218,34 @@
       color: var(--muted);
       font-size: 12px;
       line-height: 1.45;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      justify-self: start;
+    }
+
+    .badge.success {
+      background: rgba(72, 214, 138, 0.16);
+      color: #9ef1c4;
+      border-color: rgba(72, 214, 138, 0.28);
+    }
+
+    .badge.warning {
+      background: rgba(255, 204, 104, 0.16);
+      color: #ffd992;
+      border-color: rgba(255, 204, 104, 0.28);
     }
 
     .menu-shell {
@@ -241,8 +263,6 @@
     }
 
     .menu-title {
-      display: grid;
-      gap: 4px;
       text-align: center;
     }
 
@@ -254,7 +274,6 @@
     }
 
     .menu-grid {
-      width: 100%;
       display: grid;
       gap: 10px;
     }
@@ -274,7 +293,7 @@
 
     .panel-header {
       padding: 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -312,16 +331,16 @@
       min-width: 40px;
       height: 40px;
       border-radius: 14px;
-      background: rgba(255,255,255,0.07);
+      background: rgba(255, 255, 255, 0.07);
       color: #fff;
-      border: 1px solid rgba(255,255,255,0.10);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       cursor: pointer;
       font-size: 18px;
     }
 
     .panel-tools {
       padding: 10px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
       display: grid;
       gap: 10px;
     }
@@ -344,7 +363,7 @@
     .empty {
       padding: 18px;
       border-radius: 20px;
-      border: 1px dashed rgba(255,255,255,0.12);
+      border: 1px dashed rgba(255, 255, 255, 0.12);
       color: var(--muted);
       text-align: center;
       line-height: 1.6;
@@ -361,7 +380,7 @@
       touch-action: pan-y;
       background: transparent;
       border: 0;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       box-shadow: none;
       margin: 0;
     }
@@ -394,7 +413,7 @@
       cursor: pointer;
       font-size: 15px;
       font-weight: 700;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.16);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
       opacity: 0;
       transform: translateX(18px) scale(0.96);
       transition: opacity 0.18s ease, transform 0.18s ease;
@@ -416,9 +435,7 @@
       height: 46px;
       padding: 0 12px;
       border: 0;
-      border-radius: 0;
-      background: rgba(18,22,30,0.96);
-      box-shadow: none;
+      background: rgba(18, 22, 30, 0.96);
       color: #fff;
       text-align: left;
       transform: translateX(0);
@@ -431,7 +448,9 @@
       touch-action: pan-y;
     }
 
-    .swipe-row.revealed .swipe-content { transform: translateX(calc(var(--swipe-reveal-width) * -1)); }
+    .swipe-row.revealed .swipe-content {
+      transform: translateX(calc(var(--swipe-reveal-width) * -1));
+    }
 
     .swipe-row.revealed .action-btn,
     .swipe-row.swiping .action-btn {
@@ -459,7 +478,6 @@
       font-size: 14px;
       line-height: 1.2;
       font-weight: 700;
-      text-align: left;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -471,17 +489,15 @@
       color: var(--muted);
       font-size: 12px;
       line-height: 1.2;
-      text-align: left;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
     .row-user {
-      color: rgba(255,255,255,0.84);
+      color: rgba(255, 255, 255, 0.84);
       font-size: 11px;
       line-height: 1.2;
-      text-align: left;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -496,14 +512,14 @@
       border-radius: 999px;
       font-size: 10px;
       font-weight: 700;
-      border: 1px solid rgba(255,255,255,0.10);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       white-space: nowrap;
       flex-shrink: 0;
     }
 
-    .mini-badge.success { background: rgba(72,214,138,0.14); color: #9ef1c4; }
-    .mini-badge.warning { background: rgba(255,204,104,0.14); color: #ffd992; }
-    .mini-badge.danger { background: rgba(255,111,111,0.14); color: #ffc2c2; }
+    .mini-badge.success { background: rgba(72, 214, 138, 0.14); color: #9ef1c4; }
+    .mini-badge.warning { background: rgba(255, 204, 104, 0.14); color: #ffd992; }
+    .mini-badge.danger { background: rgba(255, 111, 111, 0.14); color: #ffc2c2; }
 
     .modal {
       position: fixed;
@@ -515,22 +531,22 @@
       backdrop-filter: blur(10px);
     }
 
-    .modal.active { display: block; }
+    .modal.active {
+      display: block;
+    }
 
     .modal-card {
       height: 100%;
-      background: linear-gradient(180deg, rgba(13,19,31,0.98), rgba(7,11,19,0.96));
+      background: linear-gradient(180deg, rgba(13, 19, 31, 0.98), rgba(7, 11, 19, 0.96));
       box-shadow: var(--shadow);
       display: grid;
       grid-template-rows: auto 1fr auto;
       overflow: hidden;
-      border-radius: 0;
-      border: 0;
     }
 
     .modal-head {
       padding: 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -553,7 +569,7 @@
 
     .modal-foot {
       padding: 14px;
-      border-top: 1px solid rgba(255,255,255,0.08);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
       display: grid;
       gap: 10px;
     }
@@ -561,8 +577,8 @@
     .detail-block {
       padding: 14px;
       border-radius: 20px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       display: grid;
       gap: 8px;
     }
@@ -582,7 +598,10 @@
       word-break: break-word;
     }
 
-    .form-grid { display: grid; gap: 12px; }
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
 
     @keyframes flow {
       0% { background-position: 0% 50%; }
@@ -595,7 +614,7 @@
   <div id="loginScreen" class="screen active">
     <div class="shell login-shell">
       <div class="login-head">
-        <div id="heroBadge" class="badge warning" style="justify-self:start;">Aguardando login</div>
+        <div id="heroBadge" class="badge warning">Aguardando login</div>
         <h1>Palco Pro Admin</h1>
         <p>Faça login para liberar o painel administrativo.</p>
       </div>
@@ -650,7 +669,7 @@
         </div>
       </div>
       <div class="panel-tools">
-        <input id="pendingSearch" class="search-input" type="text" placeholder="Buscar por música, artista, estilo ou conta" />
+        <input id="pendingSearch" type="text" placeholder="Buscar por música, artista, estilo ou conta" />
       </div>
       <div id="pendingList" class="list-area"></div>
       <div id="pendingStatus" class="panel-footer"></div>
@@ -670,7 +689,7 @@
         </div>
       </div>
       <div class="panel-tools">
-        <input id="approvedSearch" class="search-input" type="text" placeholder="Buscar por música, artista ou estilo" />
+        <input id="approvedSearch" type="text" placeholder="Buscar por música, artista ou estilo" />
       </div>
       <div id="approvedList" class="list-area"></div>
       <div id="approvedStatus" class="panel-footer"></div>
@@ -690,7 +709,7 @@
         </div>
       </div>
       <div class="panel-tools">
-        <input id="inactiveSearch" class="search-input" type="text" placeholder="Buscar por música, artista ou estilo" />
+        <input id="inactiveSearch" type="text" placeholder="Buscar por música, artista ou estilo" />
       </div>
       <div id="inactiveList" class="list-area"></div>
       <div id="inactiveStatus" class="panel-footer"></div>
@@ -710,7 +729,7 @@
         </div>
       </div>
       <div class="panel-tools">
-        <input id="usersSearch" class="search-input" type="text" placeholder="Buscar por e-mail" />
+        <input id="usersSearch" type="text" placeholder="Buscar por e-mail" />
       </div>
       <div id="usersList" class="list-area"></div>
       <div id="usersStatus" class="panel-footer"></div>
@@ -790,45 +809,37 @@
       suggestions: [],
       searches: { pending: '', approved: '', inactive: '', users: '' },
       editSuggestionId: null,
-      activePanel: null,
       revealedRowKey: null
     };
 
     const $ = (id) => document.getElementById(id);
-
     const heroBadge = $('heroBadge');
     const loginScreen = $('loginScreen');
     const menuScreen = $('menuScreen');
+    const pendingPanel = $('pendingPanel');
+    const approvedPanel = $('approvedPanel');
+    const inactivePanel = $('inactivePanel');
+    const usersPanel = $('usersPanel');
     const emailInput = $('emailInput');
     const passwordInput = $('passwordInput');
     const showPasswordToggle = $('showPasswordToggle');
     const loginBtn = $('loginBtn');
     const authStatus = $('authStatus');
-
-    const pendingPanel = $('pendingPanel');
-    const approvedPanel = $('approvedPanel');
-    const inactivePanel = $('inactivePanel');
-    const usersPanel = $('usersPanel');
-
     const pendingSearch = $('pendingSearch');
     const approvedSearch = $('approvedSearch');
     const inactiveSearch = $('inactiveSearch');
     const usersSearch = $('usersSearch');
-
     const pendingList = $('pendingList');
     const approvedList = $('approvedList');
     const inactiveList = $('inactiveList');
     const usersList = $('usersList');
-
     const pendingStatus = $('pendingStatus');
     const approvedStatus = $('approvedStatus');
     const inactiveStatus = $('inactiveStatus');
     const usersStatus = $('usersStatus');
-
     const detailModal = $('detailModal');
     const detailModalTitle = $('detailModalTitle');
     const detailModalBody = $('detailModalBody');
-
     const editModal = $('editModal');
     const editTitle = $('editTitle');
     const editArtist = $('editArtist');
@@ -836,18 +847,21 @@
     const editLyrics = $('editLyrics');
     const editStatus = $('editStatus');
     const saveEditBtn = $('saveEditBtn');
-
     const userSongsModal = $('userSongsModal');
     const userSongsTitle = $('userSongsTitle');
     const userSongsBody = $('userSongsBody');
 
     function createSupabaseClient() {
       if (!window.supabase) throw new Error('Supabase não carregou.');
-      if (!state.supabase) state.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+      if (!state.supabase) {
+        state.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+      }
       return state.supabase;
     }
 
-    function setAuthStatus(message) { authStatus.textContent = message || ''; }
+    function setAuthStatus(message) {
+      authStatus.textContent = message || '';
+    }
 
     function setPanelStatus(panel, message) {
       if (panel === 'pending') pendingStatus.textContent = message || '';
@@ -856,12 +870,18 @@
       if (panel === 'users') usersStatus.textContent = message || '';
     }
 
-    function normalizeText(value) { return String(value || '').trim(); }
-    function sanitizeLyrics(value) { return String(value || '').replace(/
+    function normalizeText(value) {
+      return String(value || '').trim();
+    }
+
+    function sanitizeLyrics(value) {
+      return String(value || '').replace(/
 /g, '
 ').replace(/
 /g, '
-').trim(); }
+').trim();
+    }
+
     function escapeHtml(value) {
       return String(value || '')
         .replace(/&/g, '&amp;')
@@ -872,8 +892,8 @@
     }
 
     function showScreen(screen) {
-      [loginScreen, menuScreen, pendingPanel, approvedPanel, inactivePanel, usersPanel].forEach(el => el.classList.remove('active'));
-      if (screen) screen.classList.add('active');
+      [loginScreen, menuScreen, pendingPanel, approvedPanel, inactivePanel, usersPanel].forEach((el) => el.classList.remove('active'));
+      screen.classList.add('active');
     }
 
     function closeAllSwipes() {
@@ -892,9 +912,17 @@
       return getUserEmail(song.user_id);
     }
 
-    function getSuggestionById(id) { return state.suggestions.find((item) => item.id === id) || null; }
-    function getSuggestionBySongId(songId) { return state.suggestions.find((item) => item.source_song_id === songId) || null; }
-    function getActiveSuggestionBySongId(songId) { return state.suggestions.find((item) => item.source_song_id === songId && item.active === true) || null; }
+    function getSuggestionById(id) {
+      return state.suggestions.find((item) => item.id === id) || null;
+    }
+
+    function getSuggestionBySongId(songId) {
+      return state.suggestions.find((item) => item.source_song_id === songId) || null;
+    }
+
+    function getActiveSuggestionBySongId(songId) {
+      return state.suggestions.find((item) => item.source_song_id === songId && item.active === true) || null;
+    }
 
     function getPendingSongs() {
       return state.songs
@@ -903,11 +931,15 @@
     }
 
     function getApprovedSuggestions() {
-      return state.suggestions.filter((item) => item.active === true).sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' }));
+      return state.suggestions
+        .filter((item) => item.active === true)
+        .sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' }));
     }
 
     function getInactiveSuggestions() {
-      return state.suggestions.filter((item) => item.active === false).sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' }));
+      return state.suggestions
+        .filter((item) => item.active === false)
+        .sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' }));
     }
 
     function applySearch(items, panel) {
@@ -916,9 +948,118 @@
       return items.filter((item) => JSON.stringify(item).toLowerCase().includes(query));
     }
 
-    function getPendingBadge() { return '<span class="mini-badge warning">Pendente</span>'; }
-    function getApprovedBadge() { return '<span class="mini-badge success">Ativa</span>'; }
-    function getInactiveBadge() { return '<span class="mini-badge danger">Inativa</span>'; }
+    function getPendingBadge() {
+      return '<span class="mini-badge warning">Pendente</span>';
+    }
+
+    function getApprovedBadge() {
+      return '<span class="mini-badge success">Ativa</span>';
+    }
+
+    function getInactiveBadge() {
+      return '<span class="mini-badge danger">Inativa</span>';
+    }
+
+    function createSwipeRow({ key, revealWidth, actions, onOpenDetail, title, meta, extra, badge }) {
+      const row = document.createElement('div');
+      row.className = 'swipe-row';
+      row.dataset.key = key;
+      row.style.setProperty('--swipe-reveal-width', `${revealWidth}px`);
+
+      const actionsWrap = document.createElement('div');
+      actionsWrap.className = 'swipe-actions';
+      actions.forEach((action) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `action-btn ${action.className}`;
+        button.setAttribute('aria-label', action.aria);
+        button.textContent = action.icon;
+        button.addEventListener('click', (event) => {
+          event.stopPropagation();
+          closeAllSwipes();
+          action.onClick();
+        });
+        actionsWrap.appendChild(button);
+      });
+
+      const content = document.createElement('button');
+      content.type = 'button';
+      content.className = 'swipe-content';
+      content.innerHTML = `<div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(title)}</h3>${badge || ''}</div><div class="row-meta">${escapeHtml(meta || '')}</div>${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}</div>`;
+      content.addEventListener('click', () => {
+        if (row.classList.contains('revealed')) {
+          closeAllSwipes();
+          return;
+        }
+        onOpenDetail();
+      });
+
+      attachSwipe(row, content, key, revealWidth);
+      row.appendChild(actionsWrap);
+      row.appendChild(content);
+      return row;
+    }
+
+    function attachSwipe(row, card, key, revealWidth) {
+      let startX = 0;
+      let startY = 0;
+      let currentX = 0;
+      let dragging = false;
+      let horizontalLocked = false;
+
+      row.addEventListener('pointerdown', (event) => {
+        dragging = true;
+        horizontalLocked = false;
+        startX = event.clientX;
+        startY = event.clientY;
+        currentX = 0;
+      });
+
+      row.addEventListener('pointermove', (event) => {
+        if (!dragging) return;
+        const dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+        if (!horizontalLocked) {
+          if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+            horizontalLocked = true;
+          } else if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) {
+            dragging = false;
+            row.classList.remove('swiping');
+            return;
+          } else {
+            return;
+          }
+        }
+        currentX = Math.max(-revealWidth, Math.min(0, dx));
+        row.classList.add('swiping');
+        card.style.transform = `translateX(${currentX}px)`;
+        if (state.revealedRowKey && state.revealedRowKey !== key) {
+          closeAllSwipes();
+          row.classList.add('swiping');
+          card.style.transform = `translateX(${currentX}px)`;
+        }
+      });
+
+      const endSwipe = () => {
+        if (!dragging) return;
+        dragging = false;
+        row.classList.remove('swiping');
+        card.style.transform = '';
+        if (!horizontalLocked) return;
+        if (currentX <= -(revealWidth * 0.35)) {
+          closeAllSwipes();
+          row.classList.add('revealed');
+          state.revealedRowKey = key;
+        } else {
+          row.classList.remove('revealed');
+          if (state.revealedRowKey === key) state.revealedRowKey = null;
+        }
+      };
+
+      row.addEventListener('pointerup', endSwipe);
+      row.addEventListener('pointercancel', endSwipe);
+      row.addEventListener('lostpointercapture', endSwipe);
+    }
 
     function renderPendingList() {
       const items = applySearch(getPendingSongs().map((song) => ({ ...song, account_email: getUserEmail(song.user_id) })), 'pending');
@@ -999,122 +1140,23 @@
         return;
       }
       items.forEach((user) => {
-        const userSongCount = state.songs.filter((song) => song.user_id === user.id).length;
+        const count = state.songs.filter((song) => song.user_id === user.id).length;
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'swipe-row';
-        button.style.cursor = 'pointer';
-        button.innerHTML = `<div class="swipe-content" style="transform:none;"><div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(user.email)}</h3><span class="mini-badge ${user.is_admin ? 'success' : 'warning'}">${user.is_admin ? 'Admin' : 'Usuário'}</span></div><div class="row-meta">${userSongCount} música${userSongCount !== 1 ? 's' : ''} cadastrada${userSongCount !== 1 ? 's' : ''}</div></div></div>`;
+        button.innerHTML = `<div class="swipe-content" style="transform:none;"><div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(user.email)}</h3><span class="mini-badge ${user.is_admin ? 'success' : 'warning'}">${user.is_admin ? 'Admin' : 'Usuário'}</span></div><div class="row-meta">${count} música${count !== 1 ? 's' : ''} cadastrada${count !== 1 ? 's' : ''}</div></div></div>`;
         button.addEventListener('click', () => openUserSongs(user));
         usersList.appendChild(button);
       });
       setPanelStatus('users', `${items.length} usuário${items.length > 1 ? 's' : ''} listado${items.length > 1 ? 's' : ''}.`);
     }
 
-    function createSwipeRow({ key, revealWidth, actions, onOpenDetail, title, meta, extra, badge }) {
-      const row = document.createElement('div');
-      row.className = 'swipe-row';
-      row.dataset.key = key;
-      row.style.setProperty('--swipe-reveal-width', `${revealWidth}px`);
-
-      const actionsWrap = document.createElement('div');
-      actionsWrap.className = 'swipe-actions';
-      actions.forEach((action) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = `action-btn ${action.className}`;
-        button.setAttribute('aria-label', action.aria);
-        button.textContent = action.icon;
-        button.addEventListener('click', (event) => {
-          event.stopPropagation();
-          closeAllSwipes();
-          action.onClick();
-        });
-        actionsWrap.appendChild(button);
-      });
-
-      const content = document.createElement('button');
-      content.type = 'button';
-      content.className = 'swipe-content';
-      content.innerHTML = `<div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(title)}</h3>${badge || ''}</div><div class="row-meta">${escapeHtml(meta || '')}</div>${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}</div>`;
-      content.addEventListener('click', () => {
-        if (row.classList.contains('revealed')) {
-          closeAllSwipes();
-          return;
-        }
-        onOpenDetail();
-      });
-
-      attachSwipe(row, content, key, revealWidth);
-      row.appendChild(actionsWrap);
-      row.appendChild(content);
-      return row;
-    }
-
-    function attachSwipe(row, card, key, revealWidth) {
-      let startX = 0, startY = 0, currentX = 0, dragging = false, horizontalLocked = false;
-
-      row.addEventListener('pointerdown', (event) => {
-        dragging = true;
-        horizontalLocked = false;
-        startX = event.clientX;
-        startY = event.clientY;
-        currentX = 0;
-      });
-
-      row.addEventListener('pointermove', (event) => {
-        if (!dragging) return;
-        const dx = event.clientX - startX;
-        const dy = event.clientY - startY;
-        if (!horizontalLocked) {
-          if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
-            horizontalLocked = true;
-          } else if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) {
-            dragging = false;
-            row.classList.remove('swiping');
-            return;
-          } else {
-            return;
-          }
-        }
-        currentX = Math.max(-revealWidth, Math.min(0, dx));
-        row.classList.add('swiping');
-        card.style.transform = `translateX(${currentX}px)`;
-        if (state.revealedRowKey && state.revealedRowKey !== key) {
-          closeAllSwipes();
-          row.classList.add('swiping');
-          card.style.transform = `translateX(${currentX}px)`;
-        }
-      });
-
-      const endSwipe = () => {
-        if (!dragging) return;
-        dragging = false;
-        row.classList.remove('swiping');
-        card.style.transform = '';
-        if (!horizontalLocked) return;
-        if (currentX <= -(revealWidth * 0.35)) {
-          closeAllSwipes();
-          row.classList.add('revealed');
-          state.revealedRowKey = key;
-        } else {
-          row.classList.remove('revealed');
-          if (state.revealedRowKey === key) state.revealedRowKey = null;
-        }
-      };
-
-      row.addEventListener('pointerup', endSwipe);
-      row.addEventListener('pointercancel', endSwipe);
-      row.addEventListener('lostpointercapture', endSwipe);
-    }
-
-    function openPanel(panelName) {
+    function openPanel(name) {
       closeAllSwipes();
-      state.activePanel = panelName;
-      if (panelName === 'pending') showScreen(pendingPanel);
-      if (panelName === 'approved') showScreen(approvedPanel);
-      if (panelName === 'inactive') showScreen(inactivePanel);
-      if (panelName === 'users') showScreen(usersPanel);
+      if (name === 'pending') showScreen(pendingPanel);
+      if (name === 'approved') showScreen(approvedPanel);
+      if (name === 'inactive') showScreen(inactivePanel);
+      if (name === 'users') showScreen(usersPanel);
     }
 
     function openDetailModal(title, contentHtml) {
@@ -1124,17 +1166,18 @@
       closeAllSwipes();
     }
 
-    function closeDetailModal() { detailModal.classList.remove('active'); detailModalBody.innerHTML = ''; }
+    function closeDetailModal() {
+      detailModal.classList.remove('active');
+      detailModalBody.innerHTML = '';
+    }
 
     function openSongDetail(song) {
       const existing = getSuggestionBySongId(song.id);
-      const html = `<div class="detail-block"><label>Nome da música</label><div>${escapeHtml(song.song_title || 'Sem título')}</div></div><div class="detail-block"><label>Artista</label><div>${escapeHtml(song.artist || 'Sem artista')}</div></div><div class="detail-block"><label>Estilo</label><div>${escapeHtml(song.style || 'Sem estilo')}</div></div><div class="detail-block"><label>Conta</label><div>${escapeHtml(getUserEmail(song.user_id))}</div></div><div class="detail-block"><label>Status</label><div>${existing ? (existing.active ? 'Já aprovada e ativa.' : 'Existe aprovada, mas está inativa.') : 'Pendente de aprovação.'}</div></div><div class="detail-block"><label>Letra</label><div>${escapeHtml(sanitizeLyrics(song.lyrics || '') || 'Sem letra cadastrada.')}</div></div>`;
-      openDetailModal('Detalhes da música', html);
+      openDetailModal('Detalhes da música', `<div class="detail-block"><label>Nome da música</label><div>${escapeHtml(song.song_title || 'Sem título')}</div></div><div class="detail-block"><label>Artista</label><div>${escapeHtml(song.artist || 'Sem artista')}</div></div><div class="detail-block"><label>Estilo</label><div>${escapeHtml(song.style || 'Sem estilo')}</div></div><div class="detail-block"><label>Conta</label><div>${escapeHtml(getUserEmail(song.user_id))}</div></div><div class="detail-block"><label>Status</label><div>${existing ? (existing.active ? 'Já aprovada e ativa.' : 'Existe aprovada, mas está inativa.') : 'Pendente de aprovação.'}</div></div><div class="detail-block"><label>Letra</label><div>${escapeHtml(sanitizeLyrics(song.lyrics || '') || 'Sem letra cadastrada.')}</div></div>`);
     }
 
     function openSuggestionDetail(item, type) {
-      const html = `<div class="detail-block"><label>Nome da música</label><div>${escapeHtml(item.song_title || 'Sem título')}</div></div><div class="detail-block"><label>Artista</label><div>${escapeHtml(item.artist || 'Sem artista')}</div></div><div class="detail-block"><label>Estilo</label><div>${escapeHtml(item.style || 'Sem estilo')}</div></div><div class="detail-block"><label>Status</label><div>${type === 'approved' ? 'Aprovada e ativa.' : 'Aprovada, mas inativa.'}</div></div><div class="detail-block"><label>Origem</label><div>${escapeHtml(getOriginEmailBySongId(item.source_song_id))}</div></div><div class="detail-block"><label>Letra</label><div>${escapeHtml(sanitizeLyrics(item.lyrics || '') || 'Sem letra cadastrada.')}</div></div>`;
-      openDetailModal('Detalhes da música', html);
+      openDetailModal('Detalhes da música', `<div class="detail-block"><label>Nome da música</label><div>${escapeHtml(item.song_title || 'Sem título')}</div></div><div class="detail-block"><label>Artista</label><div>${escapeHtml(item.artist || 'Sem artista')}</div></div><div class="detail-block"><label>Estilo</label><div>${escapeHtml(item.style || 'Sem estilo')}</div></div><div class="detail-block"><label>Status</label><div>${type === 'approved' ? 'Aprovada e ativa.' : 'Aprovada, mas inativa.'}</div></div><div class="detail-block"><label>Origem</label><div>${escapeHtml(getOriginEmailBySongId(item.source_song_id))}</div></div><div class="detail-block"><label>Letra</label><div>${escapeHtml(sanitizeLyrics(item.lyrics || '') || 'Sem letra cadastrada.')}</div></div>`);
     }
 
     function openUserSongs(user) {
@@ -1153,7 +1196,10 @@
       userSongsModal.classList.add('active');
     }
 
-    function closeUserSongsModal() { userSongsModal.classList.remove('active'); userSongsBody.innerHTML = ''; }
+    function closeUserSongsModal() {
+      userSongsModal.classList.remove('active');
+      userSongsBody.innerHTML = '';
+    }
 
     function openEditModal(suggestionId) {
       const item = getSuggestionById(suggestionId);
@@ -1168,7 +1214,11 @@
       closeAllSwipes();
     }
 
-    function closeEditModal() { editModal.classList.remove('active'); state.editSuggestionId = null; editStatus.textContent = ''; }
+    function closeEditModal() {
+      editModal.classList.remove('active');
+      state.editSuggestionId = null;
+      editStatus.textContent = '';
+    }
 
     async function requireAdminProfile(userId) {
       const supabase = createSupabaseClient();
@@ -1198,6 +1248,33 @@
       renderUsersList();
     }
 
+    function resetAdminView() {
+      state.currentUser = null;
+      state.currentProfile = null;
+      state.songs = [];
+      state.users = [];
+      state.suggestions = [];
+      heroBadge.textContent = 'Aguardando login';
+      heroBadge.className = 'badge warning';
+      showScreen(loginScreen);
+      closeDetailModal();
+      closeEditModal();
+      closeUserSongsModal();
+    }
+
+    async function applySession(session) {
+      if (!session?.user) {
+        resetAdminView();
+        return;
+      }
+      await requireAdminProfile(session.user.id);
+      state.currentUser = session.user;
+      heroBadge.textContent = 'Administrador conectado';
+      heroBadge.className = 'badge success';
+      await loadAllData();
+      showScreen(menuScreen);
+    }
+
     async function handleLogin() {
       const email = normalizeText(emailInput.value);
       const password = passwordInput.value;
@@ -1218,33 +1295,6 @@
       } finally {
         loginBtn.disabled = false;
       }
-    }
-
-    function resetAdminView() {
-      state.currentUser = null;
-      state.currentProfile = null;
-      state.songs = [];
-      state.suggestions = [];
-      state.users = [];
-      heroBadge.textContent = 'Aguardando login';
-      heroBadge.className = 'badge warning';
-      showScreen(loginScreen);
-      closeDetailModal();
-      closeEditModal();
-      closeUserSongsModal();
-    }
-
-    async function applySession(session) {
-      if (!session?.user) {
-        resetAdminView();
-        return;
-      }
-      await requireAdminProfile(session.user.id);
-      state.currentUser = session.user;
-      heroBadge.textContent = 'Administrador conectado';
-      heroBadge.className = 'badge success';
-      await loadAllData();
-      showScreen(menuScreen);
     }
 
     async function upsertSuggestionFromSong(songId, active = true) {
@@ -1310,8 +1360,7 @@
     async function handleDeleteSuggestion(suggestionId) {
       const item = getSuggestionById(suggestionId);
       const name = item?.song_title || 'esta música';
-      const confirmed = window.confirm(`Deseja realmente apagar "${name}"?`);
-      if (!confirmed) return;
+      if (!window.confirm(`Deseja realmente apagar "${name}"?`)) return;
       try {
         const supabase = createSupabaseClient();
         setPanelStatus('inactive', 'Apagando música...');
@@ -1378,15 +1427,12 @@
         $('openApprovedBtn').addEventListener('click', () => openPanel('approved'));
         $('openInactiveBtn').addEventListener('click', () => openPanel('inactive'));
         $('openUsersBtn').addEventListener('click', () => openPanel('users'));
-
         document.querySelectorAll('[data-close-panel]').forEach((button) => button.addEventListener('click', () => showScreen(menuScreen)));
         document.querySelectorAll('[data-close-detail]').forEach((button) => button.addEventListener('click', closeDetailModal));
         document.querySelectorAll('[data-close-edit]').forEach((button) => button.addEventListener('click', closeEditModal));
         document.querySelectorAll('[data-close-user-songs]').forEach((button) => button.addEventListener('click', closeUserSongsModal));
         document.querySelectorAll('[data-refresh]').forEach((button) => button.addEventListener('click', () => refreshCurrentPanel(button.dataset.refresh)));
-
         saveEditBtn.addEventListener('click', handleSaveEdit);
-
         document.addEventListener('click', (event) => {
           if (!event.target.closest('.swipe-row')) closeAllSwipes();
         });
