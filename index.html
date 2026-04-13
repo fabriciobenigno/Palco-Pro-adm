@@ -431,10 +431,39 @@
     </section>
   </main>
 
+  <section id="pendingPanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Músicas pendentes</h2><p>Músicas da tabela songs que ainda não existem como aprovadas ativas.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="pending">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="pendingSearch" class="search-input" type="text" placeholder="Buscar por música, artista, estilo ou conta" /></div><div id="pendingList" class="list-area"></div><div id="pendingStatus" class="panel-footer"></div></div></section>
+  <section id="approvedPanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Músicas aprovadas</h2><p>Itens de approved_suggestions com active = true.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="approved">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="approvedSearch" class="search-input" type="text" placeholder="Buscar por música, artista ou estilo" /></div><div id="approvedList" class="list-area"></div><div id="approvedStatus" class="panel-footer"></div></div></section>
+  <section id="inactivePanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Músicas inativas</h2><p>Itens de approved_suggestions com active = false.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="inactive">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="inactiveSearch" class="search-input" type="text" placeholder="Buscar por música, artista ou estilo" /></div><div id="inactiveList" class="list-area"></div><div id="inactiveStatus" class="panel-footer"></div></div></section>
+  <section id="usersPanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Usuários</h2><p>Lista de usuários com acesso rápido às músicas de cada conta.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="users">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="usersSearch" class="search-input" type="text" placeholder="Buscar por nome ou e-mail" /></div><div id="usersList" class="list-area"></div><div id="usersStatus" class="panel-footer"></div></div></section>
+
+  <section id="detailModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="detailModalTitle">Detalhes</h3><button type="button" class="icon-btn" data-close-detail>✕</button></div><div id="detailModalBody" class="modal-body"></div><div class="modal-foot"><button type="button" class="btn btn-secondary" data-close-detail>Fechar</button></div></div></section>
+  <section id="editModal" class="modal"><div class="modal-card"><div class="modal-head"><h3>Editar música aprovada</h3><button type="button" class="icon-btn" data-close-edit>✕</button></div><div class="modal-body"><div class="form-grid"><div class="field"><label for="editTitle">Nome da música</label><input id="editTitle" type="text" placeholder="Nome da música" /></div><div class="field"><label for="editArtist">Artista</label><input id="editArtist" type="text" placeholder="Artista" /></div><div class="field"><label for="editStyle">Estilo</label><input id="editStyle" type="text" placeholder="Estilo" /></div><div class="field"><label for="editLyrics">Letra</label><textarea id="editLyrics" placeholder="Letra da música"></textarea></div></div><div id="editStatus" class="status-line"></div></div><div class="modal-foot"><button id="saveEditBtn" type="button" class="btn btn-primary">Salvar alterações</button><button type="button" class="btn btn-secondary" data-close-edit>Cancelar</button></div></div></section>
+  <section id="userSongsModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="userSongsTitle">Músicas do usuário</h3><button type="button" class="icon-btn" data-close-user-songs>✕</button></div><div id="userSongsBody" class="modal-body"></div><div class="modal-foot"><button type="button" class="btn btn-secondary" data-close-user-songs>Fechar</button></div></div></section>
+
   <script>
-    const state = { suggestions: [], songs: [] };
+    const SUPABASE_URL = 'https://dlcjcsbdabjupsiwlncd.supabase.co';
+    const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2JU7mYP9oeeUvzncDuZMRw_8p3lzGfT';
+
+    const state = { supabase: null, currentUser: null, currentProfile: null, songs: [], users: [], suggestions: [], searches: { pending: '', approved: '', inactive: '', users: '' }, editSuggestionId: null, activePanel: null, revealedRowKey: null };
+    const $ = (id) => document.getElementById(id);
+    const authCard = $('authCard'); const adminPanel = $('adminPanel'); const emailInput = $('emailInput'); const passwordInput = $('passwordInput'); const showPasswordToggle = $('showPasswordToggle'); const loginBtn = $('loginBtn'); const logoutBtn = $('logoutBtn'); const authStatus = $('authStatus'); const accountLabel = $('accountLabel'); const mainStatus = $('mainStatus');
+    const pendingPanel = $('pendingPanel'); const approvedPanel = $('approvedPanel'); const inactivePanel = $('inactivePanel'); const usersPanel = $('usersPanel');
+    const pendingSearch = $('pendingSearch'); const approvedSearch = $('approvedSearch'); const inactiveSearch = $('inactiveSearch'); const usersSearch = $('usersSearch');
+    const pendingList = $('pendingList'); const approvedList = $('approvedList'); const inactiveList = $('inactiveList'); const usersList = $('usersList');
+    const pendingStatus = $('pendingStatus'); const approvedStatus = $('approvedStatus'); const inactiveStatus = $('inactiveStatus'); const usersStatus = $('usersStatus');
+    const detailModal = $('detailModal'); const detailModalTitle = $('detailModalTitle'); const detailModalBody = $('detailModalBody');
+    const editModal = $('editModal'); const editTitle = $('editTitle'); const editArtist = $('editArtist'); const editStyle = $('editStyle'); const editLyrics = $('editLyrics'); const editStatus = $('editStatus'); const saveEditBtn = $('saveEditBtn');
+    const userSongsModal = $('userSongsModal'); const userSongsTitle = $('userSongsTitle'); const userSongsBody = $('userSongsBody');
+
+    function createSupabaseClient() { if (!window.supabase) throw new Error('Supabase não carregou.'); if (!state.supabase) state.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY); return state.supabase; }
+    function setAuthStatus(message) { authStatus.textContent = message || ''; }
+    function setMainStatus(message) { mainStatus.textContent = message || ''; }
+    function setPanelStatus(panel, message) { if (panel === 'pending') pendingStatus.textContent = message || ''; if (panel === 'approved') approvedStatus.textContent = message || ''; if (panel === 'inactive') inactiveStatus.textContent = message || ''; if (panel === 'users') usersStatus.textContent = message || ''; }
     function normalizeText(value) { return String(value || '').trim(); }
     function normalizeMatchText(value) { return normalizeText(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' '); }
+    function sanitizeLyrics(value) { return String(value || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim(); }
+    function escapeHtml(value) { return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&#39;'); }
+    function closeAllSwipes() { document.querySelectorAll('.swipe-row.revealed, .swipe-row.swiping').forEach((row) => row.classList.remove('revealed', 'swiping')); state.revealedRowKey = null; }
     function idsEqual(a, b) { return String(a ?? '') === String(b ?? ''); }
     function buildSongSignature(song) {
       const title = normalizeMatchText(song?.song_title || song?.title || '');
@@ -442,6 +471,10 @@
       if (!title) return '';
       return artist ? `${title}::${artist}` : title;
     }
+    function getUserEmail(userId) { const profile = state.users.find((item) => idsEqual(item.id, userId)); return profile?.email || 'Conta sem e-mail visível'; }
+    function getOriginEmailBySongId(songId) { const song = state.songs.find((item) => idsEqual(item.id, songId)); return song ? getUserEmail(song.user_id) : 'Conta sem e-mail visível'; }
+    function getSuggestionById(id) { return state.suggestions.find((item) => idsEqual(item.id, id)) || null; }
+    function getSuggestionBySongId(songId) { return state.suggestions.find((item) => idsEqual(item.source_song_id, songId)) || null; }
     function getActiveSuggestionBySongId(songId) { return state.suggestions.find((item) => idsEqual(item.source_song_id, songId) && item.active === true) || null; }
     function getActiveSuggestionBySongSignature(song) {
       const signature = buildSongSignature(song);
@@ -453,6 +486,207 @@
         .filter((song) => !getActiveSuggestionBySongId(song.id) && !getActiveSuggestionBySongSignature(song))
         .sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' }));
     }
+    function getApprovedSuggestions() { return state.suggestions.filter((item) => item.active === true).sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' })); }
+    function getInactiveSuggestions() { return state.suggestions.filter((item) => item.active === false).sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' })); }
+    function applySearch(items, panel) { const query = normalizeText(state.searches[panel]).toLowerCase(); return query ? items.filter((item) => JSON.stringify(item).toLowerCase().includes(query)) : items; }
+    function getPendingBadge() { return '<span class="mini-badge warning">Pendente</span>'; }
+    function getApprovedBadge() { return '<span class="mini-badge success">Ativa</span>'; }
+    function getInactiveBadge() { return '<span class="mini-badge danger">Inativa</span>'; }
+
+    function mergeSuggestionRecord(record) {
+      if (!record) return;
+      const indexById = state.suggestions.findIndex((item) => idsEqual(item.id, record.id));
+      if (indexById >= 0) state.suggestions[indexById] = record;
+      else {
+        const indexBySong = state.suggestions.findIndex((item) => idsEqual(item.source_song_id, record.source_song_id));
+        if (indexBySong >= 0) state.suggestions[indexBySong] = record;
+        else state.suggestions.unshift(record);
+      }
+    }
+
+    function rerenderAdminLists() {
+      renderPendingList();
+      renderApprovedList();
+      renderInactiveList();
+      renderUsersList();
+    }
+
+    function createSwipeRow({ key, revealWidth, actions, onOpenDetail, title, meta, extra, badge }) {
+      const row = document.createElement('div'); row.className = 'swipe-row'; row.dataset.key = key; row.style.setProperty('--swipe-reveal-width', `${revealWidth}px`);
+      const actionsWrap = document.createElement('div'); actionsWrap.className = 'swipe-actions';
+      actions.forEach((action) => { const button = document.createElement('button'); button.type = 'button'; button.className = `action-btn ${action.className}`; button.setAttribute('aria-label', action.aria); button.textContent = action.icon; button.addEventListener('click', (event) => { event.stopPropagation(); closeAllSwipes(); action.onClick(); }); actionsWrap.appendChild(button); });
+      const content = document.createElement('button'); content.type = 'button'; content.className = 'swipe-content'; content.innerHTML = `<div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(title)}</h3>${badge || ''}</div><div class="row-meta">${escapeHtml(meta || '')}</div>${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}</div>`;
+      content.addEventListener('click', () => { if (row.classList.contains('revealed')) { closeAllSwipes(); return; } onOpenDetail(); });
+      attachSwipe(row, content, key, revealWidth); row.appendChild(actionsWrap); row.appendChild(content); return row;
+    }
+
+    function attachSwipe(row, card, key, revealWidth) {
+      let startX = 0, startY = 0, currentX = 0, dragging = false, horizontalLocked = false;
+      row.addEventListener('pointerdown', (event) => { dragging = true; horizontalLocked = false; startX = event.clientX; startY = event.clientY; currentX = 0; });
+      row.addEventListener('pointermove', (event) => {
+        if (!dragging) return; const dx = event.clientX - startX; const dy = event.clientY - startY;
+        if (!horizontalLocked) { if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) horizontalLocked = true; else if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) { dragging = false; row.classList.remove('swiping'); return; } else return; }
+        currentX = Math.max(-revealWidth, Math.min(0, dx)); row.classList.add('swiping'); card.style.transform = `translateX(${currentX}px)`;
+        if (state.revealedRowKey && state.revealedRowKey !== key) { closeAllSwipes(); row.classList.add('swiping'); card.style.transform = `translateX(${currentX}px)`; }
+      });
+      const endSwipe = () => { if (!dragging) return; dragging = false; row.classList.remove('swiping'); card.style.transform = ''; if (!horizontalLocked) return; if (currentX <= -(revealWidth * 0.35)) { closeAllSwipes(); row.classList.add('revealed'); state.revealedRowKey = key; } else { row.classList.remove('revealed'); if (state.revealedRowKey === key) state.revealedRowKey = null; } };
+      row.addEventListener('pointerup', endSwipe); row.addEventListener('pointercancel', endSwipe); row.addEventListener('lostpointercapture', endSwipe);
+    }
+
+    function renderPendingList() {
+      const items = applySearch(getPendingSongs().map((song) => ({ ...song, account_email: getUserEmail(song.user_id) })), 'pending'); pendingList.innerHTML = '';
+      if (!items.length) { pendingList.innerHTML = '<div class="empty">Nenhuma música pendente encontrada.</div>'; setPanelStatus('pending', 'Arraste para a esquerda para aprovar. Toque no item para abrir os detalhes.'); return; }
+      items.forEach((song) => pendingList.appendChild(createSwipeRow({ key: `pending-${song.id}`, revealWidth: 48, actions: [{ icon: '✔', className: 'approve', aria: 'Aprovar música', onClick: () => handleApproveSong(song.id) }], onOpenDetail: () => openSongDetail(song), title: song.song_title || 'Sem título', meta: `${song.artist || 'Sem artista'} • ${song.style || 'Sem estilo'}`, extra: `Conta: ${song.account_email}`, badge: getPendingBadge() })));
+      setPanelStatus('pending', `${items.length} música${items.length > 1 ? 's' : ''} pendente${items.length > 1 ? 's' : ''}.`);
+    }
+
+    function renderApprovedList() {
+      const items = applySearch(getApprovedSuggestions(), 'approved'); approvedList.innerHTML = '';
+      if (!items.length) { approvedList.innerHTML = '<div class="empty">Nenhuma música aprovada ativa encontrada.</div>'; setPanelStatus('approved', 'Arraste para a esquerda para editar ou desabilitar.'); return; }
+      items.forEach((item) => approvedList.appendChild(createSwipeRow({ key: `approved-${item.id}`, revealWidth: 94, actions: [{ icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) }, { icon: '⏸', className: 'disable', aria: 'Desabilitar música', onClick: () => handleDisableSuggestion(item.id) }], onOpenDetail: () => openSuggestionDetail(item, 'approved'), title: item.song_title || 'Sem título', meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`, extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`, badge: getApprovedBadge() })));
+      setPanelStatus('approved', `${items.length} música${items.length > 1 ? 's' : ''} aprovada${items.length > 1 ? 's' : ''} ativa${items.length > 1 ? 's' : ''}.`);
+    }
+
+    function renderInactiveList() {
+      const items = applySearch(getInactiveSuggestions(), 'inactive'); inactiveList.innerHTML = '';
+      if (!items.length) { inactiveList.innerHTML = '<div class="empty">Nenhuma música inativa encontrada.</div>'; setPanelStatus('inactive', 'Arraste para a esquerda para ativar, editar ou apagar.'); return; }
+      items.forEach((item) => inactiveList.appendChild(createSwipeRow({ key: `inactive-${item.id}`, revealWidth: 140, actions: [{ icon: '✔', className: 'approve', aria: 'Ativar música', onClick: () => handleActivateSuggestion(item.id) }, { icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) }, { icon: '🗑', className: 'delete', aria: 'Apagar música', onClick: () => handleDeleteSuggestion(item.id) }], onOpenDetail: () => openSuggestionDetail(item, 'inactive'), title: item.song_title || 'Sem título', meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`, extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`, badge: getInactiveBadge() })));
+      setPanelStatus('inactive', `${items.length} música${items.length > 1 ? 's' : ''} inativa${items.length > 1 ? 's' : ''}.`);
+    }
+
+    function renderUsersList() {
+      const items = applySearch(state.users.filter((user) => user.email || user.display_name).sort((a, b) => (a.display_name || a.email || '').localeCompare((b.display_name || b.email || ''), 'pt-BR', { sensitivity: 'base' })), 'users'); usersList.innerHTML = '';
+      if (!items.length) { usersList.innerHTML = '<div class="empty">Nenhum usuário encontrado.</div>'; setPanelStatus('users', 'Toque em um usuário para abrir a lista das músicas dele.'); return; }
+      items.forEach((user) => { const count = state.songs.filter((song) => song.user_id === user.id).length; const button = document.createElement('button'); button.type = 'button'; button.className = 'swipe-row'; button.innerHTML = `<div class="swipe-content" style="transform:none;"><div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(user.display_name || user.email || 'Usuário sem nome')}</h3><span class="mini-badge ${user.is_admin ? 'success' : 'warning'}">${user.is_admin ? 'Admin' : 'Usuário'}</span></div><div class="row-meta">${escapeHtml(user.email || 'Conta sem e-mail visível')}</div><div class="row-user">${count} música${count !== 1 ? 's' : ''} cadastrada${count !== 1 ? 's' : ''}</div></div></div>`; button.addEventListener('click', () => openUserSongs(user)); usersList.appendChild(button); });
+      setPanelStatus('users', `${items.length} usuário${items.length > 1 ? 's' : ''} listado${items.length > 1 ? 's' : ''}.`);
+    }
+
+    function openPanel(panelName) { closeAllPanels(); state.activePanel = panelName; if (panelName === 'pending') pendingPanel.classList.add('active'); if (panelName === 'approved') approvedPanel.classList.add('active'); if (panelName === 'inactive') inactivePanel.classList.add('active'); if (panelName === 'users') usersPanel.classList.add('active'); closeAllSwipes(); }
+    function closeAllPanels() { pendingPanel.classList.remove('active'); approvedPanel.classList.remove('active'); inactivePanel.classList.remove('active'); usersPanel.classList.remove('active'); state.activePanel = null; closeAllSwipes(); }
+    function openDetailModal(title, contentHtml) { detailModalTitle.textContent = title; detailModalBody.innerHTML = contentHtml; detailModal.classList.add('active'); closeAllSwipes(); }
+    function closeDetailModal() { detailModal.classList.remove('active'); detailModalBody.innerHTML = ''; }
+
+    function openSongDetail(song) {
+      const existing = getSuggestionBySongId(song.id);
+      openDetailModal('Detalhes da música', `<div class="detail-block"><label>Nome da música</label><div>${escapeHtml(song.song_title || 'Sem título')}</div></div><div class="detail-block"><label>Artista</label><div>${escapeHtml(song.artist || 'Sem artista')}</div></div><div class="detail-block"><label>Estilo</label><div>${escapeHtml(song.style || 'Sem estilo')}</div></div><div class="detail-block"><label>Conta</label><div>${escapeHtml(getUserEmail(song.user_id))}</div></div><div class="detail-block"><label>Status</label><div>${existing ? (existing.active ? 'Já aprovada e ativa.' : 'Existe aprovada, mas está inativa.') : 'Pendente de aprovação.'}</div></div><div class="detail-block"><label>Letra</label><div>${escapeHtml(sanitizeLyrics(song.lyrics || '') || 'Sem letra cadastrada.')}</div></div>`);
+    }
+
+    function openSuggestionDetail(item, type) {
+      openDetailModal('Detalhes da música', `<div class="detail-block"><label>Nome da música</label><div>${escapeHtml(item.song_title || 'Sem título')}</div></div><div class="detail-block"><label>Artista</label><div>${escapeHtml(item.artist || 'Sem artista')}</div></div><div class="detail-block"><label>Estilo</label><div>${escapeHtml(item.style || 'Sem estilo')}</div></div><div class="detail-block"><label>Status</label><div>${type === 'approved' ? 'Aprovada e ativa.' : 'Aprovada, mas inativa.'}</div></div><div class="detail-block"><label>Origem</label><div>${escapeHtml(getOriginEmailBySongId(item.source_song_id))}</div></div><div class="detail-block"><label>Letra</label><div>${escapeHtml(sanitizeLyrics(item.lyrics || '') || 'Sem letra cadastrada.')}</div></div>`);
+    }
+
+    function openUserSongs(user) {
+      const songs = state.songs.filter((song) => song.user_id === user.id).sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' }));
+      userSongsTitle.textContent = `Músicas de ${user.display_name || user.email || 'usuário'}`;
+      if (!songs.length) userSongsBody.innerHTML = '<div class="empty">Este usuário ainda não possui músicas cadastradas.</div>';
+      else userSongsBody.innerHTML = songs.map((song) => { const activeSuggestion = getActiveSuggestionBySongId(song.id); const anySuggestion = getSuggestionBySongId(song.id); const badge = activeSuggestion ? getApprovedBadge() : anySuggestion ? getInactiveBadge() : getPendingBadge(); return `<div class="detail-block"><div class="row-top"><label style="margin:0;">${escapeHtml(song.song_title || 'Sem título')}</label>${badge}</div><div>${escapeHtml(`${song.artist || 'Sem artista'} • ${song.style || 'Sem estilo'}`)}</div></div>`; }).join('');
+      userSongsModal.classList.add('active');
+    }
+
+    function closeUserSongsModal() { userSongsModal.classList.remove('active'); userSongsBody.innerHTML = ''; }
+    function openEditModal(suggestionId) { const item = getSuggestionById(suggestionId); if (!item) return; state.editSuggestionId = suggestionId; editTitle.value = item.song_title || ''; editArtist.value = item.artist || ''; editStyle.value = item.style || ''; editLyrics.value = sanitizeLyrics(item.lyrics || ''); editStatus.textContent = ''; editModal.classList.add('active'); closeAllSwipes(); }
+    function closeEditModal() { editModal.classList.remove('active'); state.editSuggestionId = null; editStatus.textContent = ''; }
+
+    async function requireAdminProfile(userId) {
+      const supabase = createSupabaseClient();
+      const { data, error } = await supabase.from('profiles').select('id, email, is_admin').eq('id', userId).maybeSingle();
+      if (error) throw error;
+      if (!data || data.is_admin !== true) throw new Error('Esta conta não está autorizada como administradora.');
+      state.currentProfile = data;
+      return data;
+    }
+
+    async function loadAllData() {
+      const supabase = createSupabaseClient();
+      const [songsRes, suggestionsRes, usersRes] = await Promise.all([
+        supabase.from('songs').select('id, created_at, user_id, song_title, artist, style, lyrics, updated_at').order('created_at', { ascending: false }),
+        supabase.from('approved_suggestions').select('id, created_at, source_song_id, approved_by, song_title, artist, style, lyrics, active').order('created_at', { ascending: false }),
+        supabase.from('profiles').select('id, email, display_name, is_admin').order('display_name', { ascending: true })
+      ]);
+      if (songsRes.error) throw songsRes.error; if (suggestionsRes.error) throw suggestionsRes.error; if (usersRes.error) throw usersRes.error;
+      state.songs = Array.isArray(songsRes.data) ? songsRes.data : []; state.suggestions = Array.isArray(suggestionsRes.data) ? suggestionsRes.data : []; state.users = Array.isArray(usersRes.data) ? usersRes.data : [];
+      renderPendingList(); renderApprovedList(); renderInactiveList(); renderUsersList();
+    }
+
+    async function handleLogin() {
+      const email = normalizeText(emailInput.value); const password = passwordInput.value;
+      if (!email || !password) { setAuthStatus('Preencha e-mail e senha para entrar.'); return; }
+      try {
+        loginBtn.disabled = true; setAuthStatus('Entrando...'); const supabase = createSupabaseClient(); const { data, error } = await supabase.auth.signInWithPassword({ email, password }); if (error) throw error; await applySession(data.session || null); setAuthStatus('');
+      } catch (error) { setAuthStatus(error.message || 'Não foi possível fazer login agora.'); }
+      finally { loginBtn.disabled = false; }
+    }
+
+    async function handleLogout() {
+      try { logoutBtn.disabled = true; const supabase = createSupabaseClient(); await supabase.auth.signOut(); resetAdminView(); }
+      catch (error) { setMainStatus(error.message || 'Não foi possível sair agora.'); }
+      finally { logoutBtn.disabled = false; }
+    }
+
+    function resetAdminView() {
+      state.currentUser = null; state.currentProfile = null; state.songs = []; state.suggestions = []; state.users = [];
+      authCard.classList.remove('hidden'); adminPanel.classList.add('hidden'); accountLabel.textContent = 'Conta conectada'; setMainStatus(''); closeAllPanels(); closeDetailModal(); closeEditModal(); closeUserSongsModal();
+    }
+
+    async function applySession(session) {
+      if (!session?.user) { resetAdminView(); return; }
+      const profile = await requireAdminProfile(session.user.id); state.currentUser = session.user; accountLabel.textContent = profile.email || session.user.email || 'Administrador'; authCard.classList.add('hidden'); adminPanel.classList.remove('hidden'); await loadAllData();
+    }
+
+    async function upsertSuggestionFromSong(songId, active = true) {
+      const supabase = createSupabaseClient(); const song = state.songs.find((item) => item.id === songId); if (!song) throw new Error('Música não encontrada.');
+      const existing = getSuggestionBySongId(songId);
+      const payload = { source_song_id: song.id, approved_by: state.currentUser.id, song_title: song.song_title || 'Sem título', artist: song.artist || '', style: song.style || '', lyrics: sanitizeLyrics(song.lyrics || ''), active };
+      if (existing) {
+        const { data, error } = await supabase.from('approved_suggestions').update(payload).eq('id', existing.id).select('id, created_at, source_song_id, approved_by, song_title, artist, style, lyrics, active').single();
+        if (error) throw error;
+        mergeSuggestionRecord(data);
+        return data;
+      }
+      const { data, error } = await supabase.from('approved_suggestions').insert(payload).select('id, created_at, source_song_id, approved_by, song_title, artist, style, lyrics, active').single();
+      if (error) throw error;
+      mergeSuggestionRecord(data);
+      return data;
+    }
+
+    async function handleApproveSong(songId) {
+      try {
+        setPanelStatus('pending', 'Aprovando música...');
+        await upsertSuggestionFromSong(songId, true);
+        rerenderAdminLists();
+        setPanelStatus('pending', 'Música aprovada com sucesso.');
+        setPanelStatus('approved', 'Lista de aprovadas atualizada.');
+        await loadAllData();
+      } catch (error) {
+        console.error('Falha ao aprovar música:', error);
+        setPanelStatus('pending', error.message || 'Não foi possível aprovar a música.');
+      }
+    }
+    async function handleActivateSuggestion(suggestionId) { try { const supabase = createSupabaseClient(); setPanelStatus(state.activePanel || 'inactive', 'Ativando música...'); const { error } = await supabase.from('approved_suggestions').update({ active: true, approved_by: state.currentUser.id }).eq('id', suggestionId); if (error) throw error; await loadAllData(); rerenderAdminLists(); setPanelStatus(state.activePanel || 'inactive', 'Música ativada com sucesso.'); } catch (error) { setPanelStatus(state.activePanel || 'inactive', error.message || 'Não foi possível ativar a música.'); } }
+    async function handleDisableSuggestion(suggestionId) { try { const supabase = createSupabaseClient(); setPanelStatus(state.activePanel || 'approved', 'Desabilitando música...'); const { error } = await supabase.from('approved_suggestions').update({ active: false }).eq('id', suggestionId); if (error) throw error; await loadAllData(); rerenderAdminLists(); setPanelStatus(state.activePanel || 'approved', 'Música desabilitada com sucesso.'); } catch (error) { setPanelStatus(state.activePanel || 'approved', error.message || 'Não foi possível desabilitar a música.'); } }
+    async function handleDeleteSuggestion(suggestionId) { const item = getSuggestionById(suggestionId); const name = item?.song_title || 'esta música'; if (!window.confirm(`Deseja realmente apagar \"${name}\"?`)) return; try { const supabase = createSupabaseClient(); setPanelStatus(state.activePanel || 'inactive', 'Apagando música...'); const { error } = await supabase.from('approved_suggestions').delete().eq('id', suggestionId); if (error) throw error; await loadAllData(); rerenderAdminLists(); setPanelStatus(state.activePanel || 'inactive', 'Música apagada com sucesso.'); } catch (error) { setPanelStatus(state.activePanel || 'inactive', error.message || 'Não foi possível apagar a música.'); } }
+    async function handleSaveEdit() { if (!state.editSuggestionId) return; try { saveEditBtn.disabled = true; editStatus.textContent = 'Salvando alterações...'; const supabase = createSupabaseClient(); const payload = { song_title: normalizeText(editTitle.value) || 'Sem título', artist: normalizeText(editArtist.value), style: normalizeText(editStyle.value), lyrics: sanitizeLyrics(editLyrics.value) }; const { error } = await supabase.from('approved_suggestions').update(payload).eq('id', state.editSuggestionId); if (error) throw error; await loadAllData(); rerenderAdminLists(); closeEditModal(); } catch (error) { editStatus.textContent = error.message || 'Não foi possível salvar as alterações.'; } finally { saveEditBtn.disabled = false; } }
+    async function refreshCurrentPanel(panel) { try { setPanelStatus(panel, 'Atualizando lista...'); await loadAllData(); setPanelStatus(panel, 'Lista atualizada.'); } catch (error) { setPanelStatus(panel, error.message || 'Não foi possível atualizar a lista.'); } }
+
+    function bindSearches() {
+      pendingSearch.addEventListener('input', () => { state.searches.pending = pendingSearch.value; renderPendingList(); });
+      approvedSearch.addEventListener('input', () => { state.searches.approved = approvedSearch.value; renderApprovedList(); });
+      inactiveSearch.addEventListener('input', () => { state.searches.inactive = inactiveSearch.value; renderInactiveList(); });
+      usersSearch.addEventListener('input', () => { state.searches.users = usersSearch.value; renderUsersList(); });
+    }
+
+    async function bootstrap() {
+      try {
+        createSupabaseClient(); bindSearches(); showPasswordToggle.addEventListener('change', () => { passwordInput.type = showPasswordToggle.checked ? 'text' : 'password'; }); loginBtn.addEventListener('click', handleLogin); logoutBtn.addEventListener('click', handleLogout);
+        $('openPendingBtn').addEventListener('click', () => openPanel('pending')); $('openApprovedBtn').addEventListener('click', () => openPanel('approved')); $('openInactiveBtn').addEventListener('click', () => openPanel('inactive')); $('openUsersBtn').addEventListener('click', () => openPanel('users'));
+        document.querySelectorAll('[data-close-panel]').forEach((button) => button.addEventListener('click', closeAllPanels)); document.querySelectorAll('[data-close-detail]').forEach((button) => button.addEventListener('click', closeDetailModal)); document.querySelectorAll('[data-close-edit]').forEach((button) => button.addEventListener('click', closeEditModal)); document.querySelectorAll('[data-close-user-songs]').forEach((button) => button.addEventListener('click', closeUserSongsModal)); document.querySelectorAll('[data-refresh]').forEach((button) => button.addEventListener('click', () => refreshCurrentPanel(button.dataset.refresh))); saveEditBtn.addEventListener('click', handleSaveEdit);
+        document.addEventListener('click', (event) => { if (!event.target.closest('.swipe-row')) closeAllSwipes(); });
+        const { data, error } = await state.supabase.auth.getSession(); if (error) throw error; await applySession(data.session || null);
+        state.supabase.auth.onAuthStateChange(async (_event, session) => { try { await applySession(session || null); } catch (error) { setAuthStatus(error.message || 'Sessão inválida.'); resetAdminView(); } });
+      } catch (error) { setAuthStatus(error.message || 'Não foi possível iniciar o painel.'); }
+    }
+
+    bootstrap();
   </script>
 </body>
 </html>
