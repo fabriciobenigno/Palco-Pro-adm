@@ -15,8 +15,8 @@
       --bg-1: #020409;
       --bg-2: #08111e;
       --bg-3: #04070d;
-      --card-1: rgba(13,19,31,0.92);
-      --card-2: rgba(7,11,19,0.88);
+      --card-1: rgba(13,19,31,0.96);
+      --card-2: rgba(7,11,19,0.94);
       --line: rgba(255,255,255,0.12);
       --text: #f7f9ff;
       --muted: rgba(255,255,255,0.72);
@@ -31,9 +31,6 @@
       --amber-1: rgba(255,204,104,0.98);
       --amber-2: rgba(233,166,44,0.94);
       --shadow: 0 26px 70px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.05);
-      --radius-xl: 28px;
-      --radius-lg: 22px;
-      --radius-md: 18px;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -47,62 +44,11 @@
         linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 42%, var(--bg-3) 100%);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    body {
-      padding:
-        calc(var(--safe-top) + 12px)
-        12px
-        calc(var(--safe-bottom) + 14px);
-      overflow-x: hidden;
+      overflow: hidden;
     }
 
     button, input, textarea { font: inherit; }
     button { border: 0; }
-
-    .app {
-      width: 100%;
-      max-width: 760px;
-      margin: 0 auto;
-      display: grid;
-      gap: 10px;
-    }
-
-    .surface {
-      border-radius: var(--radius-xl);
-      background: linear-gradient(180deg, var(--card-1), var(--card-2));
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(22px);
-    }
-
-    .hero {
-      padding: 14px 16px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .hero-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-    }
-
-    .hero h1 {
-      margin: 0;
-      font-size: clamp(24px, 6vw, 30px);
-      line-height: 1.02;
-      letter-spacing: -0.04em;
-    }
-
-    .hero p, .muted {
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-    }
 
     .badge {
       display: inline-flex;
@@ -123,33 +69,61 @@
     .badge.warning { background: rgba(255,204,104,0.16); color: #ffd992; border-color: rgba(255,204,104,0.28); }
     .badge.danger { background: rgba(255,111,111,0.16); color: #ffc2c2; border-color: rgba(255,111,111,0.28); }
 
-    .auth-card, .main-card {
-      padding: 14px;
-      display: grid;
-      gap: 10px;
+    .screen {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: none;
+      padding:
+        calc(var(--safe-top) + 10px)
+        10px
+        calc(var(--safe-bottom) + 12px);
+      background:
+        radial-gradient(circle at 50% -10%, rgba(79,140,255,0.18), transparent 28%),
+        linear-gradient(180deg, rgba(2,4,9,0.98), rgba(8,17,30,0.98), rgba(4,7,13,0.99));
     }
 
-    .main-card {
-      min-height: calc(100vh - var(--safe-top) - var(--safe-bottom) - 106px);
+    .screen.active { display: block; }
+
+    .shell {
+      height: 100%;
+      border-radius: 28px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: linear-gradient(180deg, var(--card-1), var(--card-2));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .login-shell {
+      display: grid;
       grid-template-rows: auto 1fr auto;
     }
 
-    .panel-title {
+    .login-head {
+      padding: 16px 16px 10px;
       display: grid;
-      gap: 4px;
+      gap: 6px;
     }
 
-    .panel-title h2 {
+    .login-head h1 {
       margin: 0;
-      font-size: 17px;
-      letter-spacing: -0.02em;
+      font-size: 26px;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
     }
 
-    .panel-title p {
+    .login-head p {
       margin: 0;
+      font-size: 13px;
+      line-height: 1.5;
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
+    }
+
+    .login-body {
+      display: grid;
+      align-content: center;
+      gap: 12px;
+      padding: 16px;
     }
 
     .field {
@@ -178,9 +152,7 @@
       resize: vertical;
     }
 
-    input::placeholder, textarea::placeholder {
-      color: rgba(255,255,255,0.42);
-    }
+    input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.42); }
 
     .toggle-password-row {
       display: flex;
@@ -231,38 +203,10 @@
       line-height: 1.45;
     }
 
-    .sticky-account {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      flex-wrap: nowrap;
-      padding: 10px 12px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .sticky-account strong {
-      display: block;
-      font-size: 13px;
-      line-height: 1.2;
-      word-break: break-word;
-    }
-
-    .sticky-account span {
-      display: block;
-      color: var(--muted);
-      font-size: 11px;
-      margin-top: 2px;
-    }
-
-    .menu-wrap {
-      min-height: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
+    .menu-shell {
+      display: grid;
+      place-items: center;
+      padding: 16px;
     }
 
     .menu-grid {
@@ -280,31 +224,9 @@
       padding: 10px 14px;
     }
 
-    .panel-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      padding:
-        calc(var(--safe-top) + 10px)
-        10px
-        calc(var(--safe-bottom) + 12px);
-      background:
-        radial-gradient(circle at 50% -10%, rgba(79,140,255,0.18), transparent 28%),
-        linear-gradient(180deg, rgba(2,4,9,0.98), rgba(8,17,30,0.98), rgba(4,7,13,0.99));
-      display: none;
-    }
-
-    .panel-screen.active { display: block; }
-
     .panel-shell {
-      height: 100%;
-      border-radius: 28px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: linear-gradient(180deg, rgba(13,19,31,0.96), rgba(7,11,19,0.94));
-      box-shadow: var(--shadow);
       display: grid;
       grid-template-rows: auto auto 1fr auto;
-      overflow: hidden;
     }
 
     .panel-header {
@@ -384,10 +306,6 @@
       text-align: center;
       line-height: 1.6;
       margin-top: 10px;
-    }
-
-    .search-input {
-      width: 100%;
     }
 
     .swipe-row {
@@ -470,9 +388,7 @@
       touch-action: pan-y;
     }
 
-    .swipe-row.revealed .swipe-content {
-      transform: translateX(calc(var(--swipe-reveal-width) * -1));
-    }
+    .swipe-row.revealed .swipe-content { transform: translateX(calc(var(--swipe-reveal-width) * -1)); }
 
     .swipe-row.revealed .action-btn,
     .swipe-row.swiping .action-btn {
@@ -551,10 +467,7 @@
       inset: 0;
       z-index: 70;
       display: none;
-      padding:
-        calc(var(--safe-top) + 10px)
-        12px
-        calc(var(--safe-bottom) + 12px);
+      padding: calc(var(--safe-top) + 10px) 12px calc(var(--safe-bottom) + 12px);
       background: rgba(1, 3, 8, 0.72);
       backdrop-filter: blur(10px);
     }
@@ -626,11 +539,7 @@
       word-break: break-word;
     }
 
-    .form-grid {
-      display: grid;
-      gap: 12px;
-    }
-
+    .form-grid { display: grid; gap: 12px; }
     .hidden { display: none !important; }
 
     @keyframes flow {
@@ -641,32 +550,14 @@
   </style>
 </head>
 <body>
-  <main class="app">
-    <section class="surface hero">
-      <div class="hero-top">
-        <div>
-          <h1>Palco Pro Admin</h1>
-          <p>Painel administrativo mobile-first para revisar músicas dos usuários, aprovar sugestões e controlar o que fica ativo no app principal.</p>
-        </div>
-        <div id="heroBadge" class="badge warning">Aguardando login</div>
+  <div id="loginScreen" class="screen active">
+    <div class="shell login-shell">
+      <div class="login-head">
+        <div id="heroBadge" class="badge warning" style="justify-self:start;">Aguardando login</div>
+        <h1>Palco Pro Admin</h1>
+        <p>Faça login para liberar o painel administrativo.</p>
       </div>
-    </section>
-
-    <section id="authCard" class="panel-screen active">
-    <div class="panel-shell">
-      <div class="panel-header">
-        <div class="header-copy">
-          <h2>Entrar como administrador</h2>
-          <p>Faça login para liberar o painel administrativo.</p>
-        </div>
-      </div>
-      <div class="panel-tools" style="border-bottom:0;padding-bottom:0;"></div>
-      <div class="list-area" style="padding:14px; display:grid; align-content:center;">
-        <div class="panel-title" style="margin-bottom:6px;">
-          <h2 style="font-size:20px;">Palco Pro Admin</h2>
-          <p>Login administrativo em tela cheia.</p>
-        </div>
-
+      <div class="login-body">
         <div class="field">
           <label for="emailInput">E-mail</label>
           <input id="emailInput" type="email" inputmode="email" autocomplete="email" placeholder="Seu e-mail" />
@@ -686,24 +577,21 @@
       </div>
       <div class="panel-footer"></div>
     </div>
-  </section>
+  </div>
 
-    <section id="adminPanel" class="panel-screen">
-    <div class="panel-shell" style="grid-template-rows:1fr;">
-      <div class="list-area" style="padding:16px; display:flex; align-items:center; justify-content:center;">
-        <div class="menu-grid">
-          <button id="openPendingBtn" type="button" class="btn btn-primary menu-btn">Músicas pendentes</button>
-          <button id="openApprovedBtn" type="button" class="btn btn-primary menu-btn">Músicas aprovadas</button>
-          <button id="openInactiveBtn" type="button" class="btn btn-primary menu-btn">Músicas inativas</button>
-          <button id="openUsersBtn" type="button" class="btn btn-primary menu-btn">Usuários</button>
-        </div>
+  <div id="menuScreen" class="screen">
+    <div class="shell menu-shell">
+      <div class="menu-grid">
+        <button id="openPendingBtn" type="button" class="btn btn-primary menu-btn">Músicas pendentes</button>
+        <button id="openApprovedBtn" type="button" class="btn btn-primary menu-btn">Músicas aprovadas</button>
+        <button id="openInactiveBtn" type="button" class="btn btn-primary menu-btn">Músicas inativas</button>
+        <button id="openUsersBtn" type="button" class="btn btn-primary menu-btn">Usuários</button>
       </div>
     </div>
-  </section>
-  </main>
+  </div>
 
-  <section id="pendingPanel" class="panel-screen">
-    <div class="panel-shell">
+  <section id="pendingPanel" class="screen">
+    <div class="shell panel-shell">
       <div class="panel-header">
         <div class="header-copy">
           <h2>Músicas pendentes</h2>
@@ -715,15 +603,15 @@
         </div>
       </div>
       <div class="panel-tools">
-        <input id="pendingSearch" class="search-input" type="text" placeholder="Buscar por música, artista, estilo ou conta" />
+        <input id="pendingSearch" type="text" placeholder="Buscar por música, artista, estilo ou conta" />
       </div>
       <div id="pendingList" class="list-area"></div>
       <div id="pendingStatus" class="panel-footer"></div>
     </div>
   </section>
 
-  <section id="approvedPanel" class="panel-screen">
-    <div class="panel-shell">
+  <section id="approvedPanel" class="screen">
+    <div class="shell panel-shell">
       <div class="panel-header">
         <div class="header-copy">
           <h2>Músicas aprovadas</h2>
@@ -735,15 +623,15 @@
         </div>
       </div>
       <div class="panel-tools">
-        <input id="approvedSearch" class="search-input" type="text" placeholder="Buscar por música, artista ou estilo" />
+        <input id="approvedSearch" type="text" placeholder="Buscar por música, artista ou estilo" />
       </div>
       <div id="approvedList" class="list-area"></div>
       <div id="approvedStatus" class="panel-footer"></div>
     </div>
   </section>
 
-  <section id="inactivePanel" class="panel-screen">
-    <div class="panel-shell">
+  <section id="inactivePanel" class="screen">
+    <div class="shell panel-shell">
       <div class="panel-header">
         <div class="header-copy">
           <h2>Músicas inativas</h2>
@@ -755,15 +643,15 @@
         </div>
       </div>
       <div class="panel-tools">
-        <input id="inactiveSearch" class="search-input" type="text" placeholder="Buscar por música, artista ou estilo" />
+        <input id="inactiveSearch" type="text" placeholder="Buscar por música, artista ou estilo" />
       </div>
       <div id="inactiveList" class="list-area"></div>
       <div id="inactiveStatus" class="panel-footer"></div>
     </div>
   </section>
 
-  <section id="usersPanel" class="panel-screen">
-    <div class="panel-shell">
+  <section id="usersPanel" class="screen">
+    <div class="shell panel-shell">
       <div class="panel-header">
         <div class="header-copy">
           <h2>Usuários</h2>
@@ -775,7 +663,7 @@
         </div>
       </div>
       <div class="panel-tools">
-        <input id="usersSearch" class="search-input" type="text" placeholder="Buscar por e-mail" />
+        <input id="usersSearch" type="text" placeholder="Buscar por e-mail" />
       </div>
       <div id="usersList" class="list-area"></div>
       <div id="usersStatus" class="panel-footer"></div>
@@ -853,12 +741,7 @@
       songs: [],
       users: [],
       suggestions: [],
-      searches: {
-        pending: '',
-        approved: '',
-        inactive: '',
-        users: ''
-      },
+      searches: { pending: '', approved: '', inactive: '', users: '' },
       editSuggestionId: null,
       activePanel: null,
       revealedRowKey: null
@@ -867,16 +750,13 @@
     const $ = (id) => document.getElementById(id);
 
     const heroBadge = $('heroBadge');
-    const authCard = $('authCard');
-    const adminPanel = $('adminPanel');
+    const loginScreen = $('loginScreen');
+    const menuScreen = $('menuScreen');
     const emailInput = $('emailInput');
     const passwordInput = $('passwordInput');
     const showPasswordToggle = $('showPasswordToggle');
     const loginBtn = $('loginBtn');
-    const logoutBtn = $('logoutBtn');
     const authStatus = $('authStatus');
-    const accountLabel = $('accountLabel');
-    const mainStatus = $('mainStatus');
 
     const pendingPanel = $('pendingPanel');
     const approvedPanel = $('approvedPanel');
@@ -916,20 +796,11 @@
 
     function createSupabaseClient() {
       if (!window.supabase) throw new Error('Supabase não carregou.');
-      if (!state.supabase) {
-        state.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-      }
+      if (!state.supabase) state.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
       return state.supabase;
     }
 
-    function setAuthStatus(message) {
-      authStatus.textContent = message || '';
-    }
-
-    function setMainStatus(message) {
-      mainStatus.textContent = message || '';
-    }
-
+    function setAuthStatus(message) { authStatus.textContent = message || ''; }
     function setPanelStatus(panel, message) {
       if (panel === 'pending') pendingStatus.textContent = message || '';
       if (panel === 'approved') approvedStatus.textContent = message || '';
@@ -937,18 +808,8 @@
       if (panel === 'users') usersStatus.textContent = message || '';
     }
 
-    function normalizeText(value) {
-      return String(value || '').trim();
-    }
-
-    function sanitizeLyrics(value) {
-      return String(value || '').replace(/
-/g, '
-').replace(/
-/g, '
-').trim();
-    }
-
+    function normalizeText(value) { return String(value || '').trim(); }
+    function sanitizeLyrics(value) { return String(value || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim(); }
     function escapeHtml(value) {
       return String(value || '')
         .replace(/&/g, '&amp;')
@@ -958,10 +819,13 @@
         .replace(/'/g, '&#39;');
     }
 
+    function showScreen(screen) {
+      [loginScreen, menuScreen, pendingPanel, approvedPanel, inactivePanel, usersPanel].forEach(el => el.classList.remove('active'));
+      if (screen) screen.classList.add('active');
+    }
+
     function closeAllSwipes() {
-      document.querySelectorAll('.swipe-row.revealed, .swipe-row.swiping').forEach((row) => {
-        row.classList.remove('revealed', 'swiping');
-      });
+      document.querySelectorAll('.swipe-row.revealed, .swipe-row.swiping').forEach((row) => row.classList.remove('revealed', 'swiping'));
       state.revealedRowKey = null;
     }
 
@@ -976,17 +840,9 @@
       return getUserEmail(song.user_id);
     }
 
-    function getSuggestionById(id) {
-      return state.suggestions.find((item) => item.id === id) || null;
-    }
-
-    function getSuggestionBySongId(songId) {
-      return state.suggestions.find((item) => item.source_song_id === songId) || null;
-    }
-
-    function getActiveSuggestionBySongId(songId) {
-      return state.suggestions.find((item) => item.source_song_id === songId && item.active === true) || null;
-    }
+    function getSuggestionById(id) { return state.suggestions.find((item) => item.id === id) || null; }
+    function getSuggestionBySongId(songId) { return state.suggestions.find((item) => item.source_song_id === songId) || null; }
+    function getActiveSuggestionBySongId(songId) { return state.suggestions.find((item) => item.source_song_id === songId && item.active === true) || null; }
 
     function getPendingSongs() {
       return state.songs
@@ -995,15 +851,11 @@
     }
 
     function getApprovedSuggestions() {
-      return state.suggestions
-        .filter((item) => item.active === true)
-        .sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' }));
+      return state.suggestions.filter((item) => item.active === true).sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' }));
     }
 
     function getInactiveSuggestions() {
-      return state.suggestions
-        .filter((item) => item.active === false)
-        .sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' }));
+      return state.suggestions.filter((item) => item.active === false).sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' }));
     }
 
     function applySearch(items, panel) {
@@ -1012,17 +864,9 @@
       return items.filter((item) => JSON.stringify(item).toLowerCase().includes(query));
     }
 
-    function getPendingBadge() {
-      return '<span class="mini-badge warning">Pendente</span>';
-    }
-
-    function getApprovedBadge() {
-      return '<span class="mini-badge success">Ativa</span>';
-    }
-
-    function getInactiveBadge() {
-      return '<span class="mini-badge danger">Inativa</span>';
-    }
+    function getPendingBadge() { return '<span class="mini-badge warning">Pendente</span>'; }
+    function getApprovedBadge() { return '<span class="mini-badge success">Ativa</span>'; }
+    function getInactiveBadge() { return '<span class="mini-badge danger">Inativa</span>'; }
 
     function renderPendingList() {
       const items = applySearch(getPendingSongs().map((song) => ({ ...song, account_email: getUserEmail(song.user_id) })), 'pending');
@@ -1032,22 +876,16 @@
         setPanelStatus('pending', 'Arraste para a esquerda para aprovar. Toque no item para abrir os detalhes.');
         return;
       }
-
-      items.forEach((song) => {
-        const row = createSwipeRow({
-          key: `pending-${song.id}`,
-          revealWidth: 48,
-          actions: [
-            { icon: '✔', className: 'approve', aria: 'Aprovar música', onClick: () => handleApproveSong(song.id) }
-          ],
-          onOpenDetail: () => openSongDetail(song),
-          title: song.song_title || 'Sem título',
-          meta: `${song.artist || 'Sem artista'} • ${song.style || 'Sem estilo'}`,
-          extra: `Conta: ${song.account_email}`,
-          badge: getPendingBadge()
-        });
-        pendingList.appendChild(row);
-      });
+      items.forEach((song) => pendingList.appendChild(createSwipeRow({
+        key: `pending-${song.id}`,
+        revealWidth: 48,
+        actions: [{ icon: '✔', className: 'approve', aria: 'Aprovar música', onClick: () => handleApproveSong(song.id) }],
+        onOpenDetail: () => openSongDetail(song),
+        title: song.song_title || 'Sem título',
+        meta: `${song.artist || 'Sem artista'} • ${song.style || 'Sem estilo'}`,
+        extra: `Conta: ${song.account_email}`,
+        badge: getPendingBadge()
+      })));
       setPanelStatus('pending', `${items.length} música${items.length > 1 ? 's' : ''} pendente${items.length > 1 ? 's' : ''}.`);
     }
 
@@ -1059,23 +897,19 @@
         setPanelStatus('approved', 'Arraste para a esquerda para editar ou desabilitar.');
         return;
       }
-
-      items.forEach((item) => {
-        const row = createSwipeRow({
-          key: `approved-${item.id}`,
-          revealWidth: 94,
-          actions: [
-            { icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) },
-            { icon: '⏸', className: 'disable', aria: 'Desabilitar música', onClick: () => handleDisableSuggestion(item.id) }
-          ],
-          onOpenDetail: () => openSuggestionDetail(item, 'approved'),
-          title: item.song_title || 'Sem título',
-          meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`,
-          extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`,
-          badge: getApprovedBadge()
-        });
-        approvedList.appendChild(row);
-      });
+      items.forEach((item) => approvedList.appendChild(createSwipeRow({
+        key: `approved-${item.id}`,
+        revealWidth: 94,
+        actions: [
+          { icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) },
+          { icon: '⏸', className: 'disable', aria: 'Desabilitar música', onClick: () => handleDisableSuggestion(item.id) }
+        ],
+        onOpenDetail: () => openSuggestionDetail(item, 'approved'),
+        title: item.song_title || 'Sem título',
+        meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`,
+        extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`,
+        badge: getApprovedBadge()
+      })));
       setPanelStatus('approved', `${items.length} música${items.length > 1 ? 's' : ''} aprovada${items.length > 1 ? 's' : ''} ativa${items.length > 1 ? 's' : ''}.`);
     }
 
@@ -1087,40 +921,31 @@
         setPanelStatus('inactive', 'Arraste para a esquerda para ativar, editar ou apagar.');
         return;
       }
-
-      items.forEach((item) => {
-        const row = createSwipeRow({
-          key: `inactive-${item.id}`,
-          revealWidth: 140,
-          actions: [
-            { icon: '✔', className: 'approve', aria: 'Ativar música', onClick: () => handleActivateSuggestion(item.id) },
-            { icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) },
-            { icon: '🗑', className: 'delete', aria: 'Apagar música', onClick: () => handleDeleteSuggestion(item.id) }
-          ],
-          onOpenDetail: () => openSuggestionDetail(item, 'inactive'),
-          title: item.song_title || 'Sem título',
-          meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`,
-          extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`,
-          badge: getInactiveBadge()
-        });
-        inactiveList.appendChild(row);
-      });
+      items.forEach((item) => inactiveList.appendChild(createSwipeRow({
+        key: `inactive-${item.id}`,
+        revealWidth: 140,
+        actions: [
+          { icon: '✔', className: 'approve', aria: 'Ativar música', onClick: () => handleActivateSuggestion(item.id) },
+          { icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) },
+          { icon: '🗑', className: 'delete', aria: 'Apagar música', onClick: () => handleDeleteSuggestion(item.id) }
+        ],
+        onOpenDetail: () => openSuggestionDetail(item, 'inactive'),
+        title: item.song_title || 'Sem título',
+        meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`,
+        extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`,
+        badge: getInactiveBadge()
+      })));
       setPanelStatus('inactive', `${items.length} música${items.length > 1 ? 's' : ''} inativa${items.length > 1 ? 's' : ''}.`);
     }
 
     function renderUsersList() {
-      const items = applySearch(
-        state.users.filter((user) => user.email).sort((a, b) => (a.email || '').localeCompare((b.email || ''), 'pt-BR', { sensitivity: 'base' })),
-        'users'
-      );
-
+      const items = applySearch(state.users.filter((user) => user.email).sort((a, b) => (a.email || '').localeCompare((b.email || ''), 'pt-BR', { sensitivity: 'base' })), 'users');
       usersList.innerHTML = '';
       if (!items.length) {
         usersList.innerHTML = '<div class="empty">Nenhum usuário encontrado.</div>';
         setPanelStatus('users', 'Toque em um usuário para abrir a lista das músicas dele.');
         return;
       }
-
       items.forEach((user) => {
         const userSongCount = state.songs.filter((song) => song.user_id === user.id).length;
         const button = document.createElement('button');
@@ -1136,8 +961,7 @@
               </div>
               <div class="row-meta">${userSongCount} música${userSongCount !== 1 ? 's' : ''} cadastrada${userSongCount !== 1 ? 's' : ''}</div>
             </div>
-          </div>
-        `;
+          </div>`;
         button.addEventListener('click', () => openUserSongs(user));
         usersList.appendChild(button);
       });
@@ -1152,7 +976,6 @@
 
       const actionsWrap = document.createElement('div');
       actionsWrap.className = 'swipe-actions';
-
       actions.forEach((action) => {
         const button = document.createElement('button');
         button.type = 'button';
@@ -1178,9 +1001,7 @@
           </div>
           <div class="row-meta">${escapeHtml(meta || '')}</div>
           ${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}
-        </div>
-      `;
-
+        </div>`;
       content.addEventListener('click', () => {
         if (row.classList.contains('revealed')) {
           closeAllSwipes();
@@ -1196,11 +1017,7 @@
     }
 
     function attachSwipe(row, card, key, revealWidth) {
-      let startX = 0;
-      let startY = 0;
-      let currentX = 0;
-      let dragging = false;
-      let horizontalLocked = false;
+      let startX = 0, startY = 0, currentX = 0, dragging = false, horizontalLocked = false;
 
       row.addEventListener('pointerdown', (event) => {
         dragging = true;
@@ -1214,7 +1031,6 @@
         if (!dragging) return;
         const dx = event.clientX - startX;
         const dy = event.clientY - startY;
-
         if (!horizontalLocked) {
           if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
             horizontalLocked = true;
@@ -1226,11 +1042,9 @@
             return;
           }
         }
-
         currentX = Math.max(-revealWidth, Math.min(0, dx));
         row.classList.add('swiping');
         card.style.transform = `translateX(${currentX}px)`;
-
         if (state.revealedRowKey && state.revealedRowKey !== key) {
           closeAllSwipes();
           row.classList.add('swiping');
@@ -1243,9 +1057,7 @@
         dragging = false;
         row.classList.remove('swiping');
         card.style.transform = '';
-
         if (!horizontalLocked) return;
-
         if (currentX <= -(revealWidth * 0.35)) {
           closeAllSwipes();
           row.classList.add('revealed');
@@ -1262,22 +1074,12 @@
     }
 
     function openPanel(panelName) {
-      closeAllPanels();
+      closeAllSwipes();
       state.activePanel = panelName;
-      if (panelName === 'pending') pendingPanel.classList.add('active');
-      if (panelName === 'approved') approvedPanel.classList.add('active');
-      if (panelName === 'inactive') inactivePanel.classList.add('active');
-      if (panelName === 'users') usersPanel.classList.add('active');
-      closeAllSwipes();
-    }
-
-    function closeAllPanels() {
-      pendingPanel.classList.remove('active');
-      approvedPanel.classList.remove('active');
-      inactivePanel.classList.remove('active');
-      usersPanel.classList.remove('active');
-      state.activePanel = null;
-      closeAllSwipes();
+      if (panelName === 'pending') showScreen(pendingPanel);
+      if (panelName === 'approved') showScreen(approvedPanel);
+      if (panelName === 'inactive') showScreen(inactivePanel);
+      if (panelName === 'users') showScreen(usersPanel);
     }
 
     function openDetailModal(title, contentHtml) {
@@ -1287,77 +1089,33 @@
       closeAllSwipes();
     }
 
-    function closeDetailModal() {
-      detailModal.classList.remove('active');
-      detailModalBody.innerHTML = '';
-    }
+    function closeDetailModal() { detailModal.classList.remove('active'); detailModalBody.innerHTML = ''; }
 
     function openSongDetail(song) {
       const existing = getSuggestionBySongId(song.id);
       const html = `
-        <div class="detail-block">
-          <label>Nome da música</label>
-          <div>${escapeHtml(song.song_title || 'Sem título')}</div>
-        </div>
-        <div class="detail-block">
-          <label>Artista</label>
-          <div>${escapeHtml(song.artist || 'Sem artista')}</div>
-        </div>
-        <div class="detail-block">
-          <label>Estilo</label>
-          <div>${escapeHtml(song.style || 'Sem estilo')}</div>
-        </div>
-        <div class="detail-block">
-          <label>Conta</label>
-          <div>${escapeHtml(getUserEmail(song.user_id))}</div>
-        </div>
-        <div class="detail-block">
-          <label>Status</label>
-          <div>${existing ? (existing.active ? 'Já aprovada e ativa.' : 'Existe aprovada, mas está inativa.') : 'Pendente de aprovação.'}</div>
-        </div>
-        <div class="detail-block">
-          <label>Letra</label>
-          <div>${escapeHtml(sanitizeLyrics(song.lyrics || '') || 'Sem letra cadastrada.')}</div>
-        </div>
-      `;
+        <div class="detail-block"><label>Nome da música</label><div>${escapeHtml(song.song_title || 'Sem título')}</div></div>
+        <div class="detail-block"><label>Artista</label><div>${escapeHtml(song.artist || 'Sem artista')}</div></div>
+        <div class="detail-block"><label>Estilo</label><div>${escapeHtml(song.style || 'Sem estilo')}</div></div>
+        <div class="detail-block"><label>Conta</label><div>${escapeHtml(getUserEmail(song.user_id))}</div></div>
+        <div class="detail-block"><label>Status</label><div>${existing ? (existing.active ? 'Já aprovada e ativa.' : 'Existe aprovada, mas está inativa.') : 'Pendente de aprovação.'}</div></div>
+        <div class="detail-block"><label>Letra</label><div>${escapeHtml(sanitizeLyrics(song.lyrics || '') || 'Sem letra cadastrada.')}</div></div>`;
       openDetailModal('Detalhes da música', html);
     }
 
     function openSuggestionDetail(item, type) {
       const html = `
-        <div class="detail-block">
-          <label>Nome da música</label>
-          <div>${escapeHtml(item.song_title || 'Sem título')}</div>
-        </div>
-        <div class="detail-block">
-          <label>Artista</label>
-          <div>${escapeHtml(item.artist || 'Sem artista')}</div>
-        </div>
-        <div class="detail-block">
-          <label>Estilo</label>
-          <div>${escapeHtml(item.style || 'Sem estilo')}</div>
-        </div>
-        <div class="detail-block">
-          <label>Status</label>
-          <div>${type === 'approved' ? 'Aprovada e ativa.' : 'Aprovada, mas inativa.'}</div>
-        </div>
-        <div class="detail-block">
-          <label>Origem</label>
-          <div>${escapeHtml(getOriginEmailBySongId(item.source_song_id))}</div>
-        </div>
-        <div class="detail-block">
-          <label>Letra</label>
-          <div>${escapeHtml(sanitizeLyrics(item.lyrics || '') || 'Sem letra cadastrada.')}</div>
-        </div>
-      `;
+        <div class="detail-block"><label>Nome da música</label><div>${escapeHtml(item.song_title || 'Sem título')}</div></div>
+        <div class="detail-block"><label>Artista</label><div>${escapeHtml(item.artist || 'Sem artista')}</div></div>
+        <div class="detail-block"><label>Estilo</label><div>${escapeHtml(item.style || 'Sem estilo')}</div></div>
+        <div class="detail-block"><label>Status</label><div>${type === 'approved' ? 'Aprovada e ativa.' : 'Aprovada, mas inativa.'}</div></div>
+        <div class="detail-block"><label>Origem</label><div>${escapeHtml(getOriginEmailBySongId(item.source_song_id))}</div></div>
+        <div class="detail-block"><label>Letra</label><div>${escapeHtml(sanitizeLyrics(item.lyrics || '') || 'Sem letra cadastrada.')}</div></div>`;
       openDetailModal('Detalhes da música', html);
     }
 
     function openUserSongs(user) {
-      const songs = state.songs
-        .filter((song) => song.user_id === user.id)
-        .sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' }));
-
+      const songs = state.songs.filter((song) => song.user_id === user.id).sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' }));
       userSongsTitle.textContent = `Músicas de ${user.email || 'usuário'}`;
       if (!songs.length) {
         userSongsBody.innerHTML = '<div class="empty">Este usuário ainda não possui músicas cadastradas.</div>';
@@ -1365,29 +1123,14 @@
         userSongsBody.innerHTML = songs.map((song) => {
           const activeSuggestion = getActiveSuggestionBySongId(song.id);
           const anySuggestion = getSuggestionBySongId(song.id);
-          const badge = activeSuggestion
-            ? getApprovedBadge()
-            : anySuggestion
-              ? getInactiveBadge()
-              : getPendingBadge();
-          return `
-            <div class="detail-block">
-              <div class="row-top">
-                <label style="margin:0;">${escapeHtml(song.song_title || 'Sem título')}</label>
-                ${badge}
-              </div>
-              <div>${escapeHtml(`${song.artist || 'Sem artista'} • ${song.style || 'Sem estilo'}`)}</div>
-            </div>
-          `;
+          const badge = activeSuggestion ? getApprovedBadge() : anySuggestion ? getInactiveBadge() : getPendingBadge();
+          return `<div class="detail-block"><div class="row-top"><label style="margin:0;">${escapeHtml(song.song_title || 'Sem título')}</label>${badge}</div><div>${escapeHtml(`${song.artist || 'Sem artista'} • ${song.style || 'Sem estilo'}`)}</div></div>`;
         }).join('');
       }
       userSongsModal.classList.add('active');
     }
 
-    function closeUserSongsModal() {
-      userSongsModal.classList.remove('active');
-      userSongsBody.innerHTML = '';
-    }
+    function closeUserSongsModal() { userSongsModal.classList.remove('active'); userSongsBody.innerHTML = ''; }
 
     function openEditModal(suggestionId) {
       const item = getSuggestionById(suggestionId);
@@ -1402,50 +1145,30 @@
       closeAllSwipes();
     }
 
-    function closeEditModal() {
-      editModal.classList.remove('active');
-      state.editSuggestionId = null;
-      editStatus.textContent = '';
-    }
+    function closeEditModal() { editModal.classList.remove('active'); state.editSuggestionId = null; editStatus.textContent = ''; }
 
     async function requireAdminProfile(userId) {
       const supabase = createSupabaseClient();
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, email, is_admin')
-        .eq('id', userId)
-        .maybeSingle();
+      const { data, error } = await supabase.from('profiles').select('id, email, is_admin').eq('id', userId).maybeSingle();
       if (error) throw error;
-      if (!data || data.is_admin !== true) {
-        throw new Error('Esta conta não está autorizada como administradora.');
-      }
+      if (!data || data.is_admin !== true) throw new Error('Esta conta não está autorizada como administradora.');
       state.currentProfile = data;
       return data;
     }
 
     async function loadAllData() {
       const supabase = createSupabaseClient();
-      setMainStatus('Carregando dados do painel...');
-
       const [songsRes, suggestionsRes, usersRes] = await Promise.all([
         supabase.from('songs').select('id, created_at, user_id, song_title, artist, style, lyrics, updated_at').order('created_at', { ascending: false }),
         supabase.from('approved_suggestions').select('id, created_at, source_song_id, approved_by, song_title, artist, style, lyrics, active').order('created_at', { ascending: false }),
         supabase.from('profiles').select('id, email, is_admin').order('email', { ascending: true })
       ]);
-
       if (songsRes.error) throw songsRes.error;
       if (suggestionsRes.error) throw suggestionsRes.error;
       if (usersRes.error) throw usersRes.error;
-
       state.songs = Array.isArray(songsRes.data) ? songsRes.data : [];
       state.suggestions = Array.isArray(suggestionsRes.data) ? suggestionsRes.data : [];
       state.users = Array.isArray(usersRes.data) ? usersRes.data : [];
-
-      renderAllPanels();
-      setMainStatus('Painel atualizado.');
-    }
-
-    function renderAllPanels() {
       renderPendingList();
       renderApprovedList();
       renderInactiveList();
@@ -1459,7 +1182,6 @@
         setAuthStatus('Preencha e-mail e senha para entrar.');
         return;
       }
-
       try {
         loginBtn.disabled = true;
         setAuthStatus('Entrando...');
@@ -1475,31 +1197,15 @@
       }
     }
 
-    async function handleLogout() {
-      try {
-        logoutBtn.disabled = true;
-        const supabase = createSupabaseClient();
-        await supabase.auth.signOut();
-        resetAdminView();
-      } catch (error) {
-        setMainStatus(error.message || 'Não foi possível sair agora.');
-      } finally {
-        logoutBtn.disabled = false;
-      }
-    }
-
     function resetAdminView() {
       state.currentUser = null;
       state.currentProfile = null;
       state.songs = [];
       state.suggestions = [];
       state.users = [];
-      authCard.classList.add('active');
-      adminPanel.classList.remove('active');
       heroBadge.textContent = 'Aguardando login';
       heroBadge.className = 'badge warning';
-            setMainStatus('');
-      closeAllPanels();
+      showScreen(loginScreen);
       closeDetailModal();
       closeEditModal();
       closeUserSongsModal();
@@ -1510,22 +1216,18 @@
         resetAdminView();
         return;
       }
-
-      const profile = await requireAdminProfile(session.user.id);
+      await requireAdminProfile(session.user.id);
       state.currentUser = session.user;
-            authCard.classList.remove('active');
-      adminPanel.classList.add('active');
       heroBadge.textContent = 'Administrador conectado';
       heroBadge.className = 'badge success';
-      setMainStatus('');
       await loadAllData();
+      showScreen(menuScreen);
     }
 
     async function upsertSuggestionFromSong(songId, active = true) {
       const supabase = createSupabaseClient();
       const song = state.songs.find((item) => item.id === songId);
       if (!song) throw new Error('Música não encontrada.');
-
       const existing = getSuggestionBySongId(songId);
       const payload = {
         source_song_id: song.id,
@@ -1536,7 +1238,6 @@
         lyrics: sanitizeLyrics(song.lyrics || ''),
         active
       };
-
       if (existing) {
         const { error } = await supabase.from('approved_suggestions').update(payload).eq('id', existing.id);
         if (error) throw error;
@@ -1560,26 +1261,26 @@
     async function handleActivateSuggestion(suggestionId) {
       try {
         const supabase = createSupabaseClient();
-        setPanelStatus(state.activePanel || 'inactive', 'Ativando música...');
+        setPanelStatus('inactive', 'Ativando música...');
         const { error } = await supabase.from('approved_suggestions').update({ active: true, approved_by: state.currentUser.id }).eq('id', suggestionId);
         if (error) throw error;
         await loadAllData();
-        setPanelStatus(state.activePanel || 'inactive', 'Música ativada com sucesso.');
+        setPanelStatus('inactive', 'Música ativada com sucesso.');
       } catch (error) {
-        setPanelStatus(state.activePanel || 'inactive', error.message || 'Não foi possível ativar a música.');
+        setPanelStatus('inactive', error.message || 'Não foi possível ativar a música.');
       }
     }
 
     async function handleDisableSuggestion(suggestionId) {
       try {
         const supabase = createSupabaseClient();
-        setPanelStatus(state.activePanel || 'approved', 'Desabilitando música...');
+        setPanelStatus('approved', 'Desabilitando música...');
         const { error } = await supabase.from('approved_suggestions').update({ active: false }).eq('id', suggestionId);
         if (error) throw error;
         await loadAllData();
-        setPanelStatus(state.activePanel || 'approved', 'Música desabilitada com sucesso.');
+        setPanelStatus('approved', 'Música desabilitada com sucesso.');
       } catch (error) {
-        setPanelStatus(state.activePanel || 'approved', error.message || 'Não foi possível desabilitar a música.');
+        setPanelStatus('approved', error.message || 'Não foi possível desabilitar a música.');
       }
     }
 
@@ -1588,16 +1289,15 @@
       const name = item?.song_title || 'esta música';
       const confirmed = window.confirm(`Deseja realmente apagar "${name}"?`);
       if (!confirmed) return;
-
       try {
         const supabase = createSupabaseClient();
-        setPanelStatus(state.activePanel || 'inactive', 'Apagando música...');
+        setPanelStatus('inactive', 'Apagando música...');
         const { error } = await supabase.from('approved_suggestions').delete().eq('id', suggestionId);
         if (error) throw error;
         await loadAllData();
-        setPanelStatus(state.activePanel || 'inactive', 'Música apagada com sucesso.');
+        setPanelStatus('inactive', 'Música apagada com sucesso.');
       } catch (error) {
-        setPanelStatus(state.activePanel || 'inactive', error.message || 'Não foi possível apagar a música.');
+        setPanelStatus('inactive', error.message || 'Não foi possível apagar a música.');
       }
     }
 
@@ -1651,14 +1351,12 @@
         });
 
         loginBtn.addEventListener('click', handleLogin);
-        logoutBtn.addEventListener('click', handleLogout);
-
         $('openPendingBtn').addEventListener('click', () => openPanel('pending'));
         $('openApprovedBtn').addEventListener('click', () => openPanel('approved'));
         $('openInactiveBtn').addEventListener('click', () => openPanel('inactive'));
         $('openUsersBtn').addEventListener('click', () => openPanel('users'));
 
-        document.querySelectorAll('[data-close-panel]').forEach((button) => button.addEventListener('click', closeAllPanels));
+        document.querySelectorAll('[data-close-panel]').forEach((button) => button.addEventListener('click', () => showScreen(menuScreen)));
         document.querySelectorAll('[data-close-detail]').forEach((button) => button.addEventListener('click', closeDetailModal));
         document.querySelectorAll('[data-close-edit]').forEach((button) => button.addEventListener('click', closeEditModal));
         document.querySelectorAll('[data-close-user-songs]').forEach((button) => button.addEventListener('click', closeUserSongsModal));
