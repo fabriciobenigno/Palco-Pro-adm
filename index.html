@@ -652,40 +652,45 @@
       </div>
     </section>
 
-    <section id="authCard" class="surface auth-card">
-      <div class="panel-title">
-        <h2>Entrar como administrador</h2>
-        <p>Faça login para liberar o painel. Depois do login, esta área desaparece e fica apenas a opção de sair da conta.</p>
-      </div>
-
-      <div class="field">
-        <label for="emailInput">E-mail</label>
-        <input id="emailInput" type="email" inputmode="email" autocomplete="email" placeholder="Seu e-mail" />
-      </div>
-
-      <div class="field">
-        <label for="passwordInput">Senha</label>
-        <input id="passwordInput" type="password" autocomplete="current-password" placeholder="Sua senha" />
-        <label class="toggle-password-row" for="showPasswordToggle">
-          <input id="showPasswordToggle" type="checkbox" />
-          <span>Mostrar senha</span>
-        </label>
-      </div>
-
-      <button id="loginBtn" type="button" class="btn btn-primary">Entrar</button>
-      <div id="authStatus" class="status-line"></div>
-    </section>
-
-    <section id="adminPanel" class="surface main-card hidden">
-      <div class="sticky-account">
-        <div>
-          <strong id="accountLabel">Conta conectada</strong>
-          <span>Painel liberado para administração</span>
+    <section id="authCard" class="panel-screen active">
+    <div class="panel-shell">
+      <div class="panel-header">
+        <div class="header-copy">
+          <h2>Entrar como administrador</h2>
+          <p>Faça login para liberar o painel administrativo.</p>
         </div>
-        <button id="logoutBtn" type="button" class="btn btn-secondary">Sair da conta</button>
       </div>
+      <div class="panel-tools" style="border-bottom:0;padding-bottom:0;"></div>
+      <div class="list-area" style="padding:14px; display:grid; align-content:center;">
+        <div class="panel-title" style="margin-bottom:6px;">
+          <h2 style="font-size:20px;">Palco Pro Admin</h2>
+          <p>Login administrativo em tela cheia.</p>
+        </div>
 
-      <div class="menu-wrap">
+        <div class="field">
+          <label for="emailInput">E-mail</label>
+          <input id="emailInput" type="email" inputmode="email" autocomplete="email" placeholder="Seu e-mail" />
+        </div>
+
+        <div class="field">
+          <label for="passwordInput">Senha</label>
+          <input id="passwordInput" type="password" autocomplete="current-password" placeholder="Sua senha" />
+          <label class="toggle-password-row" for="showPasswordToggle">
+            <input id="showPasswordToggle" type="checkbox" />
+            <span>Mostrar senha</span>
+          </label>
+        </div>
+
+        <button id="loginBtn" type="button" class="btn btn-primary">Entrar</button>
+        <div id="authStatus" class="status-line"></div>
+      </div>
+      <div class="panel-footer"></div>
+    </div>
+  </section>
+
+    <section id="adminPanel" class="panel-screen">
+    <div class="panel-shell" style="grid-template-rows:1fr;">
+      <div class="list-area" style="padding:16px; display:flex; align-items:center; justify-content:center;">
         <div class="menu-grid">
           <button id="openPendingBtn" type="button" class="btn btn-primary menu-btn">Músicas pendentes</button>
           <button id="openApprovedBtn" type="button" class="btn btn-primary menu-btn">Músicas aprovadas</button>
@@ -693,9 +698,8 @@
           <button id="openUsersBtn" type="button" class="btn btn-primary menu-btn">Usuários</button>
         </div>
       </div>
-
-      <div id="mainStatus" class="status-line"></div>
-    </section>
+    </div>
+  </section>
   </main>
 
   <section id="pendingPanel" class="panel-screen">
@@ -938,7 +942,11 @@
     }
 
     function sanitizeLyrics(value) {
-      return String(value || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+      return String(value || '').replace(/
+/g, '
+').replace(/
+/g, '
+').trim();
     }
 
     function escapeHtml(value) {
@@ -960,6 +968,12 @@
     function getUserEmail(userId) {
       const profile = state.users.find((item) => item.id === userId);
       return profile?.email || 'Conta sem e-mail visível';
+    }
+
+    function getOriginEmailBySongId(songId) {
+      const song = state.songs.find((item) => item.id === songId);
+      if (!song) return 'Conta sem e-mail visível';
+      return getUserEmail(song.user_id);
     }
 
     function getSuggestionById(id) {
@@ -1057,7 +1071,7 @@
           onOpenDetail: () => openSuggestionDetail(item, 'approved'),
           title: item.song_title || 'Sem título',
           meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`,
-          extra: `Origem: ${item.source_song_id || 'Sem vínculo'}`,
+          extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`,
           badge: getApprovedBadge()
         });
         approvedList.appendChild(row);
@@ -1086,7 +1100,7 @@
           onOpenDetail: () => openSuggestionDetail(item, 'inactive'),
           title: item.song_title || 'Sem título',
           meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`,
-          extra: `Origem: ${item.source_song_id || 'Sem vínculo'}`,
+          extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`,
           badge: getInactiveBadge()
         });
         inactiveList.appendChild(row);
@@ -1329,7 +1343,7 @@
         </div>
         <div class="detail-block">
           <label>Origem</label>
-          <div>${escapeHtml(item.source_song_id || 'Sem vínculo')}</div>
+          <div>${escapeHtml(getOriginEmailBySongId(item.source_song_id))}</div>
         </div>
         <div class="detail-block">
           <label>Letra</label>
@@ -1480,12 +1494,11 @@
       state.songs = [];
       state.suggestions = [];
       state.users = [];
-      authCard.classList.remove('hidden');
-      adminPanel.classList.add('hidden');
+      authCard.classList.add('active');
+      adminPanel.classList.remove('active');
       heroBadge.textContent = 'Aguardando login';
       heroBadge.className = 'badge warning';
-      accountLabel.textContent = 'Conta conectada';
-      setMainStatus('');
+            setMainStatus('');
       closeAllPanels();
       closeDetailModal();
       closeEditModal();
@@ -1500,11 +1513,11 @@
 
       const profile = await requireAdminProfile(session.user.id);
       state.currentUser = session.user;
-      accountLabel.textContent = profile.email || session.user.email || 'Administrador';
-      authCard.classList.add('hidden');
-      adminPanel.classList.remove('hidden');
+            authCard.classList.remove('active');
+      adminPanel.classList.add('active');
       heroBadge.textContent = 'Administrador conectado';
       heroBadge.className = 'badge success';
+      setMainStatus('');
       await loadAllData();
     }
 
