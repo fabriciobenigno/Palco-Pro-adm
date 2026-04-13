@@ -21,9 +21,8 @@
       --bg-1: #020409;
       --bg-2: #08111e;
       --bg-3: #04070d;
-      --card-1: rgba(13,19,31,0.92);
-      --card-2: rgba(7,11,19,0.88);
-      --line: rgba(255,255,255,0.12);
+      --card-1: rgba(13,19,31,0.96);
+      --card-2: rgba(7,11,19,0.94);
       --text: #f7f9ff;
       --muted: rgba(255,255,255,0.72);
       --soft: rgba(255,255,255,0.54);
@@ -37,7 +36,6 @@
       --amber-1: rgba(255,204,104,0.98);
       --amber-2: rgba(233,166,44,0.94);
       --shadow: 0 26px 70px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.05);
-      --radius-xl: 28px;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -55,22 +53,15 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    body {
-      position: fixed;
-      inset: 0;
-      padding: 0;
-    }
-
+    body { position: fixed; inset: 0; }
     button, input, textarea { font: inherit; }
     button { border: 0; }
 
     .app {
       width: 100vw;
       height: 100dvh;
-      max-width: none;
-      margin: 0;
       display: grid;
-      gap: 0;
+      grid-template-rows: 1fr;
       overflow: hidden;
       padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
       background:
@@ -80,100 +71,31 @@
     }
 
     .surface {
-      border-radius: 0;
       background: linear-gradient(180deg, var(--card-1), var(--card-2));
       border: 0;
+      border-radius: 0;
       box-shadow: none;
       backdrop-filter: blur(22px);
     }
-
-    .hero {
-      padding: 14px 16px 10px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .hero-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-    }
-
-    .hero h1 {
-      margin: 0;
-      font-size: clamp(24px, 6vw, 30px);
-      line-height: 1.02;
-      letter-spacing: -0.04em;
-    }
-
-    .hero p, .muted {
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 28px;
-      padding: 6px 11px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.06);
-      color: rgba(255,255,255,0.86);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-    }
-
-    .badge.success { background: rgba(72,214,138,0.16); color: #9ef1c4; border-color: rgba(72,214,138,0.28); }
-    .badge.warning { background: rgba(255,204,104,0.16); color: #ffd992; border-color: rgba(255,204,104,0.28); }
 
     .auth-card, .main-card {
       padding: 14px;
       display: grid;
       gap: 10px;
-      flex: 1;
+      min-height: 100%;
     }
 
     .main-card {
-      min-height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 72px);
       grid-template-rows: 1fr;
       align-items: center;
     }
 
-    .panel-title {
-      display: grid;
-      gap: 4px;
-    }
+    .panel-title { display: grid; gap: 4px; }
+    .panel-title h2 { margin: 0; font-size: 17px; letter-spacing: -0.02em; }
+    .panel-title p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
 
-    .panel-title h2 {
-      margin: 0;
-      font-size: 17px;
-      letter-spacing: -0.02em;
-    }
-
-    .panel-title p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    .field {
-      display: grid;
-      gap: 8px;
-    }
-
-    .field label {
-      color: rgba(255,255,255,0.8);
-      font-size: 13px;
-      font-weight: 600;
-    }
+    .field { display: grid; gap: 8px; }
+    .field label { color: rgba(255,255,255,0.8); font-size: 13px; font-weight: 600; }
 
     input, textarea {
       width: 100%;
@@ -230,17 +152,9 @@
       border: 1px solid rgba(255,255,255,0.14);
     }
 
-    .status-line {
-      min-height: 18px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    .sticky-account,
-    #mainStatus {
-      display: none !important;
-    }
+    .status-line { min-height: 18px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .badge { display: none !important; }
+    .sticky-account, #mainStatus { display: none !important; }
 
     .menu-wrap {
       min-height: 0;
@@ -257,10 +171,7 @@
       gap: 14px;
     }
 
-    .menu-title {
-      text-align: center;
-    }
-
+    .menu-title { text-align: center; }
     .menu-title h2 {
       margin: 0;
       font-size: clamp(24px, 6vw, 30px);
@@ -268,20 +179,8 @@
       letter-spacing: -0.04em;
     }
 
-    .menu-grid {
-      width: 100%;
-      max-width: 360px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .menu-btn {
-      min-height: 52px;
-      border-radius: 18px;
-      text-align: center;
-      font-size: 15px;
-      padding: 10px 14px;
-    }
+    .menu-grid { width: 100%; display: grid; gap: 10px; }
+    .menu-btn { min-height: 52px; border-radius: 18px; text-align: center; font-size: 15px; padding: 10px 14px; }
 
     .panel-screen {
       position: fixed;
@@ -307,21 +206,8 @@
       overflow: hidden;
     }
 
-    .panel-header {
-      padding: 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .panel-header h2 {
-      margin: 0;
-      font-size: 17px;
-      letter-spacing: -0.02em;
-    }
-
+    .panel-header { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .panel-header h2 { margin: 0; font-size: 17px; letter-spacing: -0.02em; }
     .header-copy { display: grid; gap: 4px; min-width: 0; }
     .header-copy p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.4; }
     .header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
@@ -338,38 +224,10 @@
       font-size: 18px;
     }
 
-    .panel-tools {
-      padding: 10px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      display: grid;
-      gap: 10px;
-    }
-
-    .list-area {
-      overflow: auto;
-      padding: 0 12px 8px;
-      display: grid;
-      gap: 0;
-      align-content: start;
-    }
-
-    .panel-footer {
-      padding: 8px 12px 10px;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.4;
-    }
-
-    .empty {
-      padding: 18px;
-      border-radius: 20px;
-      border: 1px dashed rgba(255,255,255,0.12);
-      color: var(--muted);
-      text-align: center;
-      line-height: 1.6;
-      margin-top: 10px;
-    }
-
+    .panel-tools { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.06); display: grid; gap: 10px; }
+    .list-area { overflow: auto; padding: 0 12px 8px; display: grid; gap: 0; align-content: start; }
+    .panel-footer { padding: 8px 12px 10px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+    .empty { padding: 18px; border-radius: 20px; border: 1px dashed rgba(255,255,255,0.12); color: var(--muted); text-align: center; line-height: 1.6; margin-top: 10px; }
     .search-input { width: 100%; }
 
     .swipe-row {
@@ -453,8 +311,7 @@
     }
 
     .swipe-row.revealed .swipe-content { transform: translateX(calc(var(--swipe-reveal-width) * -1)); }
-    .swipe-row.revealed .action-btn,
-    .swipe-row.swiping .action-btn { opacity: 1; transform: translateX(0) scale(1); pointer-events: auto; }
+    .swipe-row.revealed .action-btn, .swipe-row.swiping .action-btn { opacity: 1; transform: translateX(0) scale(1); pointer-events: auto; }
 
     .row-main { display: grid; gap: 1px; width: 100%; }
     .row-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; min-width: 0; }
@@ -503,43 +360,14 @@
       overflow: hidden;
     }
 
-    .modal-head {
-      padding: 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
+    .modal-head { padding: 14px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .modal-head h3 { margin: 0; font-size: 18px; letter-spacing: -0.02em; }
     .modal-body { overflow: auto; padding: 14px; display: grid; gap: 12px; align-content: start; }
     .modal-foot { padding: 14px; border-top: 1px solid rgba(255,255,255,0.08); display: grid; gap: 10px; }
 
-    .detail-block {
-      padding: 14px;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      display: grid;
-      gap: 8px;
-    }
-
-    .detail-block label {
-      color: var(--soft);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-    }
-
-    .detail-block div {
-      color: #fff;
-      line-height: 1.7;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
+    .detail-block { padding: 14px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); display: grid; gap: 8px; }
+    .detail-block label { color: var(--soft); font-size: 12px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
+    .detail-block div { color: #fff; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
     .form-grid { display: grid; gap: 12px; }
     .hidden { display: none !important; }
 
@@ -552,20 +380,10 @@
 </head>
 <body>
   <main class="app">
-    <section class="surface hero">
-      <div class="hero-top">
-        <div>
-          <h1>Palco Pro Admin</h1>
-          <p>Painel administrativo mobile-first para revisar músicas dos usuários, aprovar sugestões e controlar o que fica ativo no app principal.</p>
-        </div>
-        <div id="heroBadge" class="badge warning">Aguardando login</div>
-      </div>
-    </section>
-
     <section id="authCard" class="surface auth-card">
       <div class="panel-title">
         <h2>Entrar como administrador</h2>
-        <p>Faça login para liberar o painel. Depois do login, esta área desaparece e fica apenas a opção de sair da conta.</p>
+        <p>Faça login para liberar o painel.</p>
       </div>
 
       <div class="field">
@@ -626,102 +444,27 @@
     const SUPABASE_URL = 'https://dlcjcsbdabjupsiwlncd.supabase.co';
     const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2JU7mYP9oeeUvzncDuZMRw_8p3lzGfT';
 
-    const state = {
-      supabase: null,
-      currentUser: null,
-      currentProfile: null,
-      songs: [],
-      users: [],
-      suggestions: [],
-      searches: { pending: '', approved: '', inactive: '', users: '' },
-      editSuggestionId: null,
-      activePanel: null,
-      revealedRowKey: null
-    };
-
+    const state = { supabase: null, currentUser: null, currentProfile: null, songs: [], users: [], suggestions: [], searches: { pending: '', approved: '', inactive: '', users: '' }, editSuggestionId: null, activePanel: null, revealedRowKey: null };
     const $ = (id) => document.getElementById(id);
-    const heroBadge = $('heroBadge');
-    const authCard = $('authCard');
-    const adminPanel = $('adminPanel');
-    const emailInput = $('emailInput');
-    const passwordInput = $('passwordInput');
-    const showPasswordToggle = $('showPasswordToggle');
-    const loginBtn = $('loginBtn');
-    const logoutBtn = $('logoutBtn');
-    const authStatus = $('authStatus');
-    const accountLabel = $('accountLabel');
-    const mainStatus = $('mainStatus');
-    const pendingPanel = $('pendingPanel');
-    const approvedPanel = $('approvedPanel');
-    const inactivePanel = $('inactivePanel');
-    const usersPanel = $('usersPanel');
-    const pendingSearch = $('pendingSearch');
-    const approvedSearch = $('approvedSearch');
-    const inactiveSearch = $('inactiveSearch');
-    const usersSearch = $('usersSearch');
-    const pendingList = $('pendingList');
-    const approvedList = $('approvedList');
-    const inactiveList = $('inactiveList');
-    const usersList = $('usersList');
-    const pendingStatus = $('pendingStatus');
-    const approvedStatus = $('approvedStatus');
-    const inactiveStatus = $('inactiveStatus');
-    const usersStatus = $('usersStatus');
-    const detailModal = $('detailModal');
-    const detailModalTitle = $('detailModalTitle');
-    const detailModalBody = $('detailModalBody');
-    const editModal = $('editModal');
-    const editTitle = $('editTitle');
-    const editArtist = $('editArtist');
-    const editStyle = $('editStyle');
-    const editLyrics = $('editLyrics');
-    const editStatus = $('editStatus');
-    const saveEditBtn = $('saveEditBtn');
-    const userSongsModal = $('userSongsModal');
-    const userSongsTitle = $('userSongsTitle');
-    const userSongsBody = $('userSongsBody');
+    const authCard = $('authCard'); const adminPanel = $('adminPanel'); const emailInput = $('emailInput'); const passwordInput = $('passwordInput'); const showPasswordToggle = $('showPasswordToggle'); const loginBtn = $('loginBtn'); const logoutBtn = $('logoutBtn'); const authStatus = $('authStatus'); const accountLabel = $('accountLabel'); const mainStatus = $('mainStatus');
+    const pendingPanel = $('pendingPanel'); const approvedPanel = $('approvedPanel'); const inactivePanel = $('inactivePanel'); const usersPanel = $('usersPanel');
+    const pendingSearch = $('pendingSearch'); const approvedSearch = $('approvedSearch'); const inactiveSearch = $('inactiveSearch'); const usersSearch = $('usersSearch');
+    const pendingList = $('pendingList'); const approvedList = $('approvedList'); const inactiveList = $('inactiveList'); const usersList = $('usersList');
+    const pendingStatus = $('pendingStatus'); const approvedStatus = $('approvedStatus'); const inactiveStatus = $('inactiveStatus'); const usersStatus = $('usersStatus');
+    const detailModal = $('detailModal'); const detailModalTitle = $('detailModalTitle'); const detailModalBody = $('detailModalBody');
+    const editModal = $('editModal'); const editTitle = $('editTitle'); const editArtist = $('editArtist'); const editStyle = $('editStyle'); const editLyrics = $('editLyrics'); const editStatus = $('editStatus'); const saveEditBtn = $('saveEditBtn');
+    const userSongsModal = $('userSongsModal'); const userSongsTitle = $('userSongsTitle'); const userSongsBody = $('userSongsBody');
 
-    function createSupabaseClient() {
-      if (!window.supabase) throw new Error('Supabase não carregou.');
-      if (!state.supabase) state.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-      return state.supabase;
-    }
-
+    function createSupabaseClient() { if (!window.supabase) throw new Error('Supabase não carregou.'); if (!state.supabase) state.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY); return state.supabase; }
     function setAuthStatus(message) { authStatus.textContent = message || ''; }
     function setMainStatus(message) { mainStatus.textContent = message || ''; }
-    function setPanelStatus(panel, message) {
-      if (panel === 'pending') pendingStatus.textContent = message || '';
-      if (panel === 'approved') approvedStatus.textContent = message || '';
-      if (panel === 'inactive') inactiveStatus.textContent = message || '';
-      if (panel === 'users') usersStatus.textContent = message || '';
-    }
-
+    function setPanelStatus(panel, message) { if (panel === 'pending') pendingStatus.textContent = message || ''; if (panel === 'approved') approvedStatus.textContent = message || ''; if (panel === 'inactive') inactiveStatus.textContent = message || ''; if (panel === 'users') usersStatus.textContent = message || ''; }
     function normalizeText(value) { return String(value || '').trim(); }
     function sanitizeLyrics(value) { return String(value || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim(); }
-    function escapeHtml(value) {
-      return String(value || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/\"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    function closeAllSwipes() {
-      document.querySelectorAll('.swipe-row.revealed, .swipe-row.swiping').forEach((row) => row.classList.remove('revealed', 'swiping'));
-      state.revealedRowKey = null;
-    }
-
-    function getUserEmail(userId) {
-      const profile = state.users.find((item) => item.id === userId);
-      return profile?.email || 'Conta sem e-mail visível';
-    }
-
-    function getOriginEmailBySongId(songId) {
-      const song = state.songs.find((item) => item.id === songId);
-      return song ? getUserEmail(song.user_id) : 'Conta sem e-mail visível';
-    }
-
+    function escapeHtml(value) { return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&#39;'); }
+    function closeAllSwipes() { document.querySelectorAll('.swipe-row.revealed, .swipe-row.swiping').forEach((row) => row.classList.remove('revealed', 'swiping')); state.revealedRowKey = null; }
+    function getUserEmail(userId) { const profile = state.users.find((item) => item.id === userId); return profile?.email || 'Conta sem e-mail visível'; }
+    function getOriginEmailBySongId(songId) { const song = state.songs.find((item) => item.id === songId); return song ? getUserEmail(song.user_id) : 'Conta sem e-mail visível'; }
     function getSuggestionById(id) { return state.suggestions.find((item) => item.id === id) || null; }
     function getSuggestionBySongId(songId) { return state.suggestions.find((item) => item.source_song_id === songId) || null; }
     function getActiveSuggestionBySongId(songId) { return state.suggestions.find((item) => item.source_song_id === songId && item.active === true) || null; }
@@ -734,129 +477,57 @@
     function getInactiveBadge() { return '<span class="mini-badge danger">Inativa</span>'; }
 
     function createSwipeRow({ key, revealWidth, actions, onOpenDetail, title, meta, extra, badge }) {
-      const row = document.createElement('div');
-      row.className = 'swipe-row';
-      row.dataset.key = key;
-      row.style.setProperty('--swipe-reveal-width', `${revealWidth}px`);
-      const actionsWrap = document.createElement('div');
-      actionsWrap.className = 'swipe-actions';
-      actions.forEach((action) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = `action-btn ${action.className}`;
-        button.setAttribute('aria-label', action.aria);
-        button.textContent = action.icon;
-        button.addEventListener('click', (event) => { event.stopPropagation(); closeAllSwipes(); action.onClick(); });
-        actionsWrap.appendChild(button);
-      });
-      const content = document.createElement('button');
-      content.type = 'button';
-      content.className = 'swipe-content';
-      content.innerHTML = `<div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(title)}</h3>${badge || ''}</div><div class="row-meta">${escapeHtml(meta || '')}</div>${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}</div>`;
-      content.addEventListener('click', () => {
-        if (row.classList.contains('revealed')) { closeAllSwipes(); return; }
-        onOpenDetail();
-      });
-      attachSwipe(row, content, key, revealWidth);
-      row.appendChild(actionsWrap);
-      row.appendChild(content);
-      return row;
+      const row = document.createElement('div'); row.className = 'swipe-row'; row.dataset.key = key; row.style.setProperty('--swipe-reveal-width', `${revealWidth}px`);
+      const actionsWrap = document.createElement('div'); actionsWrap.className = 'swipe-actions';
+      actions.forEach((action) => { const button = document.createElement('button'); button.type = 'button'; button.className = `action-btn ${action.className}`; button.setAttribute('aria-label', action.aria); button.textContent = action.icon; button.addEventListener('click', (event) => { event.stopPropagation(); closeAllSwipes(); action.onClick(); }); actionsWrap.appendChild(button); });
+      const content = document.createElement('button'); content.type = 'button'; content.className = 'swipe-content'; content.innerHTML = `<div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(title)}</h3>${badge || ''}</div><div class="row-meta">${escapeHtml(meta || '')}</div>${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}</div>`;
+      content.addEventListener('click', () => { if (row.classList.contains('revealed')) { closeAllSwipes(); return; } onOpenDetail(); });
+      attachSwipe(row, content, key, revealWidth); row.appendChild(actionsWrap); row.appendChild(content); return row;
     }
 
     function attachSwipe(row, card, key, revealWidth) {
       let startX = 0, startY = 0, currentX = 0, dragging = false, horizontalLocked = false;
       row.addEventListener('pointerdown', (event) => { dragging = true; horizontalLocked = false; startX = event.clientX; startY = event.clientY; currentX = 0; });
       row.addEventListener('pointermove', (event) => {
-        if (!dragging) return;
-        const dx = event.clientX - startX;
-        const dy = event.clientY - startY;
-        if (!horizontalLocked) {
-          if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) horizontalLocked = true;
-          else if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) { dragging = false; row.classList.remove('swiping'); return; }
-          else return;
-        }
-        currentX = Math.max(-revealWidth, Math.min(0, dx));
-        row.classList.add('swiping');
-        card.style.transform = `translateX(${currentX}px)`;
-        if (state.revealedRowKey && state.revealedRowKey !== key) {
-          closeAllSwipes();
-          row.classList.add('swiping');
-          card.style.transform = `translateX(${currentX}px)`;
-        }
+        if (!dragging) return; const dx = event.clientX - startX; const dy = event.clientY - startY;
+        if (!horizontalLocked) { if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) horizontalLocked = true; else if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) { dragging = false; row.classList.remove('swiping'); return; } else return; }
+        currentX = Math.max(-revealWidth, Math.min(0, dx)); row.classList.add('swiping'); card.style.transform = `translateX(${currentX}px)`;
+        if (state.revealedRowKey && state.revealedRowKey !== key) { closeAllSwipes(); row.classList.add('swiping'); card.style.transform = `translateX(${currentX}px)`; }
       });
-      const endSwipe = () => {
-        if (!dragging) return;
-        dragging = false;
-        row.classList.remove('swiping');
-        card.style.transform = '';
-        if (!horizontalLocked) return;
-        if (currentX <= -(revealWidth * 0.35)) { closeAllSwipes(); row.classList.add('revealed'); state.revealedRowKey = key; }
-        else { row.classList.remove('revealed'); if (state.revealedRowKey === key) state.revealedRowKey = null; }
-      };
-      row.addEventListener('pointerup', endSwipe);
-      row.addEventListener('pointercancel', endSwipe);
-      row.addEventListener('lostpointercapture', endSwipe);
+      const endSwipe = () => { if (!dragging) return; dragging = false; row.classList.remove('swiping'); card.style.transform = ''; if (!horizontalLocked) return; if (currentX <= -(revealWidth * 0.35)) { closeAllSwipes(); row.classList.add('revealed'); state.revealedRowKey = key; } else { row.classList.remove('revealed'); if (state.revealedRowKey === key) state.revealedRowKey = null; } };
+      row.addEventListener('pointerup', endSwipe); row.addEventListener('pointercancel', endSwipe); row.addEventListener('lostpointercapture', endSwipe);
     }
 
     function renderPendingList() {
-      const items = applySearch(getPendingSongs().map((song) => ({ ...song, account_email: getUserEmail(song.user_id) })), 'pending');
-      pendingList.innerHTML = '';
+      const items = applySearch(getPendingSongs().map((song) => ({ ...song, account_email: getUserEmail(song.user_id) })), 'pending'); pendingList.innerHTML = '';
       if (!items.length) { pendingList.innerHTML = '<div class="empty">Nenhuma música pendente encontrada.</div>'; setPanelStatus('pending', 'Arraste para a esquerda para aprovar. Toque no item para abrir os detalhes.'); return; }
       items.forEach((song) => pendingList.appendChild(createSwipeRow({ key: `pending-${song.id}`, revealWidth: 48, actions: [{ icon: '✔', className: 'approve', aria: 'Aprovar música', onClick: () => handleApproveSong(song.id) }], onOpenDetail: () => openSongDetail(song), title: song.song_title || 'Sem título', meta: `${song.artist || 'Sem artista'} • ${song.style || 'Sem estilo'}`, extra: `Conta: ${song.account_email}`, badge: getPendingBadge() })));
       setPanelStatus('pending', `${items.length} música${items.length > 1 ? 's' : ''} pendente${items.length > 1 ? 's' : ''}.`);
     }
 
     function renderApprovedList() {
-      const items = applySearch(getApprovedSuggestions(), 'approved');
-      approvedList.innerHTML = '';
+      const items = applySearch(getApprovedSuggestions(), 'approved'); approvedList.innerHTML = '';
       if (!items.length) { approvedList.innerHTML = '<div class="empty">Nenhuma música aprovada ativa encontrada.</div>'; setPanelStatus('approved', 'Arraste para a esquerda para editar ou desabilitar.'); return; }
       items.forEach((item) => approvedList.appendChild(createSwipeRow({ key: `approved-${item.id}`, revealWidth: 94, actions: [{ icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) }, { icon: '⏸', className: 'disable', aria: 'Desabilitar música', onClick: () => handleDisableSuggestion(item.id) }], onOpenDetail: () => openSuggestionDetail(item, 'approved'), title: item.song_title || 'Sem título', meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`, extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`, badge: getApprovedBadge() })));
       setPanelStatus('approved', `${items.length} música${items.length > 1 ? 's' : ''} aprovada${items.length > 1 ? 's' : ''} ativa${items.length > 1 ? 's' : ''}.`);
     }
 
     function renderInactiveList() {
-      const items = applySearch(getInactiveSuggestions(), 'inactive');
-      inactiveList.innerHTML = '';
+      const items = applySearch(getInactiveSuggestions(), 'inactive'); inactiveList.innerHTML = '';
       if (!items.length) { inactiveList.innerHTML = '<div class="empty">Nenhuma música inativa encontrada.</div>'; setPanelStatus('inactive', 'Arraste para a esquerda para ativar, editar ou apagar.'); return; }
       items.forEach((item) => inactiveList.appendChild(createSwipeRow({ key: `inactive-${item.id}`, revealWidth: 140, actions: [{ icon: '✔', className: 'approve', aria: 'Ativar música', onClick: () => handleActivateSuggestion(item.id) }, { icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) }, { icon: '🗑', className: 'delete', aria: 'Apagar música', onClick: () => handleDeleteSuggestion(item.id) }], onOpenDetail: () => openSuggestionDetail(item, 'inactive'), title: item.song_title || 'Sem título', meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`, extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`, badge: getInactiveBadge() })));
       setPanelStatus('inactive', `${items.length} música${items.length > 1 ? 's' : ''} inativa${items.length > 1 ? 's' : ''}.`);
     }
 
     function renderUsersList() {
-      const items = applySearch(state.users.filter((user) => user.email).sort((a, b) => (a.email || '').localeCompare((b.email || ''), 'pt-BR', { sensitivity: 'base' })), 'users');
-      usersList.innerHTML = '';
+      const items = applySearch(state.users.filter((user) => user.email).sort((a, b) => (a.email || '').localeCompare((b.email || ''), 'pt-BR', { sensitivity: 'base' })), 'users'); usersList.innerHTML = '';
       if (!items.length) { usersList.innerHTML = '<div class="empty">Nenhum usuário encontrado.</div>'; setPanelStatus('users', 'Toque em um usuário para abrir a lista das músicas dele.'); return; }
-      items.forEach((user) => {
-        const count = state.songs.filter((song) => song.user_id === user.id).length;
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'swipe-row';
-        button.innerHTML = `<div class="swipe-content" style="transform:none;"><div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(user.email)}</h3><span class="mini-badge ${user.is_admin ? 'success' : 'warning'}">${user.is_admin ? 'Admin' : 'Usuário'}</span></div><div class="row-meta">${count} música${count !== 1 ? 's' : ''} cadastrada${count !== 1 ? 's' : ''}</div></div></div>`;
-        button.addEventListener('click', () => openUserSongs(user));
-        usersList.appendChild(button);
-      });
+      items.forEach((user) => { const count = state.songs.filter((song) => song.user_id === user.id).length; const button = document.createElement('button'); button.type = 'button'; button.className = 'swipe-row'; button.innerHTML = `<div class="swipe-content" style="transform:none;"><div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(user.email)}</h3><span class="mini-badge ${user.is_admin ? 'success' : 'warning'}">${user.is_admin ? 'Admin' : 'Usuário'}</span></div><div class="row-meta">${count} música${count !== 1 ? 's' : ''} cadastrada${count !== 1 ? 's' : ''}</div></div></div>`; button.addEventListener('click', () => openUserSongs(user)); usersList.appendChild(button); });
       setPanelStatus('users', `${items.length} usuário${items.length > 1 ? 's' : ''} listado${items.length > 1 ? 's' : ''}.`);
     }
 
-    function openPanel(panelName) {
-      closeAllPanels();
-      state.activePanel = panelName;
-      if (panelName === 'pending') pendingPanel.classList.add('active');
-      if (panelName === 'approved') approvedPanel.classList.add('active');
-      if (panelName === 'inactive') inactivePanel.classList.add('active');
-      if (panelName === 'users') usersPanel.classList.add('active');
-      closeAllSwipes();
-    }
-
-    function closeAllPanels() {
-      pendingPanel.classList.remove('active');
-      approvedPanel.classList.remove('active');
-      inactivePanel.classList.remove('active');
-      usersPanel.classList.remove('active');
-      state.activePanel = null;
-      closeAllSwipes();
-    }
-
+    function openPanel(panelName) { closeAllPanels(); state.activePanel = panelName; if (panelName === 'pending') pendingPanel.classList.add('active'); if (panelName === 'approved') approvedPanel.classList.add('active'); if (panelName === 'inactive') inactivePanel.classList.add('active'); if (panelName === 'users') usersPanel.classList.add('active'); closeAllSwipes(); }
+    function closeAllPanels() { pendingPanel.classList.remove('active'); approvedPanel.classList.remove('active'); inactivePanel.classList.remove('active'); usersPanel.classList.remove('active'); state.activePanel = null; closeAllSwipes(); }
     function openDetailModal(title, contentHtml) { detailModalTitle.textContent = title; detailModalBody.innerHTML = contentHtml; detailModal.classList.add('active'); closeAllSwipes(); }
     function closeDetailModal() { detailModal.classList.remove('active'); detailModalBody.innerHTML = ''; }
 
@@ -872,31 +543,13 @@
     function openUserSongs(user) {
       const songs = state.songs.filter((song) => song.user_id === user.id).sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' }));
       userSongsTitle.textContent = `Músicas de ${user.email || 'usuário'}`;
-      if (!songs.length) { userSongsBody.innerHTML = '<div class="empty">Este usuário ainda não possui músicas cadastradas.</div>'; }
-      else {
-        userSongsBody.innerHTML = songs.map((song) => {
-          const activeSuggestion = getActiveSuggestionBySongId(song.id);
-          const anySuggestion = getSuggestionBySongId(song.id);
-          const badge = activeSuggestion ? getApprovedBadge() : anySuggestion ? getInactiveBadge() : getPendingBadge();
-          return `<div class="detail-block"><div class="row-top"><label style="margin:0;">${escapeHtml(song.song_title || 'Sem título')}</label>${badge}</div><div>${escapeHtml(`${song.artist || 'Sem artista'} • ${song.style || 'Sem estilo'}`)}</div></div>`;
-        }).join('');
-      }
+      if (!songs.length) userSongsBody.innerHTML = '<div class="empty">Este usuário ainda não possui músicas cadastradas.</div>';
+      else userSongsBody.innerHTML = songs.map((song) => { const activeSuggestion = getActiveSuggestionBySongId(song.id); const anySuggestion = getSuggestionBySongId(song.id); const badge = activeSuggestion ? getApprovedBadge() : anySuggestion ? getInactiveBadge() : getPendingBadge(); return `<div class="detail-block"><div class="row-top"><label style="margin:0;">${escapeHtml(song.song_title || 'Sem título')}</label>${badge}</div><div>${escapeHtml(`${song.artist || 'Sem artista'} • ${song.style || 'Sem estilo'}`)}</div></div>`; }).join('');
       userSongsModal.classList.add('active');
     }
 
     function closeUserSongsModal() { userSongsModal.classList.remove('active'); userSongsBody.innerHTML = ''; }
-    function openEditModal(suggestionId) {
-      const item = getSuggestionById(suggestionId);
-      if (!item) return;
-      state.editSuggestionId = suggestionId;
-      editTitle.value = item.song_title || '';
-      editArtist.value = item.artist || '';
-      editStyle.value = item.style || '';
-      editLyrics.value = sanitizeLyrics(item.lyrics || '');
-      editStatus.textContent = '';
-      editModal.classList.add('active');
-      closeAllSwipes();
-    }
+    function openEditModal(suggestionId) { const item = getSuggestionById(suggestionId); if (!item) return; state.editSuggestionId = suggestionId; editTitle.value = item.song_title || ''; editArtist.value = item.artist || ''; editStyle.value = item.style || ''; editLyrics.value = sanitizeLyrics(item.lyrics || ''); editStatus.textContent = ''; editModal.classList.add('active'); closeAllSwipes(); }
     function closeEditModal() { editModal.classList.remove('active'); state.editSuggestionId = null; editStatus.textContent = ''; }
 
     async function requireAdminProfile(userId) {
@@ -915,136 +568,50 @@
         supabase.from('approved_suggestions').select('id, created_at, source_song_id, approved_by, song_title, artist, style, lyrics, active').order('created_at', { ascending: false }),
         supabase.from('profiles').select('id, email, is_admin').order('email', { ascending: true })
       ]);
-      if (songsRes.error) throw songsRes.error;
-      if (suggestionsRes.error) throw suggestionsRes.error;
-      if (usersRes.error) throw usersRes.error;
-      state.songs = Array.isArray(songsRes.data) ? songsRes.data : [];
-      state.suggestions = Array.isArray(suggestionsRes.data) ? suggestionsRes.data : [];
-      state.users = Array.isArray(usersRes.data) ? usersRes.data : [];
-      renderPendingList();
-      renderApprovedList();
-      renderInactiveList();
-      renderUsersList();
+      if (songsRes.error) throw songsRes.error; if (suggestionsRes.error) throw suggestionsRes.error; if (usersRes.error) throw usersRes.error;
+      state.songs = Array.isArray(songsRes.data) ? songsRes.data : []; state.suggestions = Array.isArray(suggestionsRes.data) ? suggestionsRes.data : []; state.users = Array.isArray(usersRes.data) ? usersRes.data : [];
+      renderPendingList(); renderApprovedList(); renderInactiveList(); renderUsersList();
     }
 
     async function handleLogin() {
-      const email = normalizeText(emailInput.value);
-      const password = passwordInput.value;
+      const email = normalizeText(emailInput.value); const password = passwordInput.value;
       if (!email || !password) { setAuthStatus('Preencha e-mail e senha para entrar.'); return; }
       try {
-        loginBtn.disabled = true;
-        setAuthStatus('Entrando...');
-        const supabase = createSupabaseClient();
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        await applySession(data.session || null);
-        setAuthStatus('');
-      } catch (error) {
-        setAuthStatus(error.message || 'Não foi possível fazer login agora.');
-      } finally {
-        loginBtn.disabled = false;
-      }
+        loginBtn.disabled = true; setAuthStatus('Entrando...'); const supabase = createSupabaseClient(); const { data, error } = await supabase.auth.signInWithPassword({ email, password }); if (error) throw error; await applySession(data.session || null); setAuthStatus('');
+      } catch (error) { setAuthStatus(error.message || 'Não foi possível fazer login agora.'); }
+      finally { loginBtn.disabled = false; }
     }
 
     async function handleLogout() {
-      try {
-        logoutBtn.disabled = true;
-        const supabase = createSupabaseClient();
-        await supabase.auth.signOut();
-        resetAdminView();
-      } catch (error) {
-        setMainStatus(error.message || 'Não foi possível sair agora.');
-      } finally {
-        logoutBtn.disabled = false;
-      }
+      try { logoutBtn.disabled = true; const supabase = createSupabaseClient(); await supabase.auth.signOut(); resetAdminView(); }
+      catch (error) { setMainStatus(error.message || 'Não foi possível sair agora.'); }
+      finally { logoutBtn.disabled = false; }
     }
 
     function resetAdminView() {
-      state.currentUser = null;
-      state.currentProfile = null;
-      state.songs = [];
-      state.suggestions = [];
-      state.users = [];
-      authCard.classList.remove('hidden');
-      adminPanel.classList.add('hidden');
-      heroBadge.textContent = 'Aguardando login';
-      heroBadge.className = 'badge warning';
-      accountLabel.textContent = 'Conta conectada';
-      setMainStatus('');
-      closeAllPanels();
-      closeDetailModal();
-      closeEditModal();
-      closeUserSongsModal();
+      state.currentUser = null; state.currentProfile = null; state.songs = []; state.suggestions = []; state.users = [];
+      authCard.classList.remove('hidden'); adminPanel.classList.add('hidden'); accountLabel.textContent = 'Conta conectada'; setMainStatus(''); closeAllPanels(); closeDetailModal(); closeEditModal(); closeUserSongsModal();
     }
 
     async function applySession(session) {
       if (!session?.user) { resetAdminView(); return; }
-      const profile = await requireAdminProfile(session.user.id);
-      state.currentUser = session.user;
-      accountLabel.textContent = profile.email || session.user.email || 'Administrador';
-      authCard.classList.add('hidden');
-      adminPanel.classList.remove('hidden');
-      heroBadge.textContent = 'Administrador conectado';
-      heroBadge.className = 'badge success';
-      await loadAllData();
+      const profile = await requireAdminProfile(session.user.id); state.currentUser = session.user; accountLabel.textContent = profile.email || session.user.email || 'Administrador'; authCard.classList.add('hidden'); adminPanel.classList.remove('hidden'); await loadAllData();
     }
 
     async function upsertSuggestionFromSong(songId, active = true) {
-      const supabase = createSupabaseClient();
-      const song = state.songs.find((item) => item.id === songId);
-      if (!song) throw new Error('Música não encontrada.');
+      const supabase = createSupabaseClient(); const song = state.songs.find((item) => item.id === songId); if (!song) throw new Error('Música não encontrada.');
       const existing = getSuggestionBySongId(songId);
       const payload = { source_song_id: song.id, approved_by: state.currentUser.id, song_title: song.song_title || 'Sem título', artist: song.artist || '', style: song.style || '', lyrics: sanitizeLyrics(song.lyrics || ''), active };
-      if (existing) {
-        const { error } = await supabase.from('approved_suggestions').update(payload).eq('id', existing.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from('approved_suggestions').insert(payload);
-        if (error) throw error;
-      }
+      if (existing) { const { error } = await supabase.from('approved_suggestions').update(payload).eq('id', existing.id); if (error) throw error; }
+      else { const { error } = await supabase.from('approved_suggestions').insert(payload); if (error) throw error; }
     }
 
-    async function handleApproveSong(songId) {
-      try { setPanelStatus('pending', 'Aprovando música...'); await upsertSuggestionFromSong(songId, true); await loadAllData(); setPanelStatus('pending', 'Música aprovada com sucesso.'); }
-      catch (error) { setPanelStatus('pending', error.message || 'Não foi possível aprovar a música.'); }
-    }
-    async function handleActivateSuggestion(suggestionId) {
-      try { const supabase = createSupabaseClient(); setPanelStatus(state.activePanel || 'inactive', 'Ativando música...'); const { error } = await supabase.from('approved_suggestions').update({ active: true, approved_by: state.currentUser.id }).eq('id', suggestionId); if (error) throw error; await loadAllData(); setPanelStatus(state.activePanel || 'inactive', 'Música ativada com sucesso.'); }
-      catch (error) { setPanelStatus(state.activePanel || 'inactive', error.message || 'Não foi possível ativar a música.'); }
-    }
-    async function handleDisableSuggestion(suggestionId) {
-      try { const supabase = createSupabaseClient(); setPanelStatus(state.activePanel || 'approved', 'Desabilitando música...'); const { error } = await supabase.from('approved_suggestions').update({ active: false }).eq('id', suggestionId); if (error) throw error; await loadAllData(); setPanelStatus(state.activePanel || 'approved', 'Música desabilitada com sucesso.'); }
-      catch (error) { setPanelStatus(state.activePanel || 'approved', error.message || 'Não foi possível desabilitar a música.'); }
-    }
-    async function handleDeleteSuggestion(suggestionId) {
-      const item = getSuggestionById(suggestionId);
-      const name = item?.song_title || 'esta música';
-      if (!window.confirm(`Deseja realmente apagar \"${name}\"?`)) return;
-      try { const supabase = createSupabaseClient(); setPanelStatus(state.activePanel || 'inactive', 'Apagando música...'); const { error } = await supabase.from('approved_suggestions').delete().eq('id', suggestionId); if (error) throw error; await loadAllData(); setPanelStatus(state.activePanel || 'inactive', 'Música apagada com sucesso.'); }
-      catch (error) { setPanelStatus(state.activePanel || 'inactive', error.message || 'Não foi possível apagar a música.'); }
-    }
-    async function handleSaveEdit() {
-      if (!state.editSuggestionId) return;
-      try {
-        saveEditBtn.disabled = true;
-        editStatus.textContent = 'Salvando alterações.';
-        const supabase = createSupabaseClient();
-        const payload = { song_title: normalizeText(editTitle.value) || 'Sem título', artist: normalizeText(editArtist.value), style: normalizeText(editStyle.value), lyrics: sanitizeLyrics(editLyrics.value) };
-        const { error } = await supabase.from('approved_suggestions').update(payload).eq('id', state.editSuggestionId);
-        if (error) throw error;
-        await loadAllData();
-        closeEditModal();
-      } catch (error) {
-        editStatus.textContent = error.message || 'Não foi possível salvar as alterações.';
-      } finally {
-        saveEditBtn.disabled = false;
-      }
-    }
-
-    async function refreshCurrentPanel(panel) {
-      try { setPanelStatus(panel, 'Atualizando lista...'); await loadAllData(); setPanelStatus(panel, 'Lista atualizada.'); }
-      catch (error) { setPanelStatus(panel, error.message || 'Não foi possível atualizar a lista.'); }
-    }
+    async function handleApproveSong(songId) { try { setPanelStatus('pending', 'Aprovando música...'); await upsertSuggestionFromSong(songId, true); await loadAllData(); setPanelStatus('pending', 'Música aprovada com sucesso.'); } catch (error) { setPanelStatus('pending', error.message || 'Não foi possível aprovar a música.'); } }
+    async function handleActivateSuggestion(suggestionId) { try { const supabase = createSupabaseClient(); setPanelStatus(state.activePanel || 'inactive', 'Ativando música...'); const { error } = await supabase.from('approved_suggestions').update({ active: true, approved_by: state.currentUser.id }).eq('id', suggestionId); if (error) throw error; await loadAllData(); setPanelStatus(state.activePanel || 'inactive', 'Música ativada com sucesso.'); } catch (error) { setPanelStatus(state.activePanel || 'inactive', error.message || 'Não foi possível ativar a música.'); } }
+    async function handleDisableSuggestion(suggestionId) { try { const supabase = createSupabaseClient(); setPanelStatus(state.activePanel || 'approved', 'Desabilitando música...'); const { error } = await supabase.from('approved_suggestions').update({ active: false }).eq('id', suggestionId); if (error) throw error; await loadAllData(); setPanelStatus(state.activePanel || 'approved', 'Música desabilitada com sucesso.'); } catch (error) { setPanelStatus(state.activePanel || 'approved', error.message || 'Não foi possível desabilitar a música.'); } }
+    async function handleDeleteSuggestion(suggestionId) { const item = getSuggestionById(suggestionId); const name = item?.song_title || 'esta música'; if (!window.confirm(`Deseja realmente apagar \"${name}\"?`)) return; try { const supabase = createSupabaseClient(); setPanelStatus(state.activePanel || 'inactive', 'Apagando música...'); const { error } = await supabase.from('approved_suggestions').delete().eq('id', suggestionId); if (error) throw error; await loadAllData(); setPanelStatus(state.activePanel || 'inactive', 'Música apagada com sucesso.'); } catch (error) { setPanelStatus(state.activePanel || 'inactive', error.message || 'Não foi possível apagar a música.'); } }
+    async function handleSaveEdit() { if (!state.editSuggestionId) return; try { saveEditBtn.disabled = true; editStatus.textContent = 'Salvando alterações...'; const supabase = createSupabaseClient(); const payload = { song_title: normalizeText(editTitle.value) || 'Sem título', artist: normalizeText(editArtist.value), style: normalizeText(editStyle.value), lyrics: sanitizeLyrics(editLyrics.value) }; const { error } = await supabase.from('approved_suggestions').update(payload).eq('id', state.editSuggestionId); if (error) throw error; await loadAllData(); closeEditModal(); } catch (error) { editStatus.textContent = error.message || 'Não foi possível salvar as alterações.'; } finally { saveEditBtn.disabled = false; } }
+    async function refreshCurrentPanel(panel) { try { setPanelStatus(panel, 'Atualizando lista...'); await loadAllData(); setPanelStatus(panel, 'Lista atualizada.'); } catch (error) { setPanelStatus(panel, error.message || 'Não foi possível atualizar a lista.'); } }
 
     function bindSearches() {
       pendingSearch.addEventListener('input', () => { state.searches.pending = pendingSearch.value; renderPendingList(); });
@@ -1055,32 +622,13 @@
 
     async function bootstrap() {
       try {
-        createSupabaseClient();
-        bindSearches();
-        showPasswordToggle.addEventListener('change', () => { passwordInput.type = showPasswordToggle.checked ? 'text' : 'password'; });
-        loginBtn.addEventListener('click', handleLogin);
-        logoutBtn.addEventListener('click', handleLogout);
-        $('openPendingBtn').addEventListener('click', () => openPanel('pending'));
-        $('openApprovedBtn').addEventListener('click', () => openPanel('approved'));
-        $('openInactiveBtn').addEventListener('click', () => openPanel('inactive'));
-        $('openUsersBtn').addEventListener('click', () => openPanel('users'));
-        document.querySelectorAll('[data-close-panel]').forEach((button) => button.addEventListener('click', closeAllPanels));
-        document.querySelectorAll('[data-close-detail]').forEach((button) => button.addEventListener('click', closeDetailModal));
-        document.querySelectorAll('[data-close-edit]').forEach((button) => button.addEventListener('click', closeEditModal));
-        document.querySelectorAll('[data-close-user-songs]').forEach((button) => button.addEventListener('click', closeUserSongsModal));
-        document.querySelectorAll('[data-refresh]').forEach((button) => button.addEventListener('click', () => refreshCurrentPanel(button.dataset.refresh)));
-        saveEditBtn.addEventListener('click', handleSaveEdit);
+        createSupabaseClient(); bindSearches(); showPasswordToggle.addEventListener('change', () => { passwordInput.type = showPasswordToggle.checked ? 'text' : 'password'; }); loginBtn.addEventListener('click', handleLogin); logoutBtn.addEventListener('click', handleLogout);
+        $('openPendingBtn').addEventListener('click', () => openPanel('pending')); $('openApprovedBtn').addEventListener('click', () => openPanel('approved')); $('openInactiveBtn').addEventListener('click', () => openPanel('inactive')); $('openUsersBtn').addEventListener('click', () => openPanel('users'));
+        document.querySelectorAll('[data-close-panel]').forEach((button) => button.addEventListener('click', closeAllPanels)); document.querySelectorAll('[data-close-detail]').forEach((button) => button.addEventListener('click', closeDetailModal)); document.querySelectorAll('[data-close-edit]').forEach((button) => button.addEventListener('click', closeEditModal)); document.querySelectorAll('[data-close-user-songs]').forEach((button) => button.addEventListener('click', closeUserSongsModal)); document.querySelectorAll('[data-refresh]').forEach((button) => button.addEventListener('click', () => refreshCurrentPanel(button.dataset.refresh))); saveEditBtn.addEventListener('click', handleSaveEdit);
         document.addEventListener('click', (event) => { if (!event.target.closest('.swipe-row')) closeAllSwipes(); });
-        const { data, error } = await state.supabase.auth.getSession();
-        if (error) throw error;
-        await applySession(data.session || null);
-        state.supabase.auth.onAuthStateChange(async (_event, session) => {
-          try { await applySession(session || null); }
-          catch (error) { setAuthStatus(error.message || 'Sessão inválida.'); resetAdminView(); }
-        });
-      } catch (error) {
-        setAuthStatus(error.message || 'Não foi possível iniciar o painel.');
-      }
+        const { data, error } = await state.supabase.auth.getSession(); if (error) throw error; await applySession(data.session || null);
+        state.supabase.auth.onAuthStateChange(async (_event, session) => { try { await applySession(session || null); } catch (error) { setAuthStatus(error.message || 'Sessão inválida.'); resetAdminView(); } });
+      } catch (error) { setAuthStatus(error.message || 'Não foi possível iniciar o painel.'); }
     }
 
     bootstrap();
