@@ -548,7 +548,6 @@
 
     .search-input { width: 100%; }
 
-
     .selection-toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -655,86 +654,73 @@
     }
 
     .swipe-row {
-      --swipe-reveal-width: 0px;
       position: relative;
       overflow: hidden;
       border-radius: 20px;
       min-height: 58px;
-      height: 58px;
-      touch-action: pan-y;
       background: transparent;
       border: 0;
       box-shadow: none;
       margin: 0;
     }
 
-    .swipe-actions {
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      width: var(--swipe-reveal-width);
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 8px;
-      padding: 0 8px 0 6px;
-      z-index: 0;
-      pointer-events: none;
-      background: transparent;
+    .swipe-row.has-selection .swipe-content {
+      padding-left: 48px;
     }
 
-    .action-btn {
-      width: 36px;
-      height: 36px;
-      min-height: 36px;
-      border: 0;
+    .selection-toggle {
+      position: absolute;
+      z-index: 3;
+      top: 22px;
+      left: 12px;
+      width: 26px;
+      height: 26px;
       border-radius: 999px;
-      color: #fff;
+      border: 1px solid rgba(184, 223, 255, 0.22);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)),
+        rgba(10, 16, 28, 0.96);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
       display: grid;
       place-items: center;
       cursor: pointer;
-      font-size: 15px;
-      font-weight: 700;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.22);
-      opacity: 0;
-      transform: translateX(18px) scale(0.96);
-      transition: opacity 0.18s ease, transform 0.18s ease;
-      pointer-events: none;
-      flex: 0 0 36px;
-      padding: 0;
-      overflow: hidden;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
     }
 
-    .action-btn img {
-      width: 18px;
-      height: 18px;
-      object-fit: contain;
-      display: block;
-      pointer-events: none;
-      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.28));
+    .selection-toggle:hover {
+      transform: translateY(-1px);
+      border-color: rgba(184, 223, 255, 0.34);
     }
 
-    .action-btn .action-fallback {
-      line-height: 1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
+    .selection-toggle::after {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: transparent;
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+      transform: scale(0.7);
     }
 
-    .action-btn.approve { background: linear-gradient(180deg, var(--green-1), var(--green-2)); }
-    .action-btn.edit { background: linear-gradient(180deg, var(--blue-1), var(--blue-2)); color: #08111f; }
-    .action-btn.disable { background: linear-gradient(180deg, var(--amber-1), var(--amber-2)); color: #1f1404; }
-    .action-btn.delete { background: linear-gradient(180deg, var(--red-1), var(--red-2)); }
+    .selection-toggle.selected {
+      border-color: rgba(120, 214, 166, 0.44);
+      background:
+        linear-gradient(180deg, rgba(72,214,138,0.22), rgba(27,168,94,0.12)),
+        rgba(8, 18, 16, 0.96);
+      box-shadow: 0 0 0 3px rgba(72,214,138,0.12), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .selection-toggle.selected::after {
+      background: linear-gradient(180deg, var(--green-1), var(--green-2));
+      box-shadow: 0 0 16px rgba(72,214,138,0.38);
+      transform: scale(1);
+    }
 
     .swipe-content {
       position: relative;
       z-index: 1;
       width: 100%;
-      min-height: 58px;
-      height: 58px;
-      padding: 0 14px;
+      padding: 14px;
       border: 1px solid rgba(255,255,255,0.06);
       border-radius: 20px;
       background:
@@ -743,26 +729,58 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
       color: #fff;
       text-align: left;
-      transform: translateX(0);
-      transition: transform 0.22s ease, border-color .18s ease, background .18s ease;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
+      transition: border-color .18s ease, background .18s ease;
       overflow: hidden;
-      touch-action: pan-y;
     }
 
     .swipe-content:hover { border-color: rgba(174, 220, 255, 0.14); }
 
-    .swipe-row.revealed .swipe-content { transform: translateX(calc(var(--swipe-reveal-width) * -1)); }
-    .swipe-row.revealed .action-btn, .swipe-row.swiping .action-btn { opacity: 1; transform: translateX(0) scale(1); pointer-events: auto; }
-
-    .row-main { display: grid; gap: 2px; width: 100%; }
+    .row-main { display: grid; gap: 8px; width: 100%; }
     .row-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; min-width: 0; }
     .row-title { margin: 0; font-size: 14px; line-height: 1.2; font-weight: 700; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
     .row-meta { color: var(--muted); font-size: 12px; line-height: 1.25; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .row-user { color: rgba(255,255,255,0.84); font-size: 11px; line-height: 1.2; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .row-open-btn {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      text-align: left;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      display: block;
+    }
+
+    .row-actions-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .row-action-btn {
+      min-height: 34px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      color: #fff;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+    }
+
+    .row-action-btn.approve { background: linear-gradient(180deg, var(--green-1), var(--green-2)); }
+    .row-action-btn.edit { background: linear-gradient(180deg, var(--blue-1), var(--blue-2)); color: #08111f; }
+    .row-action-btn.disable { background: linear-gradient(180deg, var(--amber-1), var(--amber-2)); color: #1f1404; }
+    .row-action-btn.delete { background: linear-gradient(180deg, var(--red-1), var(--red-2)); }
 
     .mini-badge {
       display: inline-flex;
@@ -935,7 +953,7 @@
     </section>
   </main>
 
-  <section id="pendingPanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Músicas pendentes</h2><p>Músicas da tabela songs que ainda não existem como aprovadas ativas.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="pending">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="pendingSearch" class="search-input" type="text" placeholder="Buscar por música, artista, estilo ou conta" /><div class="selection-toolbar"><div class="selection-toolbar-main"><button id="toggleAllPendingBtn" type="button" class="btn btn-secondary toolbar-btn">Selecionar visíveis</button><span id="pendingSelectionCount" class="toolbar-count">0 selecionadas</span></div><div class="selection-toolbar-actions"><button id="bulkApprovePendingBtn" type="button" class="btn btn-primary toolbar-btn">Aprovar selecionadas</button><button id="bulkDeletePendingBtn" type="button" class="btn toolbar-btn toolbar-btn-danger">Excluir selecionadas</button></div></div></div><div id="pendingList" class="list-area"></div><div id="pendingStatus" class="panel-footer"></div></div></section>
+  <section id="pendingPanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Músicas pendentes</h2><p>Músicas da tabela songs que ainda não existem como aprovadas ativas.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="pending">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="pendingSearch" class="search-input" type="text" placeholder="Buscar por música, artista, estilo ou conta" /><div class="selection-toolbar"><div class="selection-toolbar-main"><button id="toggleAllPendingBtn" type="button" class="btn btn-secondary toolbar-btn">Selecionar visíveis</button><span id="pendingSelectionCount" class="toolbar-count">0 selecionadas</span></div><div class="selection-toolbar-actions"><button id="bulkApprovePendingBtn" type="button" class="btn btn-primary toolbar-btn">Aprovar selecionadas</button><button id="bulkDeletePendingBtn" type="button" class="btn toolbar-btn-danger toolbar-btn">Excluir selecionadas</button></div></div></div><div id="pendingList" class="list-area"></div><div id="pendingStatus" class="panel-footer"></div></div></section>
   <section id="approvedPanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Músicas aprovadas</h2><p>Itens de approved_suggestions com active = true.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="approved">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="approvedSearch" class="search-input" type="text" placeholder="Buscar por música, artista ou estilo" /></div><div id="approvedList" class="list-area"></div><div id="approvedStatus" class="panel-footer"></div></div></section>
   <section id="inactivePanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Músicas inativas</h2><p>Itens de approved_suggestions com active = false.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="inactive">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="inactiveSearch" class="search-input" type="text" placeholder="Buscar por música, artista ou estilo" /></div><div id="inactiveList" class="list-area"></div><div id="inactiveStatus" class="panel-footer"></div></div></section>
   <section id="usersPanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Usuários</h2><p>Lista de usuários com acesso rápido às músicas de cada conta.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="users">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="usersSearch" class="search-input" type="text" placeholder="Buscar por nome ou e-mail" /></div><div id="usersList" class="list-area"></div><div id="usersStatus" class="panel-footer"></div></div></section>
@@ -1077,48 +1095,10 @@
       renderUsersList();
     }
 
-    function createSwipeRow({ key, revealWidth, actions, onOpenDetail, title, meta, extra, badge, selection }) {
-      const row = document.createElement('div'); row.className = `swipe-row ${selection ? 'has-selection' : ''}`; row.dataset.key = key; row.style.setProperty('--swipe-reveal-width', `${revealWidth}px`);
-      const actionsWrap = document.createElement('div'); actionsWrap.className = 'swipe-actions';
-      actions.forEach((action) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = `action-btn ${action.className}`;
-        button.setAttribute('aria-label', action.aria);
-
-        const iconMap = {
-          approve: 'aprovar.png',
-          disable: 'desabilitar.png',
-          delete: 'excluir.png',
-          edit: 'editar.png'
-        };
-
-        const iconSrc = action.iconSrc || iconMap[action.className];
-        if (iconSrc) {
-          const img = document.createElement('img');
-          img.src = iconSrc;
-          img.alt = action.aria;
-          img.addEventListener('error', () => {
-            img.replaceWith(Object.assign(document.createElement('span'), {
-              className: 'action-fallback',
-              textContent: action.icon || ''
-            }));
-          }, { once: true });
-          button.appendChild(img);
-        } else {
-          const fallback = document.createElement('span');
-          fallback.className = 'action-fallback';
-          fallback.textContent = action.icon || '';
-          button.appendChild(fallback);
-        }
-
-        button.addEventListener('click', (event) => {
-          event.stopPropagation();
-          closeAllSwipes();
-          action.onClick();
-        });
-        actionsWrap.appendChild(button);
-      });
+    function createSwipeRow({ key, actions, onOpenDetail, title, meta, extra, badge, selection }) {
+      const row = document.createElement('div');
+      row.className = `swipe-row ${selection ? 'has-selection' : ''}`;
+      row.dataset.key = key;
 
       if (selection) {
         const selectionToggle = document.createElement('button');
@@ -1134,44 +1114,34 @@
 
       const content = document.createElement('div');
       content.className = 'swipe-content';
-      content.setAttribute('role', 'button');
-      content.setAttribute('tabindex', '0');
-      content.innerHTML = `<div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(title)}</h3>${badge || ''}</div><div class="row-meta">${escapeHtml(meta || '')}</div>${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}</div>`;
-      content.addEventListener('click', () => { if (row.classList.contains('revealed')) { closeAllSwipes(); return; } onOpenDetail(); });
-      content.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          if (row.classList.contains('revealed')) { closeAllSwipes(); return; }
-          onOpenDetail();
-        }
-      });
-      attachSwipe(row, content, key, revealWidth); row.appendChild(actionsWrap); row.appendChild(content); return row;
-    }
 
-    function attachSwipe(row, card, key, revealWidth) {
-      let startX = 0; let currentX = 0; let swiping = false; let pointerId = null; let horizontalLocked = false; let verticalLock = false; let startY = 0;
-      const beginSwipe = (event) => { if (event.pointerType === 'mouse' && event.button !== 0) return; closeAllSwipes(); startX = event.clientX; startY = event.clientY; currentX = 0; swiping = true; horizontalLocked = false; verticalLock = false; pointerId = event.pointerId; row.classList.add('swiping'); row.setPointerCapture?.(pointerId); };
-      const moveSwipe = (event) => {
-        if (!swiping || event.pointerId !== pointerId) return;
-        const deltaX = event.clientX - startX;
-        const deltaY = event.clientY - startY;
-        if (!horizontalLocked && !verticalLock) {
-          if (Math.abs(deltaY) > 10 && Math.abs(deltaY) > Math.abs(deltaX)) { verticalLock = true; row.classList.remove('swiping'); return; }
-          if (Math.abs(deltaX) > 10 && Math.abs(deltaX) > Math.abs(deltaY)) horizontalLocked = true;
-        }
-        if (!horizontalLocked) return;
-        event.preventDefault();
-        currentX = Math.max(-revealWidth, Math.min(0, deltaX));
-        card.style.transform = `translateX(${currentX}px)`;
-      };
-      const endSwipe = (event) => {
-        if (!swiping || event.pointerId !== pointerId) return;
-        swiping = false; pointerId = null; row.classList.remove('swiping'); card.style.transform = '';
-        if (!horizontalLocked) return;
-        if (currentX <= -(revealWidth * 0.35)) { closeAllSwipes(); row.classList.add('revealed'); state.revealedRowKey = key; }
-        else { row.classList.remove('revealed'); if (state.revealedRowKey === key) state.revealedRowKey = null; }
-      };
-      row.addEventListener('pointerdown', beginSwipe); row.addEventListener('pointermove', moveSwipe); row.addEventListener('pointerup', endSwipe); row.addEventListener('pointercancel', endSwipe); row.addEventListener('lostpointercapture', endSwipe);
+      const openButton = document.createElement('button');
+      openButton.type = 'button';
+      openButton.className = 'row-open-btn';
+      openButton.innerHTML = `<div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(title)}</h3>${badge || ''}</div><div class="row-meta">${escapeHtml(meta || '')}</div>${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}</div>`;
+      openButton.addEventListener('click', () => onOpenDetail());
+      content.appendChild(openButton);
+
+      if (Array.isArray(actions) && actions.length) {
+        const actionsInline = document.createElement('div');
+        actionsInline.className = 'row-actions-inline';
+        actions.forEach((action) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = `row-action-btn ${action.className}`;
+          button.setAttribute('aria-label', action.aria);
+          button.textContent = action.label || action.aria;
+          button.addEventListener('click', (event) => {
+            event.stopPropagation();
+            action.onClick();
+          });
+          actionsInline.appendChild(button);
+        });
+        content.appendChild(actionsInline);
+      }
+
+      row.appendChild(content);
+      return row;
     }
 
     function renderPendingList() {
@@ -1185,10 +1155,9 @@
       syncPendingSelectionWithData();
       items.forEach((song) => pendingList.appendChild(createSwipeRow({
         key: `pending-${song.id}`,
-        revealWidth: 94,
         actions: [
-          { icon: '✔', className: 'approve', aria: 'Aprovar música', onClick: () => handleApproveSong(song.id) },
-          { icon: '🗑', className: 'delete', aria: 'Excluir música pendente', onClick: () => handleDeletePendingSong(song.id) }
+          { label: 'Aprovar', className: 'approve', aria: 'Aprovar música', onClick: () => handleApproveSong(song.id) },
+          { label: 'Excluir', className: 'delete', aria: 'Excluir música pendente', onClick: () => handleDeletePendingSong(song.id) }
         ],
         onOpenDetail: () => openSongDetail(song),
         title: song.song_title || 'Sem título',
@@ -1206,11 +1175,10 @@
       if (!items.length) { approvedList.innerHTML = '<div class="empty">Nenhuma música aprovada ativa encontrada.</div>'; setPanelStatus('approved', 'Deslize para a esquerda para editar, desabilitar ou excluir.'); return; }
       items.forEach((item) => approvedList.appendChild(createSwipeRow({
         key: `approved-${item.id}`,
-        revealWidth: 140,
         actions: [
-          { icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) },
-          { icon: '⏸', className: 'disable', aria: 'Desabilitar música', onClick: () => handleDisableSuggestion(item.id) },
-          { icon: '🗑', className: 'delete', aria: 'Excluir música', onClick: () => handleDeleteSuggestion(item.id, 'approved') }
+          { label: 'Editar', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) },
+          { label: 'Desabilitar', className: 'disable', aria: 'Desabilitar música', onClick: () => handleDisableSuggestion(item.id) },
+          { label: 'Excluir', className: 'delete', aria: 'Excluir música', onClick: () => handleDeleteSuggestion(item.id, 'approved') }
         ],
         onOpenDetail: () => openSuggestionDetail(item, 'approved'),
         title: item.song_title || 'Sem título',
@@ -1226,11 +1194,10 @@
       if (!items.length) { inactiveList.innerHTML = '<div class="empty">Nenhuma música inativa encontrada.</div>'; setPanelStatus('inactive', 'Deslize para a esquerda para ativar, editar ou excluir.'); return; }
       items.forEach((item) => inactiveList.appendChild(createSwipeRow({
         key: `inactive-${item.id}`,
-        revealWidth: 140,
         actions: [
-          { icon: '✔', className: 'approve', aria: 'Ativar música', onClick: () => handleActivateSuggestion(item.id) },
-          { icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) },
-          { icon: '🗑', className: 'delete', aria: 'Excluir música', onClick: () => handleDeleteSuggestion(item.id, 'inactive') }
+          { label: 'Ativar', className: 'approve', aria: 'Ativar música', onClick: () => handleActivateSuggestion(item.id) },
+          { label: 'Editar', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) },
+          { label: 'Excluir', className: 'delete', aria: 'Excluir música', onClick: () => handleDeleteSuggestion(item.id, 'inactive') }
         ],
         onOpenDetail: () => openSuggestionDetail(item, 'inactive'),
         title: item.song_title || 'Sem título',
