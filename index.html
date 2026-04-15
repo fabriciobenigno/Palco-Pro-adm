@@ -548,6 +548,112 @@
 
     .search-input { width: 100%; }
 
+
+    .selection-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)),
+        rgba(9, 15, 26, 0.9);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .selection-toolbar-main {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .selection-toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-count {
+      color: rgba(236, 243, 255, 0.88);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .toolbar-btn {
+      min-height: 38px;
+      border-radius: 14px;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .toolbar-btn-danger {
+      background: linear-gradient(180deg, var(--red-1), var(--red-2));
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .selection-toggle {
+      position: absolute;
+      z-index: 3;
+      top: 50%;
+      left: 12px;
+      transform: translateY(-50%);
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      border: 1px solid rgba(184, 223, 255, 0.22);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)),
+        rgba(10, 16, 28, 0.96);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+
+    .selection-toggle:hover {
+      transform: translateY(calc(-50% - 1px));
+      border-color: rgba(184, 223, 255, 0.34);
+    }
+
+    .selection-toggle::after {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: transparent;
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+      transform: scale(0.7);
+    }
+
+    .selection-toggle.selected {
+      border-color: rgba(120, 214, 166, 0.44);
+      background:
+        linear-gradient(180deg, rgba(72,214,138,0.22), rgba(27,168,94,0.12)),
+        rgba(8, 18, 16, 0.96);
+      box-shadow: 0 0 0 3px rgba(72,214,138,0.12), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .selection-toggle.selected::after {
+      background: linear-gradient(180deg, var(--green-1), var(--green-2));
+      box-shadow: 0 0 16px rgba(72,214,138,0.38);
+      transform: scale(1);
+    }
+
+    .swipe-row.has-selection .swipe-content {
+      padding-left: 48px;
+    }
+
     .swipe-row {
       --swipe-reveal-width: 0px;
       position: relative;
@@ -829,7 +935,7 @@
     </section>
   </main>
 
-  <section id="pendingPanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Músicas pendentes</h2><p>Músicas da tabela songs que ainda não existem como aprovadas ativas.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="pending">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="pendingSearch" class="search-input" type="text" placeholder="Buscar por música, artista, estilo ou conta" /></div><div id="pendingList" class="list-area"></div><div id="pendingStatus" class="panel-footer"></div></div></section>
+  <section id="pendingPanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Músicas pendentes</h2><p>Músicas da tabela songs que ainda não existem como aprovadas ativas.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="pending">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="pendingSearch" class="search-input" type="text" placeholder="Buscar por música, artista, estilo ou conta" /><div class="selection-toolbar"><div class="selection-toolbar-main"><button id="toggleAllPendingBtn" type="button" class="btn btn-secondary toolbar-btn">Selecionar visíveis</button><span id="pendingSelectionCount" class="toolbar-count">0 selecionadas</span></div><div class="selection-toolbar-actions"><button id="bulkApprovePendingBtn" type="button" class="btn btn-primary toolbar-btn">Aprovar selecionadas</button><button id="bulkDeletePendingBtn" type="button" class="btn toolbar-btn toolbar-btn-danger">Excluir selecionadas</button></div></div></div><div id="pendingList" class="list-area"></div><div id="pendingStatus" class="panel-footer"></div></div></section>
   <section id="approvedPanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Músicas aprovadas</h2><p>Itens de approved_suggestions com active = true.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="approved">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="approvedSearch" class="search-input" type="text" placeholder="Buscar por música, artista ou estilo" /></div><div id="approvedList" class="list-area"></div><div id="approvedStatus" class="panel-footer"></div></div></section>
   <section id="inactivePanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Músicas inativas</h2><p>Itens de approved_suggestions com active = false.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="inactive">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="inactiveSearch" class="search-input" type="text" placeholder="Buscar por música, artista ou estilo" /></div><div id="inactiveList" class="list-area"></div><div id="inactiveStatus" class="panel-footer"></div></div></section>
   <section id="usersPanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Usuários</h2><p>Lista de usuários com acesso rápido às músicas de cada conta.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="users">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="usersSearch" class="search-input" type="text" placeholder="Buscar por nome ou e-mail" /></div><div id="usersList" class="list-area"></div><div id="usersStatus" class="panel-footer"></div></div></section>
@@ -837,21 +943,25 @@
   <section id="detailModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="detailModalTitle">Detalhes</h3><button type="button" class="icon-btn" data-close-detail>✕</button></div><div id="detailModalBody" class="modal-body"></div><div class="modal-foot"><button type="button" class="btn btn-secondary" data-close-detail>Fechar</button></div></div></section>
   <section id="editModal" class="modal"><div class="modal-card"><div class="modal-head"><h3>Editar música aprovada</h3><button type="button" class="icon-btn" data-close-edit>✕</button></div><div class="modal-body"><div class="form-grid"><div class="field"><label for="editTitle">Nome da música</label><input id="editTitle" type="text" placeholder="Nome da música" /></div><div class="field"><label for="editArtist">Artista</label><input id="editArtist" type="text" placeholder="Artista" /></div><div class="field"><label for="editStyle">Estilo</label><input id="editStyle" type="text" placeholder="Estilo" /></div><div class="field"><label for="editLyrics">Letra</label><textarea id="editLyrics" placeholder="Letra da música"></textarea></div></div><div id="editStatus" class="status-line"></div></div><div class="modal-foot"><button id="saveEditBtn" type="button" class="btn btn-primary">Salvar alterações</button><button type="button" class="btn btn-secondary" data-close-edit>Cancelar</button></div></div></section>
   <section id="userSongsModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="userSongsTitle">Músicas do usuário</h3><button type="button" class="icon-btn" data-close-user-songs>✕</button></div><div id="userSongsBody" class="modal-body"></div><div class="modal-foot"><button type="button" class="btn btn-secondary" data-close-user-songs>Fechar</button></div></div></section>
+  <section id="confirmModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="confirmModalTitle">Confirmar exclusão</h3><button type="button" class="icon-btn" id="confirmCancelIcon">✕</button></div><div class="modal-body"><div class="detail-block"><label id="confirmModalLabel">Confirmação</label><div id="confirmModalMessage">Deseja continuar?</div></div></div><div class="modal-foot"><button id="confirmModalConfirmBtn" type="button" class="btn toolbar-btn-danger">Excluir</button><button id="confirmModalCancelBtn" type="button" class="btn btn-secondary">Cancelar</button></div></div></section>
 
   <script>
     const SUPABASE_URL = 'https://dlcjcsbdabjupsiwlncd.supabase.co';
     const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2JU7mYP9oeeUvzncDuZMRw_8p3lzGfT';
 
-    const state = { supabase: null, currentUser: null, currentProfile: null, songs: [], users: [], suggestions: [], searches: { pending: '', approved: '', inactive: '', users: '' }, editSuggestionId: null, activePanel: null, revealedRowKey: null };
+    const state = { supabase: null, currentUser: null, currentProfile: null, songs: [], users: [], suggestions: [], searches: { pending: '', approved: '', inactive: '', users: '' }, editSuggestionId: null, activePanel: null, revealedRowKey: null, selectedPendingIds: new Set(), confirmResolver: null };
     const $ = (id) => document.getElementById(id);
     const authCard = $('authCard'); const adminPanel = $('adminPanel'); const emailInput = $('emailInput'); const passwordInput = $('passwordInput'); const showPasswordToggle = $('showPasswordToggle'); const loginBtn = $('loginBtn'); const logoutBtn = $('logoutBtn'); const authStatus = $('authStatus'); const accountLabel = $('accountLabel'); const mainStatus = $('mainStatus');
+    const openPendingBtn = $('openPendingBtn'); const openApprovedBtn = $('openApprovedBtn'); const openInactiveBtn = $('openInactiveBtn'); const openUsersBtn = $('openUsersBtn');
     const pendingPanel = $('pendingPanel'); const approvedPanel = $('approvedPanel'); const inactivePanel = $('inactivePanel'); const usersPanel = $('usersPanel');
     const pendingSearch = $('pendingSearch'); const approvedSearch = $('approvedSearch'); const inactiveSearch = $('inactiveSearch'); const usersSearch = $('usersSearch');
     const pendingList = $('pendingList'); const approvedList = $('approvedList'); const inactiveList = $('inactiveList'); const usersList = $('usersList');
     const pendingStatus = $('pendingStatus'); const approvedStatus = $('approvedStatus'); const inactiveStatus = $('inactiveStatus'); const usersStatus = $('usersStatus');
+    const toggleAllPendingBtn = $('toggleAllPendingBtn'); const bulkApprovePendingBtn = $('bulkApprovePendingBtn'); const bulkDeletePendingBtn = $('bulkDeletePendingBtn'); const pendingSelectionCount = $('pendingSelectionCount');
     const detailModal = $('detailModal'); const detailModalTitle = $('detailModalTitle'); const detailModalBody = $('detailModalBody');
     const editModal = $('editModal'); const editTitle = $('editTitle'); const editArtist = $('editArtist'); const editStyle = $('editStyle'); const editLyrics = $('editLyrics'); const editStatus = $('editStatus'); const saveEditBtn = $('saveEditBtn');
     const userSongsModal = $('userSongsModal'); const userSongsTitle = $('userSongsTitle'); const userSongsBody = $('userSongsBody');
+    const confirmModal = $('confirmModal'); const confirmModalTitle = $('confirmModalTitle'); const confirmModalLabel = $('confirmModalLabel'); const confirmModalMessage = $('confirmModalMessage'); const confirmModalConfirmBtn = $('confirmModalConfirmBtn'); const confirmModalCancelBtn = $('confirmModalCancelBtn'); const confirmCancelIcon = $('confirmCancelIcon');
 
     function createSupabaseClient() { if (!window.supabase) throw new Error('Supabase não carregou.'); if (!state.supabase) state.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY); return state.supabase; }
     function setAuthStatus(message) { authStatus.textContent = message || ''; }
@@ -890,6 +1000,64 @@
     function getPendingBadge() { return '<span class="mini-badge warning">Pendente</span>'; }
     function getApprovedBadge() { return '<span class="mini-badge success">Ativa</span>'; }
     function getInactiveBadge() { return '<span class="mini-badge danger">Inativa</span>'; }
+    function getFilteredPendingSongs() { return applySearch(getPendingSongs().map((song) => ({ ...song, account_email: getUserEmail(song.user_id) })), 'pending'); }
+    function getVisiblePendingIds() { return getFilteredPendingSongs().map((song) => String(song.id)); }
+    function syncPendingSelectionWithData() {
+      const validIds = new Set(getPendingSongs().map((song) => String(song.id)));
+      state.selectedPendingIds = new Set([...state.selectedPendingIds].filter((id) => validIds.has(String(id))));
+    }
+    function updatePendingSelectionUi() {
+      syncPendingSelectionWithData();
+      const visibleIds = getVisiblePendingIds();
+      const selectedVisibleCount = visibleIds.filter((id) => state.selectedPendingIds.has(String(id))).length;
+      const selectedCount = state.selectedPendingIds.size;
+      pendingSelectionCount.textContent = `${selectedCount} selecionada${selectedCount === 1 ? '' : 's'}`;
+      toggleAllPendingBtn.textContent = visibleIds.length && selectedVisibleCount === visibleIds.length ? 'Desmarcar visíveis' : 'Selecionar visíveis';
+      bulkApprovePendingBtn.disabled = selectedCount === 0;
+      bulkDeletePendingBtn.disabled = selectedCount === 0;
+    }
+    function isPendingSelected(songId) { return state.selectedPendingIds.has(String(songId)); }
+    function togglePendingSelection(songId) {
+      const key = String(songId);
+      if (state.selectedPendingIds.has(key)) state.selectedPendingIds.delete(key);
+      else state.selectedPendingIds.add(key);
+      renderPendingList();
+    }
+    function toggleAllVisiblePending() {
+      const visibleIds = getVisiblePendingIds();
+      if (!visibleIds.length) return;
+      const shouldSelectAll = visibleIds.some((id) => !state.selectedPendingIds.has(String(id)));
+      visibleIds.forEach((id) => {
+        if (shouldSelectAll) state.selectedPendingIds.add(String(id));
+        else state.selectedPendingIds.delete(String(id));
+      });
+      renderPendingList();
+    }
+    function clearPendingSelection() {
+      state.selectedPendingIds.clear();
+      updatePendingSelectionUi();
+    }
+    function getPanelNameBySuggestionId(suggestionId) {
+      const suggestion = getSuggestionById(suggestionId);
+      return suggestion?.active === true ? 'approved' : 'inactive';
+    }
+    function openConfirmModal({ title, label, message, confirmText = 'Confirmar', confirmClass = 'btn btn-primary' }) {
+      confirmModalTitle.textContent = title || 'Confirmar ação';
+      confirmModalLabel.textContent = label || 'Confirmação';
+      confirmModalMessage.textContent = message || 'Deseja continuar?';
+      confirmModalConfirmBtn.textContent = confirmText;
+      confirmModalConfirmBtn.className = confirmClass;
+      confirmModal.classList.add('active');
+      return new Promise((resolve) => {
+        state.confirmResolver = resolve;
+      });
+    }
+    function closeConfirmModal(result) {
+      confirmModal.classList.remove('active');
+      const resolver = state.confirmResolver;
+      state.confirmResolver = null;
+      if (resolver) resolver(Boolean(result));
+    }
 
     function mergeSuggestionRecord(record) {
       if (!record) return;
@@ -909,8 +1077,8 @@
       renderUsersList();
     }
 
-    function createSwipeRow({ key, revealWidth, actions, onOpenDetail, title, meta, extra, badge }) {
-      const row = document.createElement('div'); row.className = 'swipe-row'; row.dataset.key = key; row.style.setProperty('--swipe-reveal-width', `${revealWidth}px`);
+    function createSwipeRow({ key, revealWidth, actions, onOpenDetail, title, meta, extra, badge, selection }) {
+      const row = document.createElement('div'); row.className = `swipe-row ${selection ? 'has-selection' : ''}`; row.dataset.key = key; row.style.setProperty('--swipe-reveal-width', `${revealWidth}px`);
       const actionsWrap = document.createElement('div'); actionsWrap.className = 'swipe-actions';
       actions.forEach((action) => {
         const button = document.createElement('button');
@@ -951,8 +1119,32 @@
         });
         actionsWrap.appendChild(button);
       });
-      const content = document.createElement('button'); content.type = 'button'; content.className = 'swipe-content'; content.innerHTML = `<div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(title)}</h3>${badge || ''}</div><div class="row-meta">${escapeHtml(meta || '')}</div>${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}</div>`;
+
+      if (selection) {
+        const selectionToggle = document.createElement('button');
+        selectionToggle.type = 'button';
+        selectionToggle.className = `selection-toggle ${selection.selected ? 'selected' : ''}`;
+        selectionToggle.setAttribute('aria-label', selection.selected ? 'Desmarcar música' : 'Selecionar música');
+        selectionToggle.addEventListener('click', (event) => {
+          event.stopPropagation();
+          selection.onToggle();
+        });
+        row.appendChild(selectionToggle);
+      }
+
+      const content = document.createElement('div');
+      content.className = 'swipe-content';
+      content.setAttribute('role', 'button');
+      content.setAttribute('tabindex', '0');
+      content.innerHTML = `<div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(title)}</h3>${badge || ''}</div><div class="row-meta">${escapeHtml(meta || '')}</div>${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}</div>`;
       content.addEventListener('click', () => { if (row.classList.contains('revealed')) { closeAllSwipes(); return; } onOpenDetail(); });
+      content.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          if (row.classList.contains('revealed')) { closeAllSwipes(); return; }
+          onOpenDetail();
+        }
+      });
       attachSwipe(row, content, key, revealWidth); row.appendChild(actionsWrap); row.appendChild(content); return row;
     }
 
@@ -983,23 +1175,69 @@
     }
 
     function renderPendingList() {
-      const items = applySearch(getPendingSongs().map((song) => ({ ...song, account_email: getUserEmail(song.user_id) })), 'pending'); pendingList.innerHTML = '';
-      if (!items.length) { pendingList.innerHTML = '<div class="empty">Nenhuma música pendente encontrada.</div>'; setPanelStatus('pending', 'Arraste para a esquerda para aprovar. Toque no item para abrir os detalhes.'); return; }
-      items.forEach((song) => pendingList.appendChild(createSwipeRow({ key: `pending-${song.id}`, revealWidth: 48, actions: [{ icon: '✔', className: 'approve', aria: 'Aprovar música', onClick: () => handleApproveSong(song.id) }], onOpenDetail: () => openSongDetail(song), title: song.song_title || 'Sem título', meta: `${song.artist || 'Sem artista'} • ${song.style || 'Sem estilo'}`, extra: `Conta: ${song.account_email}`, badge: getPendingBadge() })));
+      const items = getFilteredPendingSongs(); pendingList.innerHTML = '';
+      if (!items.length) {
+        pendingList.innerHTML = '<div class="empty">Nenhuma música pendente encontrada.</div>';
+        clearPendingSelection();
+        setPanelStatus('pending', 'Deslize para a esquerda para aprovar ou excluir. Toque no item para abrir os detalhes.');
+        return;
+      }
+      syncPendingSelectionWithData();
+      items.forEach((song) => pendingList.appendChild(createSwipeRow({
+        key: `pending-${song.id}`,
+        revealWidth: 94,
+        actions: [
+          { icon: '✔', className: 'approve', aria: 'Aprovar música', onClick: () => handleApproveSong(song.id) },
+          { icon: '🗑', className: 'delete', aria: 'Excluir música pendente', onClick: () => handleDeletePendingSong(song.id) }
+        ],
+        onOpenDetail: () => openSongDetail(song),
+        title: song.song_title || 'Sem título',
+        meta: `${song.artist || 'Sem artista'} • ${song.style || 'Sem estilo'}`,
+        extra: `Conta: ${song.account_email}`,
+        badge: getPendingBadge(),
+        selection: { selected: isPendingSelected(song.id), onToggle: () => togglePendingSelection(song.id) }
+      })));
+      updatePendingSelectionUi();
       setPanelStatus('pending', `${items.length} música${items.length > 1 ? 's' : ''} pendente${items.length > 1 ? 's' : ''}.`);
     }
 
     function renderApprovedList() {
       const items = applySearch(getApprovedSuggestions(), 'approved'); approvedList.innerHTML = '';
-      if (!items.length) { approvedList.innerHTML = '<div class="empty">Nenhuma música aprovada ativa encontrada.</div>'; setPanelStatus('approved', 'Arraste para a esquerda para editar ou desabilitar.'); return; }
-      items.forEach((item) => approvedList.appendChild(createSwipeRow({ key: `approved-${item.id}`, revealWidth: 94, actions: [{ icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) }, { icon: '⏸', className: 'disable', aria: 'Desabilitar música', onClick: () => handleDisableSuggestion(item.id) }], onOpenDetail: () => openSuggestionDetail(item, 'approved'), title: item.song_title || 'Sem título', meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`, extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`, badge: getApprovedBadge() })));
+      if (!items.length) { approvedList.innerHTML = '<div class="empty">Nenhuma música aprovada ativa encontrada.</div>'; setPanelStatus('approved', 'Deslize para a esquerda para editar, desabilitar ou excluir.'); return; }
+      items.forEach((item) => approvedList.appendChild(createSwipeRow({
+        key: `approved-${item.id}`,
+        revealWidth: 140,
+        actions: [
+          { icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) },
+          { icon: '⏸', className: 'disable', aria: 'Desabilitar música', onClick: () => handleDisableSuggestion(item.id) },
+          { icon: '🗑', className: 'delete', aria: 'Excluir música', onClick: () => handleDeleteSuggestion(item.id, 'approved') }
+        ],
+        onOpenDetail: () => openSuggestionDetail(item, 'approved'),
+        title: item.song_title || 'Sem título',
+        meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`,
+        extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`,
+        badge: getApprovedBadge()
+      })));
       setPanelStatus('approved', `${items.length} música${items.length > 1 ? 's' : ''} aprovada${items.length > 1 ? 's' : ''} ativa${items.length > 1 ? 's' : ''}.`);
     }
 
     function renderInactiveList() {
       const items = applySearch(getInactiveSuggestions(), 'inactive'); inactiveList.innerHTML = '';
-      if (!items.length) { inactiveList.innerHTML = '<div class="empty">Nenhuma música inativa encontrada.</div>'; setPanelStatus('inactive', 'Arraste para a esquerda para ativar, editar ou apagar.'); return; }
-      items.forEach((item) => inactiveList.appendChild(createSwipeRow({ key: `inactive-${item.id}`, revealWidth: 140, actions: [{ icon: '✔', className: 'approve', aria: 'Ativar música', onClick: () => handleActivateSuggestion(item.id) }, { icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) }, { icon: '🗑', className: 'delete', aria: 'Apagar música', onClick: () => handleDeleteSuggestion(item.id) }], onOpenDetail: () => openSuggestionDetail(item, 'inactive'), title: item.song_title || 'Sem título', meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`, extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`, badge: getInactiveBadge() })));
+      if (!items.length) { inactiveList.innerHTML = '<div class="empty">Nenhuma música inativa encontrada.</div>'; setPanelStatus('inactive', 'Deslize para a esquerda para ativar, editar ou excluir.'); return; }
+      items.forEach((item) => inactiveList.appendChild(createSwipeRow({
+        key: `inactive-${item.id}`,
+        revealWidth: 140,
+        actions: [
+          { icon: '✔', className: 'approve', aria: 'Ativar música', onClick: () => handleActivateSuggestion(item.id) },
+          { icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) },
+          { icon: '🗑', className: 'delete', aria: 'Excluir música', onClick: () => handleDeleteSuggestion(item.id, 'inactive') }
+        ],
+        onOpenDetail: () => openSuggestionDetail(item, 'inactive'),
+        title: item.song_title || 'Sem título',
+        meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`,
+        extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`,
+        badge: getInactiveBadge()
+      })));
       setPanelStatus('inactive', `${items.length} música${items.length > 1 ? 's' : ''} inativa${items.length > 1 ? 's' : ''}.`);
     }
 
@@ -1065,42 +1303,143 @@
       editModal.classList.add('active');
     }
 
-    async function handleApproveSong(songId) {
+    async function handleApproveSong(songId, options = {}) {
       const supabase = createSupabaseClient();
       const song = state.songs.find((item) => idsEqual(item.id, songId));
-      if (!song) return;
-      setPanelStatus('pending', 'Aprovando música...');
+      const panel = options.panel || 'pending';
+      if (!song) { setPanelStatus(panel, 'Música não encontrada.'); return false; }
+      if (!options.silent) setPanelStatus(panel, 'Aprovando música...');
       const existing = getSuggestionBySongId(songId);
-      const payload = { source_song_id: song.id, song_title: song.song_title || '', artist: song.artist || '', style: song.style || '', lyrics: sanitizeLyrics(song.lyrics || ''), active: true };
+      const payload = { source_song_id: song.id, song_title: normalizeText(song.song_title || ''), artist: normalizeText(song.artist || ''), style: normalizeText(song.style || ''), lyrics: sanitizeLyrics(song.lyrics || ''), active: true };
+
       let result;
       if (existing) result = await supabase.from('approved_suggestions').update(payload).eq('id', existing.id).select('*').single();
       else result = await supabase.from('approved_suggestions').insert(payload).select('*').single();
-      if (result.error) { setPanelStatus('pending', `Erro ao aprovar: ${result.error.message}`); return; }
-      mergeSuggestionRecord(result.data); rerenderAdminLists(); setPanelStatus('pending', 'Música aprovada com sucesso.');
+
+      if (result.error) {
+        if (!options.silent) setPanelStatus(panel, `Erro ao aprovar: ${result.error.message}`);
+        return false;
+      }
+
+      mergeSuggestionRecord(result.data);
+      state.selectedPendingIds.delete(String(songId));
+      rerenderAdminLists();
+      if (!options.silent) setPanelStatus(panel, 'Música aprovada com sucesso.');
+      return true;
     }
 
     async function handleDisableSuggestion(suggestionId) {
       const supabase = createSupabaseClient();
       setPanelStatus('approved', 'Desabilitando música...');
       const { data, error } = await supabase.from('approved_suggestions').update({ active: false }).eq('id', suggestionId).select('*').single();
-      if (error) { setPanelStatus('approved', `Erro ao desabilitar: ${error.message}`); return; }
+      if (error) { setPanelStatus('approved', `Erro ao desabilitar: ${error.message}`); return false; }
       mergeSuggestionRecord(data); rerenderAdminLists(); setPanelStatus('approved', 'Música desabilitada com sucesso.');
+      return true;
     }
 
     async function handleActivateSuggestion(suggestionId) {
       const supabase = createSupabaseClient();
       setPanelStatus('inactive', 'Ativando música...');
       const { data, error } = await supabase.from('approved_suggestions').update({ active: true }).eq('id', suggestionId).select('*').single();
-      if (error) { setPanelStatus('inactive', `Erro ao ativar: ${error.message}`); return; }
+      if (error) { setPanelStatus('inactive', `Erro ao ativar: ${error.message}`); return false; }
       mergeSuggestionRecord(data); rerenderAdminLists(); setPanelStatus('inactive', 'Música ativada com sucesso.');
+      return true;
     }
 
-    async function handleDeleteSuggestion(suggestionId) {
+    async function handleDeletePendingSong(songId, options = {}) {
       const supabase = createSupabaseClient();
-      setPanelStatus('inactive', 'Apagando música...');
+      const song = state.songs.find((item) => idsEqual(item.id, songId));
+      if (!song) { setPanelStatus('pending', 'Música pendente não encontrada.'); return false; }
+
+      if (!options.skipConfirm) {
+        const confirmed = await openConfirmModal({
+          title: 'Excluir música pendente',
+          label: 'Confirmação de exclusão',
+          message: `Deseja realmente excluir a música pendente "${song.song_title || 'Sem título'}"?`,
+          confirmText: 'Excluir música',
+          confirmClass: 'btn toolbar-btn-danger'
+        });
+        if (!confirmed) return false;
+      }
+
+      if (!options.silent) setPanelStatus('pending', 'Excluindo música pendente...');
+      const { error } = await supabase.from('songs').delete().eq('id', songId);
+      if (error) {
+        if (!options.silent) setPanelStatus('pending', `Erro ao excluir: ${error.message}`);
+        return false;
+      }
+
+      state.songs = state.songs.filter((item) => !idsEqual(item.id, songId));
+      state.selectedPendingIds.delete(String(songId));
+      rerenderAdminLists();
+      if (!options.silent) setPanelStatus('pending', 'Música pendente excluída com sucesso.');
+      return true;
+    }
+
+    async function handleDeleteSuggestion(suggestionId, panelName) {
+      const supabase = createSupabaseClient();
+      const item = getSuggestionById(suggestionId);
+      const panel = panelName || getPanelNameBySuggestionId(suggestionId) || 'inactive';
+      if (!item) { setPanelStatus(panel, 'Música não encontrada para exclusão.'); return false; }
+
+      const confirmed = await openConfirmModal({
+        title: 'Excluir música de sugestões',
+        label: 'Confirmação de exclusão',
+        message: `Deseja realmente excluir "${item.song_title || 'Sem título'}" da tabela de sugestões?`,
+        confirmText: 'Excluir sugestão',
+        confirmClass: 'btn toolbar-btn-danger'
+      });
+      if (!confirmed) return false;
+
+      setPanelStatus(panel, 'Excluindo música...');
       const { error } = await supabase.from('approved_suggestions').delete().eq('id', suggestionId);
-      if (error) { setPanelStatus('inactive', `Erro ao apagar: ${error.message}`); return; }
-      state.suggestions = state.suggestions.filter((item) => !idsEqual(item.id, suggestionId)); rerenderAdminLists(); setPanelStatus('inactive', 'Música apagada com sucesso.');
+      if (error) { setPanelStatus(panel, `Erro ao excluir: ${error.message}`); return false; }
+      state.suggestions = state.suggestions.filter((entry) => !idsEqual(entry.id, suggestionId)); rerenderAdminLists(); setPanelStatus(panel, 'Música excluída com sucesso.');
+      return true;
+    }
+
+    async function handleBulkApprovePending() {
+      const selectedIds = [...state.selectedPendingIds];
+      if (!selectedIds.length) { setPanelStatus('pending', 'Selecione ao menos uma música para aprovar.'); return; }
+      bulkApprovePendingBtn.disabled = true;
+      setPanelStatus('pending', `Aprovando ${selectedIds.length} música${selectedIds.length > 1 ? 's' : ''}...`);
+      let successCount = 0;
+
+      for (const songId of selectedIds) {
+        const success = await handleApproveSong(songId, { silent: true, panel: 'pending' });
+        if (success) successCount += 1;
+      }
+
+      bulkApprovePendingBtn.disabled = false;
+      rerenderAdminLists();
+      setPanelStatus('pending', `${successCount} de ${selectedIds.length} música${selectedIds.length > 1 ? 's' : ''} aprovada${successCount === 1 ? '' : 's'} com sucesso.`);
+    }
+
+    async function handleBulkDeletePending() {
+      const selectedIds = [...state.selectedPendingIds];
+      if (!selectedIds.length) { setPanelStatus('pending', 'Selecione ao menos uma música para excluir.'); return; }
+
+      const confirmed = await openConfirmModal({
+        title: 'Excluir músicas pendentes',
+        label: 'Confirmação de exclusão',
+        message: `Deseja realmente excluir ${selectedIds.length} música${selectedIds.length > 1 ? 's' : ''} pendente${selectedIds.length > 1 ? 's' : ''}?`,
+        confirmText: 'Excluir selecionadas',
+        confirmClass: 'btn toolbar-btn-danger'
+      });
+      if (!confirmed) return;
+
+      bulkDeletePendingBtn.disabled = true;
+      setPanelStatus('pending', `Excluindo ${selectedIds.length} música${selectedIds.length > 1 ? 's' : ''}...`);
+      let successCount = 0;
+
+      for (const songId of selectedIds) {
+        const success = await handleDeletePendingSong(songId, { silent: true, skipConfirm: true });
+        if (success) successCount += 1;
+      }
+
+      bulkDeletePendingBtn.disabled = false;
+      rerenderAdminLists();
+      setPanelStatus('pending', `${successCount} de ${selectedIds.length} música${selectedIds.length > 1 ? 's' : ''} excluída${successCount === 1 ? '' : 's'} com sucesso.`);
     }
 
     async function saveEditedSuggestion() {
@@ -1108,11 +1447,13 @@
       if (!suggestionId) return;
       const supabase = createSupabaseClient();
       editStatus.textContent = 'Salvando alterações...';
+      saveEditBtn.disabled = true;
       const payload = { song_title: normalizeText(editTitle.value), artist: normalizeText(editArtist.value), style: normalizeText(editStyle.value), lyrics: sanitizeLyrics(editLyrics.value) };
       const { data, error } = await supabase.from('approved_suggestions').update(payload).eq('id', suggestionId).select('*').single();
-      if (error) { editStatus.textContent = `Erro ao salvar: ${error.message}`; return; }
+      if (error) { editStatus.textContent = `Erro ao salvar: ${error.message}`; saveEditBtn.disabled = false; return; }
       mergeSuggestionRecord(data); rerenderAdminLists(); editStatus.textContent = 'Alterações salvas com sucesso.';
       setTimeout(() => closeEditModal(), 350);
+      saveEditBtn.disabled = false;
     }
 
     async function loadProfiles() {
@@ -1141,6 +1482,7 @@
         setMainStatus('Atualizando dados...');
         if (targetPanel) setPanelStatus(targetPanel, 'Atualizando dados...');
         await Promise.all([loadProfiles(), loadSongs(), loadSuggestions()]);
+        syncPendingSelectionWithData();
         rerenderAdminLists();
         setMainStatus('');
         if (targetPanel) setPanelStatus(targetPanel, 'Dados atualizados.');
@@ -1182,6 +1524,8 @@
       closeDetailModal();
       closeEditModal();
       closeUserSongsModal();
+      confirmModal.classList.remove('active');
+      state.selectedPendingIds.clear();
     }
 
     async function bootstrapSession() {
@@ -1263,13 +1607,22 @@
     approvedSearch.addEventListener('input', () => { state.searches.approved = approvedSearch.value; renderApprovedList(); });
     inactiveSearch.addEventListener('input', () => { state.searches.inactive = inactiveSearch.value; renderInactiveList(); });
     usersSearch.addEventListener('input', () => { state.searches.users = usersSearch.value; renderUsersList(); });
+    toggleAllPendingBtn.addEventListener('click', toggleAllVisiblePending);
+    bulkApprovePendingBtn.addEventListener('click', handleBulkApprovePending);
+    bulkDeletePendingBtn.addEventListener('click', handleBulkDeletePending);
     saveEditBtn.addEventListener('click', saveEditedSuggestion);
+
+    confirmModalConfirmBtn.addEventListener('click', () => closeConfirmModal(true));
+    confirmModalCancelBtn.addEventListener('click', () => closeConfirmModal(false));
+    confirmCancelIcon.addEventListener('click', () => closeConfirmModal(false));
 
     detailModal.addEventListener('click', (event) => { if (event.target === detailModal) closeDetailModal(); });
     editModal.addEventListener('click', (event) => { if (event.target === editModal) closeEditModal(); });
     userSongsModal.addEventListener('click', (event) => { if (event.target === userSongsModal) closeUserSongsModal(); });
+    confirmModal.addEventListener('click', (event) => { if (event.target === confirmModal) closeConfirmModal(false); });
 
     createSupabaseClient();
+    updatePendingSelectionUi();
     bootstrapSession();
   </script>
 </body>
