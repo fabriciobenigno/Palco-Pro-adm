@@ -1,0 +1,25 @@
+{
+  "name": "Palco Pro Admin",
+  "short_name": "Palco Pro Adm",
+  "description": "Painel administrativo mobile do Palco Pro.",
+  "start_url": "/Palco-Pro-adm/",
+  "scope": "/Palco-Pro-adm/",
+  "display": "standalone",
+  "background_color": "#020409",
+  "theme_color": "#020409",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
