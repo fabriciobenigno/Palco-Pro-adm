@@ -10,218 +10,79 @@
   <title>Palco Pro Admin</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root {
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --safe-left: env(safe-area-inset-left, 0px);
-      --safe-right: env(safe-area-inset-right, 0px);
-      --bg-1: #020409;
-      --bg-2: #08111e;
-      --bg-3: #04070d;
-      --text: #f7f9ff;
-      --muted: rgba(232,239,255,0.74);
-      --soft: rgba(214,225,255,0.54);
-      --line: rgba(160,196,255,0.14);
-      --line-strong: rgba(184,223,255,0.24);
-      --blue-1: #8dd8ff;
-      --blue-2: #4a89ff;
-      --blue-3: #6ec9ff;
-      --green-1: rgba(72,214,138,0.98);
-      --green-2: rgba(27,168,94,0.95);
-      --red-1: rgba(255,111,111,0.98);
-      --red-2: rgba(238,65,65,0.94);
-      --amber-1: rgba(255,204,104,0.98);
-      --amber-2: rgba(233,166,44,0.94);
-      --shadow-xl: 0 24px 80px rgba(0,0,0,0.45);
-      --shadow-lg: 0 18px 46px rgba(0,0,0,0.30);
-      --shadow-md: 0 12px 26px rgba(0,0,0,0.24);
-      --glass: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
-    }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body {
-      margin: 0;
-      width: 100%;
-      min-height: 100%;
-      overflow: hidden;
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
-      background:
-        radial-gradient(circle at 18% 14%, rgba(108,186,255,.18), transparent 0 24%),
-        radial-gradient(circle at 82% 10%, rgba(90,125,255,.16), transparent 0 18%),
-        radial-gradient(circle at 50% 120%, rgba(45,87,180,.20), transparent 0 34%),
-        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 38%, var(--bg-3) 100%);
-      background-color: var(--bg-1);
-    }
-    body { position: fixed; inset: 0; overscroll-behavior: none; }
-    button, input, textarea { font: inherit; }
-    button { border: 0; }
-    .app {
-      position: relative;
-      z-index: 1;
-      width: 100vw;
-      min-height: 100dvh;
-      height: 100dvh;
-      display: grid;
-      grid-template-rows: 1fr;
-      overflow: hidden;
-      padding:
-        max(16px, calc(var(--safe-top) + 8px))
-        max(14px, calc(var(--safe-right) + 10px))
-        max(16px, calc(var(--safe-bottom) + 8px))
-        max(14px, calc(var(--safe-left) + 10px));
-      background:
-        linear-gradient(180deg, rgba(4,9,19,.50), rgba(4,8,16,.26)),
-        radial-gradient(circle at 50% -10%, rgba(89,164,255,.14), transparent 28%);
-    }
-    .surface { min-height: 100%; background: transparent; border: 0; border-radius: 0; box-shadow: none; backdrop-filter: blur(22px); }
-    .auth-card, .main-card { min-height: 100%; display: grid; gap: 12px; }
-    .auth-card { align-items: center; padding: 0; }
-    .auth-shell { width: 100%; max-width: 440px; margin: 0 auto; display: grid; gap: 18px; padding: 8px 2px; }
-    .auth-brand {
-      position: relative; overflow: hidden; border-radius: 30px; padding: 26px 22px 20px;
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)), linear-gradient(180deg, rgba(8,14,25,.82), rgba(6,10,18,.92));
-      border: 1px solid var(--line-strong); box-shadow: var(--shadow-xl), inset 0 1px 0 rgba(255,255,255,.08);
-    }
-    .auth-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 30px; width: fit-content; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(178,224,255,.14); color: rgba(234,243,255,.88); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-    .auth-chip-dot { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(180deg, var(--blue-1), var(--blue-2)); box-shadow: 0 0 18px rgba(116,200,255,.7); flex: 0 0 8px; }
-    .auth-brand h1 { margin: 14px 0 8px; font-size: clamp(28px, 8.4vw, 38px); line-height: .98; letter-spacing: -.05em; font-weight: 800; max-width: 260px; }
-    .auth-brand p { margin: 0; max-width: 300px; color: var(--muted); font-size: 13px; line-height: 1.6; }
-    .auth-form {
-      display: grid; gap: 14px; padding: 18px 16px 16px; border-radius: 28px;
-      background: linear-gradient(180deg, rgba(8,13,24,.84), rgba(7,11,19,.94)), var(--glass);
-      border: 1px solid var(--line); box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,.05); backdrop-filter: blur(20px);
-    }
-    .panel-title { display: grid; gap: 6px; }
-    .panel-title h2 { margin: 0; font-size: 18px; letter-spacing: -.03em; font-weight: 700; }
-    .panel-title p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
-    .field { display: grid; gap: 8px; }
-    .field label { color: rgba(236,243,255,.88); font-size: 12px; font-weight: 700; letter-spacing: .02em; }
-    input, textarea {
-      width: 100%; border: 1px solid rgba(163,205,255,.12);
-      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)), rgba(5,9,17,.72);
-      color: #fff; border-radius: 18px; padding: 14px 15px; outline: none; box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
-      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease, transform .18s ease;
-    }
-    textarea { min-height: 190px; resize: vertical; }
-    input:focus, textarea:focus {
-      border-color: rgba(133,208,255,.42);
-      box-shadow: 0 0 0 4px rgba(79,153,255,.14), inset 0 1px 0 rgba(255,255,255,.04);
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04)), rgba(8,13,22,.88);
-      transform: translateY(-1px);
-    }
-    input::placeholder, textarea::placeholder { color: rgba(227,235,255,.36); }
-    .toggle-password-row { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; padding: 2px 2px 0; }
-    .toggle-password-row input { width: 18px; height: 18px; accent-color: #6cb7ff; margin: 0; flex: 0 0 18px; }
-    .btn { position: relative; overflow: hidden; color: #fff; cursor: pointer; min-height: 50px; border-radius: 18px; padding: 12px 16px; font-weight: 800; letter-spacing: .01em; transition: transform .18s ease, opacity .18s ease, box-shadow .18s ease, border-color .18s ease; box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,.06); }
-    .btn:disabled { opacity: .58; cursor: default; transform: none; }
-    .btn-primary { background: linear-gradient(135deg, var(--blue-1), var(--blue-2) 58%, var(--blue-3)); border: 1px solid rgba(184,228,255,.32); color: #061120; text-shadow: 0 1px 0 rgba(255,255,255,.22); }
-    .btn-secondary { background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)), rgba(11,18,30,.72); border: 1px solid rgba(255,255,255,.12); color: #f2f7ff; }
-    .status-line { min-height: 18px; color: var(--muted); font-size: 12px; line-height: 1.45; padding-inline: 2px; }
-    .badge { display: none !important; }
-    .sticky-account, #mainStatus { display: none !important; }
-    .main-card { align-items: center; padding: 0; }
-    .menu-wrap { min-height: 0; display: flex; align-items: center; justify-content: center; padding: 0; }
-    .menu-block {
-      width: 100%; max-width: 430px; display: grid; gap: 16px; padding: 28px 18px 18px; border-radius: 32px;
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)), linear-gradient(180deg, rgba(8,13,24,.86), rgba(7,11,19,.96));
-      border: 1px solid var(--line-strong); box-shadow: var(--shadow-xl), inset 0 1px 0 rgba(255,255,255,.06); backdrop-filter: blur(22px);
-    }
-    .menu-topline { display: inline-flex; align-items: center; gap: 8px; width: fit-content; min-height: 28px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(180,224,255,.12); color: rgba(230,239,255,.84); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-    .menu-title { text-align: center; display: grid; gap: 8px; }
-    .menu-title h2 { margin: 0; font-size: clamp(28px, 7vw, 36px); line-height: .98; letter-spacing: -.05em; }
-    .menu-title p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
-    .menu-grid { width: 100%; display: grid; gap: 12px; }
-    .menu-btn { min-height: 56px; border-radius: 20px; text-align: center; font-size: 15px; padding: 12px 16px; }
-    .panel-screen {
-      position: fixed; inset: 0; z-index: 50;
-      padding: max(12px, calc(var(--safe-top) + 6px)) max(10px, calc(var(--safe-right) + 8px)) max(12px, calc(var(--safe-bottom) + 6px)) max(10px, calc(var(--safe-left) + 8px));
-      background: radial-gradient(circle at 16% 8%, rgba(110,188,255,.15), transparent 22%), linear-gradient(180deg, rgba(2,4,9,.98), rgba(8,17,30,.98), rgba(4,7,13,.99));
-      display: none;
-    }
-    .panel-screen.active { display: block; }
-    .panel-shell {
-      height: 100%; border-radius: 30px; border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(11,17,30,.95), rgba(7,11,19,.98)), var(--glass);
-      box-shadow: var(--shadow-xl), inset 0 1px 0 rgba(255,255,255,.05); display: grid; grid-template-rows: auto auto 1fr auto; overflow: hidden;
-    }
-    .panel-header { padding: 14px 14px 12px; border-bottom: 1px solid rgba(255,255,255,.06); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-    .panel-header h2 { margin: 0; font-size: 18px; letter-spacing: -.03em; }
-    .header-copy { display: grid; gap: 5px; min-width: 0; }
-    .header-copy p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
-    .header-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
-    .icon-btn { width: 42px; min-width: 42px; height: 42px; border-radius: 15px; background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)), rgba(10,17,29,.82); color: #fff; border: 1px solid rgba(255,255,255,.10); cursor: pointer; font-size: 18px; box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,.05); }
-    .panel-tools { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,.05); display: grid; gap: 10px; }
-    .list-area { overflow: auto; padding: 4px 14px 10px; display: grid; gap: 8px; align-content: start; }
-    .panel-footer { padding: 10px 14px 12px; color: var(--muted); font-size: 11px; line-height: 1.45; }
-    .empty { padding: 22px 18px; border-radius: 22px; border: 1px dashed rgba(184,224,255,.14); background: rgba(255,255,255,.03); color: var(--muted); text-align: center; line-height: 1.6; margin-top: 6px; }
-    .search-input { width: 100%; }
-    .multi-toolbar {
-      display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; padding: 10px; border-radius: 18px;
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)), rgba(10,17,29,.82); border: 1px solid rgba(255,255,255,.08);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
-    }
-    .multi-counter { color: var(--muted); font-size: 12px; font-weight: 700; padding: 0 4px; }
-    .selectable-row { position: relative; overflow: hidden; border-radius: 20px; min-height: 58px; height: 58px; cursor: pointer; }
-    .selectable-card {
-      width: 100%; min-height: 58px; height: 58px; padding: 0 14px; border: 1px solid rgba(255,255,255,.06); border-radius: 20px;
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), rgba(15,21,34,.94);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.03); display: flex; align-items: center; gap: 12px;
-      transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
-    }
-    .selectable-row.selected .selectable-card {
-      border-color: rgba(133,208,255,.45); background: linear-gradient(180deg, rgba(116,200,255,.12), rgba(74,137,255,.08)), rgba(15,21,34,.98);
-      box-shadow: 0 0 0 3px rgba(74,137,255,.12), inset 0 1px 0 rgba(255,255,255,.05); transform: translateY(-1px);
-    }
-    .check-shell { width: 24px; height: 24px; border-radius: 999px; border: 1px solid rgba(190,224,255,.22); background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)), rgba(8,13,24,.92); display: grid; place-items: center; flex: 0 0 24px; transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease; }
-    .check-shell::after { content: ''; width: 10px; height: 10px; border-radius: 999px; background: transparent; transform: scale(.4); transition: transform .18s ease, background .18s ease; }
-    .selectable-row.selected .check-shell { border-color: rgba(157,223,255,.5); background: linear-gradient(180deg, var(--blue-1), var(--blue-2)); box-shadow: 0 0 18px rgba(116,200,255,.28); transform: scale(1.04); }
-    .selectable-row.selected .check-shell::after { background: #08111f; transform: scale(1); }
-    .swipe-row { --swipe-reveal-width: 0px; position: relative; overflow: hidden; border-radius: 20px; min-height: 58px; height: 58px; touch-action: pan-y; background: transparent; border: 0; box-shadow: none; margin: 0; }
-    .swipe-actions { position: absolute; top: 0; right: 0; bottom: 0; width: var(--swipe-reveal-width); display: flex; justify-content: flex-end; align-items: center; gap: 8px; padding: 0 8px 0 6px; z-index: 0; pointer-events: none; background: transparent; }
-    .action-btn { width: 36px; height: 36px; min-height: 36px; border: 0; border-radius: 999px; color: #fff; display: grid; place-items: center; cursor: pointer; font-size: 15px; font-weight: 700; box-shadow: 0 8px 18px rgba(0,0,0,.22); opacity: 0; transform: translateX(18px) scale(.96); transition: opacity .18s ease, transform .18s ease; pointer-events: none; flex: 0 0 36px; padding: 0; overflow: hidden; }
-    .action-btn .action-fallback { line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
-    .action-btn.approve { background: linear-gradient(180deg, var(--green-1), var(--green-2)); }
-    .action-btn.edit { background: linear-gradient(180deg, var(--blue-1), var(--blue-2)); color: #08111f; }
-    .action-btn.disable { background: linear-gradient(180deg, var(--amber-1), var(--amber-2)); color: #1f1404; }
-    .action-btn.delete { background: linear-gradient(180deg, var(--red-1), var(--red-2)); }
-    .swipe-content {
-      position: relative; z-index: 1; width: 100%; min-height: 58px; height: 58px; padding: 0 14px; border: 1px solid rgba(255,255,255,.06); border-radius: 20px;
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), rgba(15,21,34,.94); box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
-      color: #fff; text-align: left; transform: translateX(0); transition: transform .22s ease, border-color .18s ease, background .18s ease; cursor: pointer; display: flex; align-items: center; justify-content: flex-start; overflow: hidden; touch-action: pan-y;
-    }
-    .swipe-row.revealed .swipe-content { transform: translateX(calc(var(--swipe-reveal-width) * -1)); }
-    .swipe-row.revealed .action-btn, .swipe-row.swiping .action-btn { opacity: 1; transform: translateX(0) scale(1); pointer-events: auto; }
-    .row-main { display: grid; gap: 2px; width: 100%; }
-    .row-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; min-width: 0; }
-    .row-title { margin: 0; font-size: 14px; line-height: 1.2; font-weight: 700; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
-    .row-meta { color: var(--muted); font-size: 12px; line-height: 1.25; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .row-user { color: rgba(255,255,255,.84); font-size: 11px; line-height: 1.2; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .mini-badge { display: inline-flex; align-items: center; justify-content: center; min-height: 20px; padding: 3px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; border: 1px solid rgba(255,255,255,.10); white-space: nowrap; flex-shrink: 0; letter-spacing: .02em; }
-    .mini-badge.success { background: rgba(72,214,138,.14); color: #9ef1c4; }
-    .mini-badge.warning { background: rgba(255,204,104,.14); color: #ffd992; }
-    .mini-badge.danger { background: rgba(255,111,111,.14); color: #ffc2c2; }
-    .modal { position: fixed; inset: 0; z-index: 70; display: none; padding: max(12px, calc(var(--safe-top) + 6px)) max(10px, calc(var(--safe-right) + 8px)) max(12px, calc(var(--safe-bottom) + 8px)) max(10px, calc(var(--safe-left) + 8px)); background: rgba(1,3,8,.72); backdrop-filter: blur(16px); }
-    .modal.active { display: block; }
-    .modal-card { height: 100%; border-radius: 30px; border: 1px solid var(--line); background: linear-gradient(180deg, rgba(11,17,30,.96), rgba(7,11,19,.98)), var(--glass); box-shadow: var(--shadow-xl), inset 0 1px 0 rgba(255,255,255,.05); display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; }
-    .modal-head { padding: 16px 14px 14px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-    .modal-head h3 { margin: 0; font-size: 18px; letter-spacing: -.02em; }
-    .modal-body { overflow: auto; padding: 14px; display: grid; gap: 12px; align-content: start; }
-    .modal-foot { padding: 14px; border-top: 1px solid rgba(255,255,255,.08); display: grid; gap: 10px; }
-    .detail-block { padding: 15px; border-radius: 20px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); display: grid; gap: 8px; }
-    .detail-block label { color: var(--soft); font-size: 12px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
-    .detail-block div { color: #fff; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
-    .form-grid { display: grid; gap: 12px; }
-    .hidden { display: none !important; }
-    @media (max-width: 560px) {
-      .auth-shell { gap: 14px; }
-      .auth-brand { padding: 24px 18px 18px; border-radius: 28px; }
-      .auth-form { padding: 16px 14px 14px; border-radius: 24px; }
-      .menu-block { padding: 24px 14px 14px; border-radius: 28px; }
-      .panel-shell, .modal-card { border-radius: 26px; }
-      .panel-header, .modal-head { padding-inline: 12px; }
-      .panel-tools, .panel-footer, .modal-body, .modal-foot { padding-inline: 12px; }
-      .list-area { padding-inline: 12px; }
-    }
+    :root { --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px); --safe-left: env(safe-area-inset-left, 0px); --safe-right: env(safe-area-inset-right, 0px); --bg-1:#020409; --bg-2:#08111e; --bg-3:#04070d; --text:#f7f9ff; --muted:rgba(232,239,255,.74); --soft:rgba(214,225,255,.54); --line:rgba(160,196,255,.14); --line-strong:rgba(184,223,255,.24); --blue-1:#8dd8ff; --blue-2:#4a89ff; --blue-3:#6ec9ff; --green-1:rgba(72,214,138,.98); --green-2:rgba(27,168,94,.95); --red-1:rgba(255,111,111,.98); --red-2:rgba(238,65,65,.94); --amber-1:rgba(255,204,104,.98); --amber-2:rgba(233,166,44,.94); --shadow-xl:0 24px 80px rgba(0,0,0,.45); --shadow-lg:0 18px 46px rgba(0,0,0,.30); --shadow-md:0 12px 26px rgba(0,0,0,.24); --glass:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02)); }
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    html, body { margin:0; width:100%; min-height:100%; overflow:hidden; color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif; background:radial-gradient(circle at 18% 14%, rgba(108,186,255,.18), transparent 0 24%), radial-gradient(circle at 82% 10%, rgba(90,125,255,.16), transparent 0 18%), radial-gradient(circle at 50% 120%, rgba(45,87,180,.20), transparent 0 34%), linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 38%, var(--bg-3) 100%); background-color:var(--bg-1); }
+    body { position:fixed; inset:0; overscroll-behavior:none; }
+    button, input, textarea { font:inherit; } button { border:0; }
+    .app { position:relative; z-index:1; width:100vw; min-height:100dvh; height:100dvh; display:grid; grid-template-rows:1fr; overflow:hidden; padding:max(16px, calc(var(--safe-top) + 8px)) max(14px, calc(var(--safe-right) + 10px)) max(16px, calc(var(--safe-bottom) + 8px)) max(14px, calc(var(--safe-left) + 10px)); background:linear-gradient(180deg, rgba(4,9,19,.50), rgba(4,8,16,.26)), radial-gradient(circle at 50% -10%, rgba(89,164,255,.14), transparent 28%); }
+    .surface { min-height:100%; background:transparent; border:0; border-radius:0; box-shadow:none; backdrop-filter:blur(22px); }
+    .auth-card, .main-card { min-height:100%; display:grid; gap:12px; }
+    .auth-card { align-items:center; padding:0; }
+    .auth-shell { width:100%; max-width:440px; margin:0 auto; display:grid; gap:18px; padding:8px 2px; }
+    .auth-brand { position:relative; overflow:hidden; border-radius:30px; padding:26px 22px 20px; background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)), linear-gradient(180deg, rgba(8,14,25,.82), rgba(6,10,18,.92)); border:1px solid var(--line-strong); box-shadow:var(--shadow-xl), inset 0 1px 0 rgba(255,255,255,.08); }
+    .auth-chip { display:inline-flex; align-items:center; gap:8px; min-height:30px; width:fit-content; padding:0 12px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(178,224,255,.14); color:rgba(234,243,255,.88); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+    .auth-chip-dot { width:8px; height:8px; border-radius:50%; background:linear-gradient(180deg, var(--blue-1), var(--blue-2)); box-shadow:0 0 18px rgba(116,200,255,.7); flex:0 0 8px; }
+    .auth-brand h1 { margin:14px 0 8px; font-size:clamp(28px, 8.4vw, 38px); line-height:.98; letter-spacing:-.05em; font-weight:800; max-width:260px; }
+    .auth-brand p { margin:0; max-width:300px; color:var(--muted); font-size:13px; line-height:1.6; }
+    .auth-form { display:grid; gap:14px; padding:18px 16px 16px; border-radius:28px; background:linear-gradient(180deg, rgba(8,13,24,.84), rgba(7,11,19,.94)), var(--glass); border:1px solid var(--line); box-shadow:var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,.05); }
+    .panel-title { display:grid; gap:6px; } .panel-title h2 { margin:0; font-size:18px; letter-spacing:-.03em; font-weight:700; } .panel-title p { margin:0; color:var(--muted); font-size:12px; line-height:1.55; }
+    .field { display:grid; gap:8px; } .field label { color:rgba(236,243,255,.88); font-size:12px; font-weight:700; letter-spacing:.02em; }
+    input, textarea { width:100%; border:1px solid rgba(163,205,255,.12); background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03)), rgba(5,9,17,.72); color:#fff; border-radius:18px; padding:14px 15px; outline:none; box-shadow:inset 0 1px 0 rgba(255,255,255,.04); }
+    textarea { min-height:190px; resize:vertical; } input::placeholder, textarea::placeholder { color:rgba(227,235,255,.36); }
+    .toggle-password-row { display:flex; align-items:center; gap:10px; color:var(--muted); font-size:13px; padding:2px 2px 0; } .toggle-password-row input { width:18px; height:18px; accent-color:#6cb7ff; margin:0; flex:0 0 18px; }
+    .btn { position:relative; overflow:hidden; color:#fff; cursor:pointer; min-height:50px; border-radius:18px; padding:12px 16px; font-weight:800; letter-spacing:.01em; box-shadow:var(--shadow-md), inset 0 1px 0 rgba(255,255,255,.06); }
+    .btn-primary { background:linear-gradient(135deg, var(--blue-1), var(--blue-2) 58%, var(--blue-3)); border:1px solid rgba(184,228,255,.32); color:#061120; text-shadow:0 1px 0 rgba(255,255,255,.22); }
+    .btn-secondary { background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)), rgba(11,18,30,.72); border:1px solid rgba(255,255,255,.12); color:#f2f7ff; }
+    .btn:disabled { opacity:.58; cursor:default; }
+    .status-line { min-height:18px; color:var(--muted); font-size:12px; line-height:1.45; padding-inline:2px; }
+    .sticky-account, #mainStatus { display:none !important; }
+    .main-card { align-items:center; padding:0; }
+    .menu-wrap { min-height:0; display:flex; align-items:center; justify-content:center; padding:0; }
+    .menu-block { width:100%; max-width:430px; display:grid; gap:16px; padding:28px 18px 18px; border-radius:32px; background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02)), linear-gradient(180deg, rgba(8,13,24,.86), rgba(7,11,19,.96)); border:1px solid var(--line-strong); box-shadow:var(--shadow-xl), inset 0 1px 0 rgba(255,255,255,.06); }
+    .menu-topline { display:inline-flex; align-items:center; gap:8px; width:fit-content; min-height:28px; padding:0 12px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(180,224,255,.12); color:rgba(230,239,255,.84); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+    .menu-title { text-align:center; display:grid; gap:8px; } .menu-title h2 { margin:0; font-size:clamp(28px, 7vw, 36px); line-height:.98; letter-spacing:-.05em; } .menu-title p { margin:0; color:var(--muted); font-size:13px; line-height:1.5; }
+    .menu-grid { width:100%; display:grid; gap:12px; } .menu-btn { min-height:56px; border-radius:20px; text-align:center; font-size:15px; padding:12px 16px; }
+    .panel-screen { position:fixed; inset:0; z-index:50; padding:max(12px, calc(var(--safe-top) + 6px)) max(10px, calc(var(--safe-right) + 8px)) max(12px, calc(var(--safe-bottom) + 6px)) max(10px, calc(var(--safe-left) + 8px)); background:radial-gradient(circle at 16% 8%, rgba(110,188,255,.15), transparent 22%), linear-gradient(180deg, rgba(2,4,9,.98), rgba(8,17,30,.98), rgba(4,7,13,.99)); display:none; }
+    .panel-screen.active { display:block; }
+    .panel-shell { height:100%; border-radius:30px; border:1px solid var(--line); background:linear-gradient(180deg, rgba(11,17,30,.95), rgba(7,11,19,.98)), var(--glass); box-shadow:var(--shadow-xl), inset 0 1px 0 rgba(255,255,255,.05); display:grid; grid-template-rows:auto auto 1fr auto; overflow:hidden; }
+    .panel-header { padding:14px 14px 12px; border-bottom:1px solid rgba(255,255,255,.06); display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .panel-header h2 { margin:0; font-size:18px; letter-spacing:-.03em; } .header-copy { display:grid; gap:5px; min-width:0; } .header-copy p { margin:0; color:var(--muted); font-size:12px; line-height:1.45; } .header-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
+    .icon-btn { width:42px; min-width:42px; height:42px; border-radius:15px; background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)), rgba(10,17,29,.82); color:#fff; border:1px solid rgba(255,255,255,.10); cursor:pointer; font-size:18px; box-shadow:var(--shadow-md), inset 0 1px 0 rgba(255,255,255,.05); }
+    .panel-tools { padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.05); display:grid; gap:10px; }
+    .list-area { overflow:auto; padding:4px 14px 10px; display:grid; gap:8px; align-content:start; }
+    .panel-footer { padding:10px 14px 12px; color:var(--muted); font-size:11px; line-height:1.45; }
+    .empty { padding:22px 18px; border-radius:22px; border:1px dashed rgba(184,224,255,.14); background:rgba(255,255,255,.03); color:var(--muted); text-align:center; line-height:1.6; margin-top:6px; }
+    .search-input { width:100%; }
+    .multi-toolbar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:10px; padding:10px; border-radius:18px; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)), rgba(10,17,29,.82); border:1px solid rgba(255,255,255,.08); box-shadow:inset 0 1px 0 rgba(255,255,255,.04); }
+    .multi-counter { color:var(--muted); font-size:12px; font-weight:700; padding:0 4px; }
+    .selectable-row { position:relative; overflow:hidden; border-radius:20px; min-height:58px; height:58px; cursor:pointer; }
+    .selectable-card { width:100%; min-height:58px; height:58px; padding:0 14px; border:1px solid rgba(255,255,255,.06); border-radius:20px; background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), rgba(15,21,34,.94); box-shadow:inset 0 1px 0 rgba(255,255,255,.03); display:flex; align-items:center; gap:12px; transition:transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease; }
+    .selectable-row.selected .selectable-card { border-color:rgba(133,208,255,.45); background:linear-gradient(180deg, rgba(116,200,255,.12), rgba(74,137,255,.08)), rgba(15,21,34,.98); box-shadow:0 0 0 3px rgba(74,137,255,.12), inset 0 1px 0 rgba(255,255,255,.05); transform:translateY(-1px); }
+    .check-shell { width:24px; height:24px; border-radius:999px; border:1px solid rgba(190,224,255,.22); background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)), rgba(8,13,24,.92); display:grid; place-items:center; flex:0 0 24px; }
+    .check-shell::after { content:''; width:10px; height:10px; border-radius:999px; background:transparent; transform:scale(.4); }
+    .selectable-row.selected .check-shell { border-color:rgba(157,223,255,.5); background:linear-gradient(180deg, var(--blue-1), var(--blue-2)); box-shadow:0 0 18px rgba(116,200,255,.28); }
+    .selectable-row.selected .check-shell::after { background:#08111f; transform:scale(1); }
+    .swipe-row { --swipe-reveal-width:0px; position:relative; overflow:hidden; border-radius:20px; min-height:58px; height:58px; touch-action:pan-y; background:transparent; border:0; box-shadow:none; margin:0; }
+    .swipe-actions { position:absolute; top:0; right:0; bottom:0; width:var(--swipe-reveal-width); display:flex; justify-content:flex-end; align-items:center; gap:8px; padding:0 8px 0 6px; z-index:3; pointer-events:none; background:transparent; }
+    .action-btn { width:36px; height:36px; min-height:36px; border:0; border-radius:999px; color:#fff; display:grid; place-items:center; cursor:pointer; font-size:15px; font-weight:700; box-shadow:0 8px 18px rgba(0,0,0,.22); opacity:0; transform:translateX(18px) scale(.96); transition:opacity .18s ease, transform .18s ease; pointer-events:none; flex:0 0 36px; padding:0; overflow:hidden; }
+    .action-btn .action-fallback { line-height:1; display:inline-flex; align-items:center; justify-content:center; pointer-events:none; }
+    .action-btn.approve { background:linear-gradient(180deg, var(--green-1), var(--green-2)); }
+    .action-btn.edit { background:linear-gradient(180deg, var(--blue-1), var(--blue-2)); color:#08111f; }
+    .action-btn.disable { background:linear-gradient(180deg, var(--amber-1), var(--amber-2)); color:#1f1404; }
+    .action-btn.delete { background:linear-gradient(180deg, var(--red-1), var(--red-2)); }
+    .swipe-content { position:relative; z-index:1; width:100%; min-height:58px; height:58px; padding:0 14px; border:1px solid rgba(255,255,255,.06); border-radius:20px; background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)), rgba(15,21,34,.94); box-shadow:inset 0 1px 0 rgba(255,255,255,.03); color:#fff; text-align:left; transform:translateX(0); transition:transform .22s ease, border-color .18s ease, background .18s ease; cursor:pointer; display:flex; align-items:center; justify-content:flex-start; overflow:hidden; touch-action:pan-y; }
+    .swipe-row.revealed .swipe-content { transform:translateX(calc(var(--swipe-reveal-width) * -1)); pointer-events:none; }
+    .swipe-row.revealed .action-btn, .swipe-row.swiping .action-btn { opacity:1; transform:translateX(0) scale(1); pointer-events:auto; }
+    .row-main { display:grid; gap:2px; width:100%; } .row-top { display:flex; justify-content:space-between; align-items:center; gap:10px; min-width:0; } .row-title { margin:0; font-size:14px; line-height:1.2; font-weight:700; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; flex:1; } .row-meta { color:var(--muted); font-size:12px; line-height:1.25; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .row-user { color:rgba(255,255,255,.84); font-size:11px; line-height:1.2; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .mini-badge { display:inline-flex; align-items:center; justify-content:center; min-height:20px; padding:3px 8px; border-radius:999px; font-size:10px; font-weight:700; border:1px solid rgba(255,255,255,.10); white-space:nowrap; flex-shrink:0; letter-spacing:.02em; }
+    .mini-badge.success { background:rgba(72,214,138,.14); color:#9ef1c4; } .mini-badge.warning { background:rgba(255,204,104,.14); color:#ffd992; } .mini-badge.danger { background:rgba(255,111,111,.14); color:#ffc2c2; }
+    .modal { position:fixed; inset:0; z-index:70; display:none; padding:max(12px, calc(var(--safe-top) + 6px)) max(10px, calc(var(--safe-right) + 8px)) max(12px, calc(var(--safe-bottom) + 8px)) max(10px, calc(var(--safe-left) + 8px)); background:rgba(1,3,8,.72); backdrop-filter:blur(16px); }
+    .modal.active { display:block; } .modal-card { height:100%; border-radius:30px; border:1px solid var(--line); background:linear-gradient(180deg, rgba(11,17,30,.96), rgba(7,11,19,.98)), var(--glass); box-shadow:var(--shadow-xl), inset 0 1px 0 rgba(255,255,255,.05); display:grid; grid-template-rows:auto 1fr auto; overflow:hidden; }
+    .modal-head { padding:16px 14px 14px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:space-between; gap:10px; } .modal-head h3 { margin:0; font-size:18px; letter-spacing:-.02em; }
+    .modal-body { overflow:auto; padding:14px; display:grid; gap:12px; align-content:start; } .modal-foot { padding:14px; border-top:1px solid rgba(255,255,255,.08); display:grid; gap:10px; }
+    .detail-block { padding:15px; border-radius:20px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); display:grid; gap:8px; } .detail-block label { color:var(--soft); font-size:12px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; } .detail-block div { color:#fff; line-height:1.7; white-space:pre-wrap; word-break:break-word; }
+    .form-grid { display:grid; gap:12px; } .hidden { display:none !important; }
   </style>
 </head>
 <body>
@@ -234,345 +95,100 @@
           <p>Acesso seguro para gerenciamento de músicas, sugestões e usuários em uma interface com visual de aplicativo profissional.</p>
         </div>
         <div class="auth-form">
-          <div class="panel-title">
-            <h2>Entrar como administrador</h2>
-            <p>Faça login para liberar o painel.</p>
-          </div>
-          <div class="field">
-            <label for="emailInput">E-mail</label>
-            <input id="emailInput" type="email" inputmode="email" autocomplete="email" placeholder="Seu e-mail" />
-          </div>
-          <div class="field">
-            <label for="passwordInput">Senha</label>
-            <input id="passwordInput" type="password" autocomplete="current-password" placeholder="Sua senha" />
-            <label class="toggle-password-row" for="showPasswordToggle">
-              <input id="showPasswordToggle" type="checkbox" />
-              <span>Mostrar senha</span>
-            </label>
-          </div>
+          <div class="panel-title"><h2>Entrar como administrador</h2><p>Faça login para liberar o painel.</p></div>
+          <div class="field"><label for="emailInput">E-mail</label><input id="emailInput" type="email" inputmode="email" autocomplete="email" placeholder="Seu e-mail" /></div>
+          <div class="field"><label for="passwordInput">Senha</label><input id="passwordInput" type="password" autocomplete="current-password" placeholder="Sua senha" /><label class="toggle-password-row" for="showPasswordToggle"><input id="showPasswordToggle" type="checkbox" /><span>Mostrar senha</span></label></div>
           <button id="loginBtn" type="button" class="btn btn-primary">Entrar</button>
           <div id="authStatus" class="status-line"></div>
         </div>
       </div>
     </section>
-
     <section id="adminPanel" class="surface main-card hidden">
-      <div class="sticky-account">
-        <div>
-          <strong id="accountLabel">Conta conectada</strong>
-          <span>Painel liberado para administração</span>
-        </div>
-        <button id="logoutBtn" type="button" class="btn btn-secondary">Sair da conta</button>
-      </div>
-      <div class="menu-wrap">
-        <div class="menu-block">
-          <div class="menu-topline">Palco Pro</div>
-          <div class="menu-title">
-            <h2>Palco Pro Adm</h2>
-            <p>Painel administrativo mobile com aparência de aplicativo profissional.</p>
-          </div>
-          <div class="menu-grid">
-            <button id="openPendingBtn" type="button" class="btn btn-primary menu-btn">Músicas pendentes</button>
-            <button id="openApprovedBtn" type="button" class="btn btn-primary menu-btn">Músicas aprovadas</button>
-            <button id="openInactiveBtn" type="button" class="btn btn-primary menu-btn">Músicas inativas</button>
-            <button id="openUsersBtn" type="button" class="btn btn-primary menu-btn">Usuários</button>
-          </div>
-        </div>
-      </div>
+      <div class="menu-wrap"><div class="menu-block"><div class="menu-topline">Palco Pro</div><div class="menu-title"><h2>Palco Pro Adm</h2><p>Painel administrativo mobile com aparência de aplicativo profissional.</p></div><div class="menu-grid"><button id="openPendingBtn" type="button" class="btn btn-primary menu-btn">Músicas pendentes</button><button id="openApprovedBtn" type="button" class="btn btn-primary menu-btn">Músicas aprovadas</button><button id="openInactiveBtn" type="button" class="btn btn-primary menu-btn">Músicas inativas</button><button id="openUsersBtn" type="button" class="btn btn-primary menu-btn">Usuários</button></div></div></div>
       <div id="mainStatus" class="status-line"></div>
     </section>
   </main>
-
   <section id="pendingPanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Músicas pendentes</h2><p>Músicas da tabela songs que ainda não existem como aprovadas ativas.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="pending">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="pendingSearch" class="search-input" type="text" placeholder="Buscar por música, artista, estilo ou conta" /></div><div id="pendingList" class="list-area"></div><div id="pendingStatus" class="panel-footer"></div></div></section>
   <section id="approvedPanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Músicas aprovadas</h2><p>Itens de approved_suggestions com active = true.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="approved">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="approvedSearch" class="search-input" type="text" placeholder="Buscar por música, artista ou estilo" /></div><div id="approvedList" class="list-area"></div><div id="approvedStatus" class="panel-footer"></div></div></section>
   <section id="inactivePanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Músicas inativas</h2><p>Itens de approved_suggestions com active = false.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="inactive">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="inactiveSearch" class="search-input" type="text" placeholder="Buscar por música, artista ou estilo" /></div><div id="inactiveList" class="list-area"></div><div id="inactiveStatus" class="panel-footer"></div></div></section>
   <section id="usersPanel" class="panel-screen"><div class="panel-shell"><div class="panel-header"><div class="header-copy"><h2>Usuários</h2><p>Lista de usuários com acesso rápido às músicas de cada conta.</p></div><div class="header-actions"><button type="button" class="icon-btn" data-refresh="users">↻</button><button type="button" class="icon-btn" data-close-panel>✕</button></div></div><div class="panel-tools"><input id="usersSearch" class="search-input" type="text" placeholder="Buscar por nome ou e-mail" /></div><div id="usersList" class="list-area"></div><div id="usersStatus" class="panel-footer"></div></div></section>
-
   <section id="detailModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="detailModalTitle">Detalhes</h3><button type="button" class="icon-btn" data-close-detail>✕</button></div><div id="detailModalBody" class="modal-body"></div><div class="modal-foot"><button type="button" class="btn btn-secondary" data-close-detail>Fechar</button></div></div></section>
-  <section id="editModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="editModalTitle">Editar música</h3><button type="button" class="icon-btn" data-close-edit>✕</button></div><div class="modal-body"><div class="form-grid"><div class="field"><label for="editTitle">Nome da música</label><input id="editTitle" type="text" placeholder="Nome da música" /></div><div class="field"><label for="editArtist">Artista</label><input id="editArtist" type="text" placeholder="Artista" /></div><div class="field"><label for="editStyle">Estilo</label><input id="editStyle" type="text" placeholder="Estilo" /></div><div class="field"><label for="editLyrics">Letra</label><textarea id="editLyrics" placeholder="Letra da música"></textarea></div></div><div id="editStatus" class="status-line"></div></div><div class="modal-foot"><button id="saveEditBtn" type="button" class="btn btn-primary">Salvar alterações</button><button type="button" class="btn btn-secondary" data-close-edit>Cancelar</button></div></div></section>
+  <section id="editModal" class="modal"><div class="modal-card"><div class="modal-head"><h3>Editar música</h3><button type="button" class="icon-btn" data-close-edit>✕</button></div><div class="modal-body"><div class="form-grid"><div class="field"><label for="editTitle">Nome da música</label><input id="editTitle" type="text" placeholder="Nome da música" /></div><div class="field"><label for="editArtist">Artista</label><input id="editArtist" type="text" placeholder="Artista" /></div><div class="field"><label for="editStyle">Estilo</label><input id="editStyle" type="text" placeholder="Estilo" /></div><div class="field"><label for="editLyrics">Letra</label><textarea id="editLyrics" placeholder="Letra da música"></textarea></div></div><div id="editStatus" class="status-line"></div></div><div class="modal-foot"><button id="saveEditBtn" type="button" class="btn btn-primary">Salvar alterações</button><button type="button" class="btn btn-secondary" data-close-edit>Cancelar</button></div></div></section>
   <section id="userSongsModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="userSongsTitle">Músicas do usuário</h3><button type="button" class="icon-btn" data-close-user-songs>✕</button></div><div id="userSongsBody" class="modal-body"></div><div class="modal-foot"><button type="button" class="btn btn-secondary" data-close-user-songs>Fechar</button></div></div></section>
-
   <script>
     const SUPABASE_URL = 'https://dlcjcsbdabjupsiwlncd.supabase.co';
     const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2JU7mYP9oeeUvzncDuZMRw_8p3lzGfT';
-
-    const state = {
-      supabase: null,
-      currentUser: null,
-      currentProfile: null,
-      songs: [],
-      users: [],
-      suggestions: [],
-      searches: { pending: '', approved: '', inactive: '', users: '' },
-      editSuggestionId: null,
-      editSongId: null,
-      editMode: 'suggestion',
-      activePanel: null,
-      revealedRowKey: null,
-      multiSelect: { active: false, panel: null, selected: new Set(), busy: false }
-    };
-
+    const state = { supabase:null, currentUser:null, currentProfile:null, songs:[], users:[], suggestions:[], searches:{ pending:'', approved:'', inactive:'', users:'' }, editSuggestionId:null, editSongId:null, editMode:'suggestion', activePanel:null, revealedRowKey:null, multiSelect:{ active:false, panel:null, selected:new Set(), busy:false } };
     const $ = (id) => document.getElementById(id);
-    const authCard = $('authCard'); const adminPanel = $('adminPanel'); const emailInput = $('emailInput'); const passwordInput = $('passwordInput'); const showPasswordToggle = $('showPasswordToggle'); const loginBtn = $('loginBtn'); const logoutBtn = $('logoutBtn'); const authStatus = $('authStatus'); const accountLabel = $('accountLabel'); const mainStatus = $('mainStatus');
-    const pendingPanel = $('pendingPanel'); const approvedPanel = $('approvedPanel'); const inactivePanel = $('inactivePanel'); const usersPanel = $('usersPanel');
-    const pendingSearch = $('pendingSearch'); const approvedSearch = $('approvedSearch'); const inactiveSearch = $('inactiveSearch'); const usersSearch = $('usersSearch');
-    const pendingList = $('pendingList'); const approvedList = $('approvedList'); const inactiveList = $('inactiveList'); const usersList = $('usersList');
-    const pendingStatus = $('pendingStatus'); const approvedStatus = $('approvedStatus'); const inactiveStatus = $('inactiveStatus'); const usersStatus = $('usersStatus');
-    const detailModal = $('detailModal'); const detailModalTitle = $('detailModalTitle'); const detailModalBody = $('detailModalBody');
-    const editModal = $('editModal'); const editModalTitle = $('editModalTitle'); const editTitle = $('editTitle'); const editArtist = $('editArtist'); const editStyle = $('editStyle'); const editLyrics = $('editLyrics'); const editStatus = $('editStatus'); const saveEditBtn = $('saveEditBtn');
-    const userSongsModal = $('userSongsModal'); const userSongsTitle = $('userSongsTitle'); const userSongsBody = $('userSongsBody');
-    const openPendingBtn = $('openPendingBtn'); const openApprovedBtn = $('openApprovedBtn'); const openInactiveBtn = $('openInactiveBtn'); const openUsersBtn = $('openUsersBtn');
-
+    const authCard=$('authCard'), adminPanel=$('adminPanel'), emailInput=$('emailInput'), passwordInput=$('passwordInput'), showPasswordToggle=$('showPasswordToggle'), loginBtn=$('loginBtn'), authStatus=$('authStatus'), accountLabel=$('accountLabel'), mainStatus=$('mainStatus');
+    const pendingPanel=$('pendingPanel'), approvedPanel=$('approvedPanel'), inactivePanel=$('inactivePanel'), usersPanel=$('usersPanel');
+    const pendingSearch=$('pendingSearch'), approvedSearch=$('approvedSearch'), inactiveSearch=$('inactiveSearch'), usersSearch=$('usersSearch');
+    const pendingList=$('pendingList'), approvedList=$('approvedList'), inactiveList=$('inactiveList'), usersList=$('usersList');
+    const pendingStatus=$('pendingStatus'), approvedStatus=$('approvedStatus'), inactiveStatus=$('inactiveStatus'), usersStatus=$('usersStatus');
+    const detailModal=$('detailModal'), detailModalTitle=$('detailModalTitle'), detailModalBody=$('detailModalBody');
+    const editModal=$('editModal'), editTitle=$('editTitle'), editArtist=$('editArtist'), editStyle=$('editStyle'), editLyrics=$('editLyrics'), editStatus=$('editStatus'), saveEditBtn=$('saveEditBtn');
+    const userSongsModal=$('userSongsModal'), userSongsTitle=$('userSongsTitle'), userSongsBody=$('userSongsBody');
+    const openPendingBtn=$('openPendingBtn'), openApprovedBtn=$('openApprovedBtn'), openInactiveBtn=$('openInactiveBtn'), openUsersBtn=$('openUsersBtn');
     function createSupabaseClient() { if (!window.supabase) throw new Error('Supabase não carregou.'); if (!state.supabase) state.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY); return state.supabase; }
-    function setAuthStatus(message) { authStatus.textContent = message || ''; }
-    function setMainStatus(message) { mainStatus.textContent = message || ''; }
-    function setPanelStatus(panel, message) { if (panel === 'pending') pendingStatus.textContent = message || ''; if (panel === 'approved') approvedStatus.textContent = message || ''; if (panel === 'inactive') inactiveStatus.textContent = message || ''; if (panel === 'users') usersStatus.textContent = message || ''; }
-    function normalizeText(value) { return String(value || '').trim(); }
-    function normalizeMatchText(value) { return normalizeText(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' '); }
-    function sanitizeLyrics(value) { return String(value || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim(); }
-    function escapeHtml(value) { return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
-    function idsEqual(a, b) { return String(a ?? '') === String(b ?? ''); }
-    function closeAllSwipes() { document.querySelectorAll('.swipe-row.revealed, .swipe-row.swiping').forEach((row) => row.classList.remove('revealed', 'swiping')); state.revealedRowKey = null; }
-    function buildSongSignature(song) { const title = normalizeMatchText(song?.song_title || song?.title || ''); const artist = normalizeMatchText(song?.artist || ''); if (!title) return ''; return artist ? `${title}::${artist}` : title; }
-    function getUserEmail(userId) { const profile = state.users.find((item) => idsEqual(item.id, userId)); return profile?.email || 'Conta sem e-mail visível'; }
-    function getOriginEmailBySongId(songId) { const song = state.songs.find((item) => idsEqual(item.id, songId)); return song ? getUserEmail(song.user_id) : 'Conta sem e-mail visível'; }
-    function getSuggestionById(id) { return state.suggestions.find((item) => idsEqual(item.id, id)) || null; }
-    function getSuggestionBySongId(songId) { return state.suggestions.find((item) => idsEqual(item.source_song_id, songId)) || null; }
-    function getActiveSuggestionBySongId(songId) { return state.suggestions.find((item) => idsEqual(item.source_song_id, songId) && item.active === true) || null; }
-    function getActiveSuggestionBySongSignature(song) { const signature = buildSongSignature(song); if (!signature) return null; return state.suggestions.find((item) => item.active === true && buildSongSignature(item) === signature) || null; }
-    function getPendingSongs() { return state.songs.filter((song) => !getActiveSuggestionBySongId(song.id) && !getActiveSuggestionBySongSignature(song)).sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' })); }
-    function getApprovedSuggestions() { return state.suggestions.filter((item) => item.active === true).sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' })); }
-    function getInactiveSuggestions() { return state.suggestions.filter((item) => item.active === false).sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' })); }
-    function applySearch(items, panel) { const query = normalizeText(state.searches[panel]).toLowerCase(); return query ? items.filter((item) => JSON.stringify(item).toLowerCase().includes(query)) : items; }
-    function getPendingBadge() { return '<span class="mini-badge warning">Pendente</span>'; }
-    function getApprovedBadge() { return '<span class="mini-badge success">Ativa</span>'; }
-    function getInactiveBadge() { return '<span class="mini-badge danger">Inativa</span>'; }
-    function isMulti(panel) { return state.multiSelect.active && state.multiSelect.panel === panel; }
-    function clearMultiSelect() { state.multiSelect.active = false; state.multiSelect.panel = null; state.multiSelect.selected.clear(); state.multiSelect.busy = false; }
-    function toggleMultiSelect(panel) { const same = state.multiSelect.active && state.multiSelect.panel === panel; if (same) clearMultiSelect(); else { state.multiSelect.active = true; state.multiSelect.panel = panel; state.multiSelect.selected.clear(); state.multiSelect.busy = false; closeAllSwipes(); } rerenderAdminLists(); }
-    function toggleItemSelection(id) { if (!state.multiSelect.active || state.multiSelect.busy) return; const key = String(id); if (state.multiSelect.selected.has(key)) state.multiSelect.selected.delete(key); else state.multiSelect.selected.add(key); rerenderAdminLists(); }
-    function getSelectedIds() { return Array.from(state.multiSelect.selected); }
-    function mergeSuggestionRecord(record) { if (!record) return; const indexById = state.suggestions.findIndex((item) => idsEqual(item.id, record.id)); if (indexById >= 0) state.suggestions[indexById] = record; else { const indexBySong = state.suggestions.findIndex((item) => idsEqual(item.source_song_id, record.source_song_id)); if (indexBySong >= 0) state.suggestions[indexBySong] = record; else state.suggestions.unshift(record); } }
-
-    function rerenderAdminLists() { renderPendingList(); renderApprovedList(); renderInactiveList(); renderUsersList(); }
-
-    function createSwipeRow({ key, revealWidth, actions, onOpenDetail, title, meta, extra, badge }) {
-      const row = document.createElement('div'); row.className = 'swipe-row'; row.dataset.key = key; row.style.setProperty('--swipe-reveal-width', `${revealWidth}px`);
-      const actionsWrap = document.createElement('div'); actionsWrap.className = 'swipe-actions';
-      actions.forEach((action) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = `action-btn ${action.className}`;
-        button.setAttribute('aria-label', action.aria);
-        button.innerHTML = `<span class="action-fallback">${action.icon || ''}</span>`;
-        button.addEventListener('click', (event) => { event.stopPropagation(); closeAllSwipes(); action.onClick(); });
-        actionsWrap.appendChild(button);
-      });
-      const content = document.createElement('button');
-      content.type = 'button';
-      content.className = 'swipe-content';
-      content.innerHTML = `<div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(title)}</h3>${badge || ''}</div><div class="row-meta">${escapeHtml(meta || '')}</div>${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}</div>`;
-      content.addEventListener('click', () => { if (row.classList.contains('revealed')) { closeAllSwipes(); return; } onOpenDetail(); });
-      attachSwipe(row, content, key, revealWidth);
-      row.appendChild(actionsWrap); row.appendChild(content); return row;
-    }
-
-    function attachSwipe(row, card, key, revealWidth) {
-      let startX = 0, currentX = 0, swiping = false, pointerId = null, horizontalLocked = false, verticalLock = false, startY = 0;
-      const beginSwipe = (event) => { if (event.pointerType === 'mouse' && event.button !== 0) return; closeAllSwipes(); startX = event.clientX; startY = event.clientY; currentX = 0; swiping = true; horizontalLocked = false; verticalLock = false; pointerId = event.pointerId; row.classList.add('swiping'); row.setPointerCapture?.(pointerId); };
-      const moveSwipe = (event) => {
-        if (!swiping || event.pointerId !== pointerId) return;
-        const deltaX = event.clientX - startX; const deltaY = event.clientY - startY;
-        if (!horizontalLocked && !verticalLock) {
-          if (Math.abs(deltaY) > 10 && Math.abs(deltaY) > Math.abs(deltaX)) { verticalLock = true; row.classList.remove('swiping'); return; }
-          if (Math.abs(deltaX) > 10 && Math.abs(deltaX) > Math.abs(deltaY)) horizontalLocked = true;
-        }
-        if (!horizontalLocked) return;
-        event.preventDefault();
-        currentX = Math.max(-revealWidth, Math.min(0, deltaX));
-        card.style.transform = `translateX(${currentX}px)`;
-      };
-      const endSwipe = (event) => {
-        if (!swiping || event.pointerId !== pointerId) return;
-        swiping = false; pointerId = null; row.classList.remove('swiping'); card.style.transform = '';
-        if (!horizontalLocked) return;
-        if (currentX <= -(revealWidth * 0.35)) { closeAllSwipes(); row.classList.add('revealed'); state.revealedRowKey = key; }
-        else { row.classList.remove('revealed'); if (state.revealedRowKey === key) state.revealedRowKey = null; }
-      };
-      row.addEventListener('pointerdown', beginSwipe); row.addEventListener('pointermove', moveSwipe); row.addEventListener('pointerup', endSwipe); row.addEventListener('pointercancel', endSwipe); row.addEventListener('lostpointercapture', endSwipe);
-    }
-
-    function createActionBtn(label, fn, variant = 'primary') { const btn = document.createElement('button'); btn.type = 'button'; btn.className = `btn ${variant === 'secondary' ? 'btn-secondary' : 'btn-primary'}`; btn.textContent = label; btn.onclick = fn; return btn; }
-    function createMultiToolbar(panel) {
-      const wrap = document.createElement('div'); wrap.className = 'multi-toolbar';
-      wrap.appendChild(createActionBtn(isMulti(panel) ? 'Cancelar seleção' : 'Selecionar', () => toggleMultiSelect(panel), 'secondary'));
-      if (!isMulti(panel)) return wrap;
-      const count = document.createElement('span'); count.className = 'multi-counter'; count.textContent = `${getSelectedIds().length} selecionada${getSelectedIds().length === 1 ? '' : 's'}`; wrap.appendChild(count);
-      if (panel === 'pending') { wrap.appendChild(createActionBtn('Aprovar', () => batchAction('approve', panel))); wrap.appendChild(createActionBtn('Excluir', () => batchAction('delete', panel))); }
-      if (panel === 'approved') { wrap.appendChild(createActionBtn('Desabilitar', () => batchAction('disable', panel))); wrap.appendChild(createActionBtn('Excluir', () => batchAction('delete', panel))); }
-      if (panel === 'inactive') { wrap.appendChild(createActionBtn('Aprovar', () => batchAction('activate', panel))); wrap.appendChild(createActionBtn('Excluir', () => batchAction('delete', panel))); }
-      return wrap;
-    }
-    function createSelectableRow(item, title, meta, extra) {
-      const row = document.createElement('div');
-      row.className = `selectable-row ${state.multiSelect.selected.has(String(item.id)) ? 'selected' : ''}`;
-      row.innerHTML = `<div class="selectable-card"><div class="check-shell"></div><div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(title)}</h3></div><div class="row-meta">${escapeHtml(meta || '')}</div>${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}</div></div>`;
-      row.addEventListener('click', () => toggleItemSelection(item.id));
-      return row;
-    }
-
-    async function batchAction(type, panel) {
-      const ids = getSelectedIds(); if (!ids.length || state.multiSelect.busy) return;
-      if (type === 'delete') { const confirmed = window.confirm(`Tem certeza que deseja excluir ${ids.length} música${ids.length === 1 ? '' : 's'}? Essa ação não pode ser desfeita.`); if (!confirmed) return; }
-      state.multiSelect.busy = true; setPanelStatus(panel, 'Executando ação em lote...');
-      try {
-        const supabase = createSupabaseClient();
-        if (panel === 'pending' && type === 'approve') {
-          const songsToApprove = state.songs.filter((item) => ids.includes(String(item.id)));
-          const upserts = songsToApprove.map((song) => {
-            const existing = getSuggestionBySongId(song.id);
-            const payload = { source_song_id: song.id, song_title: song.song_title || '', artist: song.artist || '', style: song.style || '', lyrics: sanitizeLyrics(song.lyrics || ''), active: true };
-            if (existing) return supabase.from('approved_suggestions').update(payload).eq('id', existing.id).select('*').single();
-            return supabase.from('approved_suggestions').insert(payload).select('*').single();
-          });
-          const results = await Promise.all(upserts); const failed = results.find((r) => r.error); if (failed) throw failed.error; results.forEach((r) => mergeSuggestionRecord(r.data));
-        }
-        if (panel === 'pending' && type === 'delete') {
-          const tasks = ids.map((id) => supabase.from('songs').delete().eq('id', id));
-          const results = await Promise.all(tasks); const failed = results.find((r) => r.error); if (failed) throw failed.error; state.songs = state.songs.filter((item) => !ids.includes(String(item.id)));
-        }
-        if (panel === 'approved' && type === 'disable') {
-          const tasks = ids.map((id) => supabase.from('approved_suggestions').update({ active: false }).eq('id', id).select('*').single());
-          const results = await Promise.all(tasks); const failed = results.find((r) => r.error); if (failed) throw failed.error; results.forEach((r) => mergeSuggestionRecord(r.data));
-        }
-        if (panel === 'approved' && type === 'delete') {
-          const tasks = ids.map((id) => supabase.from('approved_suggestions').delete().eq('id', id));
-          const results = await Promise.all(tasks); const failed = results.find((r) => r.error); if (failed) throw failed.error; state.suggestions = state.suggestions.filter((item) => !ids.includes(String(item.id)));
-        }
-        if (panel === 'inactive' && type === 'activate') {
-          const tasks = ids.map((id) => supabase.from('approved_suggestions').update({ active: true }).eq('id', id).select('*').single());
-          const results = await Promise.all(tasks); const failed = results.find((r) => r.error); if (failed) throw failed.error; results.forEach((r) => mergeSuggestionRecord(r.data));
-        }
-        if (panel === 'inactive' && type === 'delete') {
-          const tasks = ids.map((id) => supabase.from('approved_suggestions').delete().eq('id', id));
-          const results = await Promise.all(tasks); const failed = results.find((r) => r.error); if (failed) throw failed.error; state.suggestions = state.suggestions.filter((item) => !ids.includes(String(item.id)));
-        }
-        state.multiSelect.selected.clear(); rerenderAdminLists(); setPanelStatus(panel, 'Ação em lote concluída com sucesso.');
-      } catch (error) {
-        setPanelStatus(panel, `Erro na ação em lote: ${error?.message || 'falha desconhecida'}`);
-      } finally {
-        state.multiSelect.busy = false; rerenderAdminLists();
-      }
-    }
-
-    function renderPendingList() {
-      const items = applySearch(getPendingSongs().map((song) => ({ ...song, account_email: getUserEmail(song.user_id) })), 'pending');
-      pendingList.innerHTML = ''; pendingList.appendChild(createMultiToolbar('pending'));
-      if (!items.length) { pendingList.innerHTML += '<div class="empty">Nenhuma música pendente encontrada.</div>'; setPanelStatus('pending', 'Use a seleção múltipla para aprovar ou excluir em lote.'); return; }
-      items.forEach((song) => {
-        if (isMulti('pending')) pendingList.appendChild(createSelectableRow(song, song.song_title || 'Sem título', `${song.artist || 'Sem artista'} • ${song.style || 'Sem estilo'}`, `Conta: ${song.account_email}`));
-        else pendingList.appendChild(createSwipeRow({ key: `pending-${song.id}`, revealWidth: 140, actions: [{ icon: '✔', className: 'approve', aria: 'Aprovar música', onClick: () => handleApproveSong(song.id) }, { icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openSongEditFromPending(song.id) }, { icon: '🗑', className: 'delete', aria: 'Excluir música', onClick: () => handleDeletePendingSong(song.id) }], onOpenDetail: () => openSongDetail(song), title: song.song_title || 'Sem título', meta: `${song.artist || 'Sem artista'} • ${song.style || 'Sem estilo'}`, extra: `Conta: ${song.account_email}`, badge: getPendingBadge() }));
-      });
-      setPanelStatus('pending', `${items.length} música${items.length > 1 ? 's' : ''} pendente${items.length > 1 ? 's' : ''}.`);
-    }
-
-    function renderApprovedList() {
-      const items = applySearch(getApprovedSuggestions(), 'approved'); approvedList.innerHTML = ''; approvedList.appendChild(createMultiToolbar('approved'));
-      if (!items.length) { approvedList.innerHTML += '<div class="empty">Nenhuma música aprovada ativa encontrada.</div>'; setPanelStatus('approved', 'Use a seleção múltipla para desabilitar ou excluir em lote.'); return; }
-      items.forEach((item) => {
-        if (isMulti('approved')) approvedList.appendChild(createSelectableRow(item, item.song_title || 'Sem título', `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`, `Origem: ${getOriginEmailBySongId(item.source_song_id)}`));
-        else approvedList.appendChild(createSwipeRow({ key: `approved-${item.id}`, revealWidth: 140, actions: [{ icon: '⏸', className: 'disable', aria: 'Desabilitar música', onClick: () => handleDisableSuggestion(item.id) }, { icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) }, { icon: '🗑', className: 'delete', aria: 'Excluir música', onClick: () => handleDeleteSuggestion(item.id, 'approved') }], onOpenDetail: () => openSuggestionDetail(item, 'approved'), title: item.song_title || 'Sem título', meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`, extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`, badge: getApprovedBadge() }));
-      });
-      setPanelStatus('approved', `${items.length} música${items.length > 1 ? 's' : ''} aprovada${items.length > 1 ? 's' : ''} ativa${items.length > 1 ? 's' : ''}.`);
-    }
-
-    function renderInactiveList() {
-      const items = applySearch(getInactiveSuggestions(), 'inactive'); inactiveList.innerHTML = ''; inactiveList.appendChild(createMultiToolbar('inactive'));
-      if (!items.length) { inactiveList.innerHTML += '<div class="empty">Nenhuma música inativa encontrada.</div>'; setPanelStatus('inactive', 'Use a seleção múltipla para aprovar ou excluir em lote.'); return; }
-      items.forEach((item) => {
-        if (isMulti('inactive')) inactiveList.appendChild(createSelectableRow(item, item.song_title || 'Sem título', `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`, `Origem: ${getOriginEmailBySongId(item.source_song_id)}`));
-        else inactiveList.appendChild(createSwipeRow({ key: `inactive-${item.id}`, revealWidth: 140, actions: [{ icon: '✔', className: 'approve', aria: 'Ativar música', onClick: () => handleActivateSuggestion(item.id) }, { icon: '✎', className: 'edit', aria: 'Editar música', onClick: () => openEditModal(item.id) }, { icon: '🗑', className: 'delete', aria: 'Excluir música', onClick: () => handleDeleteSuggestion(item.id, 'inactive') }], onOpenDetail: () => openSuggestionDetail(item, 'inactive'), title: item.song_title || 'Sem título', meta: `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`, extra: `Origem: ${getOriginEmailBySongId(item.source_song_id)}`, badge: getInactiveBadge() }));
-      });
-      setPanelStatus('inactive', `${items.length} música${items.length > 1 ? 's' : ''} inativa${items.length > 1 ? 's' : ''}.`);
-    }
-
-    function renderUsersList() {
-      const items = applySearch(state.users.filter((user) => user.email || user.display_name).sort((a, b) => (a.display_name || a.email || '').localeCompare((b.display_name || b.email || ''), 'pt-BR', { sensitivity: 'base' })), 'users'); usersList.innerHTML = '';
-      if (!items.length) { usersList.innerHTML = '<div class="empty">Nenhum usuário encontrado.</div>'; setPanelStatus('users', 'Toque em um usuário para abrir a lista das músicas dele.'); return; }
-      items.forEach((user) => { const count = state.songs.filter((song) => song.user_id === user.id).length; const button = document.createElement('button'); button.type = 'button'; button.className = 'swipe-row'; button.innerHTML = `<div class="swipe-content" style="transform:none;"><div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(user.display_name || user.email || 'Usuário sem nome')}</h3><span class="mini-badge ${user.is_admin ? 'success' : 'warning'}">${user.is_admin ? 'Admin' : 'Usuário'}</span></div><div class="row-meta">${escapeHtml(user.email || 'Conta sem e-mail visível')}</div><div class="row-user">${count} música${count !== 1 ? 's' : ''} cadastrada${count !== 1 ? 's' : ''}</div></div></div>`; button.addEventListener('click', () => openUserSongs(user)); usersList.appendChild(button); });
-      setPanelStatus('users', `${items.length} usuário${items.length > 1 ? 's' : ''} listado${items.length > 1 ? 's' : ''}.`);
-    }
-
-    function openPanel(panelName) { closeAllPanels(); state.activePanel = panelName; if (panelName === 'pending') pendingPanel.classList.add('active'); if (panelName === 'approved') approvedPanel.classList.add('active'); if (panelName === 'inactive') inactivePanel.classList.add('active'); if (panelName === 'users') usersPanel.classList.add('active'); closeAllSwipes(); }
-    function closeAllPanels() { pendingPanel.classList.remove('active'); approvedPanel.classList.remove('active'); inactivePanel.classList.remove('active'); usersPanel.classList.remove('active'); state.activePanel = null; clearMultiSelect(); closeAllSwipes(); }
-    function openDetailModal(title, htmlContent) { detailModalTitle.textContent = title; detailModalBody.innerHTML = htmlContent; detailModal.classList.add('active'); }
-    function closeDetailModal() { detailModal.classList.remove('active'); detailModalBody.innerHTML = ''; }
-    function closeUserSongsModal() { userSongsModal.classList.remove('active'); userSongsBody.innerHTML = ''; }
-    function closeEditModal() { editModal.classList.remove('active'); state.editSuggestionId = null; state.editSongId = null; state.editMode = 'suggestion'; editTitle.value = ''; editArtist.value = ''; editStyle.value = ''; editLyrics.value = ''; editStatus.textContent = ''; editModalTitle.textContent = 'Editar música'; }
-
-    function openSongDetail(song) { openDetailModal('Detalhes da música', `<div class="detail-block"><label>Nome da música</label><div>${escapeHtml(song.song_title || 'Sem título')}</div></div><div class="detail-block"><label>Artista</label><div>${escapeHtml(song.artist || 'Sem artista')}</div></div><div class="detail-block"><label>Estilo</label><div>${escapeHtml(song.style || 'Sem estilo')}</div></div><div class="detail-block"><label>Conta</label><div>${escapeHtml(getUserEmail(song.user_id))}</div></div><div class="detail-block"><label>Letra</label><div>${escapeHtml(song.lyrics || 'Sem letra cadastrada')}</div></div>`); }
-    function openSuggestionDetail(item, kind) { const title = kind === 'approved' ? 'Música aprovada' : 'Música inativa'; openDetailModal(title, `<div class="detail-block"><label>Nome da música</label><div>${escapeHtml(item.song_title || 'Sem título')}</div></div><div class="detail-block"><label>Artista</label><div>${escapeHtml(item.artist || 'Sem artista')}</div></div><div class="detail-block"><label>Estilo</label><div>${escapeHtml(item.style || 'Sem estilo')}</div></div><div class="detail-block"><label>Origem</label><div>${escapeHtml(getOriginEmailBySongId(item.source_song_id))}</div></div><div class="detail-block"><label>Letra</label><div>${escapeHtml(item.lyrics || 'Sem letra cadastrada')}</div></div>`); }
-    function openUserSongs(user) { const userSongs = state.songs.filter((song) => idsEqual(song.user_id, user.id)).sort((a, b) => (a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity: 'base' })); userSongsTitle.textContent = user.display_name || user.email || 'Usuário'; if (!userSongs.length) userSongsBody.innerHTML = '<div class="empty">Esse usuário ainda não possui músicas cadastradas.</div>'; else userSongsBody.innerHTML = userSongs.map((song) => `<div class="detail-block"><label>${escapeHtml(song.song_title || 'Sem título')}</label><div><strong>Artista:</strong> ${escapeHtml(song.artist || 'Sem artista')}</div><div><strong>Estilo:</strong> ${escapeHtml(song.style || 'Sem estilo')}</div><div><strong>Letra:</strong><br>${escapeHtml(song.lyrics || 'Sem letra cadastrada')}</div></div>`).join(''); userSongsModal.classList.add('active'); }
-    function openEditModal(suggestionId) { const suggestion = getSuggestionById(suggestionId); if (!suggestion) return; state.editMode = 'suggestion'; state.editSuggestionId = suggestionId; state.editSongId = null; editModalTitle.textContent = 'Editar música aprovada/inativa'; editTitle.value = suggestion.song_title || ''; editArtist.value = suggestion.artist || ''; editStyle.value = suggestion.style || ''; editLyrics.value = suggestion.lyrics || ''; editStatus.textContent = ''; editModal.classList.add('active'); }
-    function openSongEditFromPending(songId) { const song = state.songs.find((item) => idsEqual(item.id, songId)); if (!song) return; state.editMode = 'song'; state.editSongId = songId; state.editSuggestionId = null; editModalTitle.textContent = 'Editar música pendente'; editTitle.value = song.song_title || ''; editArtist.value = song.artist || ''; editStyle.value = song.style || ''; editLyrics.value = song.lyrics || ''; editStatus.textContent = 'Ao salvar, esta música pendente será atualizada diretamente na tabela songs.'; editModal.classList.add('active'); }
-
-    async function handleApproveSong(songId) { const supabase = createSupabaseClient(); const song = state.songs.find((item) => idsEqual(item.id, songId)); if (!song) return; setPanelStatus('pending', 'Aprovando música...'); const existing = getSuggestionBySongId(songId); const payload = { source_song_id: song.id, song_title: song.song_title || '', artist: song.artist || '', style: song.style || '', lyrics: sanitizeLyrics(song.lyrics || ''), active: true }; let result; if (existing) result = await supabase.from('approved_suggestions').update(payload).eq('id', existing.id).select('*').single(); else result = await supabase.from('approved_suggestions').insert(payload).select('*').single(); if (result.error) { setPanelStatus('pending', `Erro ao aprovar: ${result.error.message}`); return; } mergeSuggestionRecord(result.data); rerenderAdminLists(); setPanelStatus('pending', 'Música aprovada com sucesso.'); }
-    async function handleDisableSuggestion(suggestionId) { const supabase = createSupabaseClient(); setPanelStatus('approved', 'Desabilitando música...'); const { data, error } = await supabase.from('approved_suggestions').update({ active: false }).eq('id', suggestionId).select('*').single(); if (error) { setPanelStatus('approved', `Erro ao desabilitar: ${error.message}`); return; } mergeSuggestionRecord(data); rerenderAdminLists(); setPanelStatus('approved', 'Música desabilitada com sucesso.'); }
-    async function handleActivateSuggestion(suggestionId) { const supabase = createSupabaseClient(); setPanelStatus('inactive', 'Ativando música...'); const { data, error } = await supabase.from('approved_suggestions').update({ active: true }).eq('id', suggestionId).select('*').single(); if (error) { setPanelStatus('inactive', `Erro ao ativar: ${error.message}`); return; } mergeSuggestionRecord(data); rerenderAdminLists(); setPanelStatus('inactive', 'Música ativada com sucesso.'); }
-    async function handleDeleteSuggestion(suggestionId, panel = 'inactive') { const confirmed = window.confirm('Tem certeza que deseja excluir esta música?'); if (!confirmed) return; const supabase = createSupabaseClient(); setPanelStatus(panel, 'Apagando música...'); const { error } = await supabase.from('approved_suggestions').delete().eq('id', suggestionId); if (error) { setPanelStatus(panel, `Erro ao apagar: ${error.message}`); return; } state.suggestions = state.suggestions.filter((item) => !idsEqual(item.id, suggestionId)); rerenderAdminLists(); setPanelStatus(panel, 'Música apagada com sucesso.'); }
-    async function handleDeletePendingSong(songId) { const confirmed = window.confirm('Tem certeza que deseja excluir esta música pendente?'); if (!confirmed) return; const supabase = createSupabaseClient(); setPanelStatus('pending', 'Excluindo música pendente...'); const { error } = await supabase.from('songs').delete().eq('id', songId); if (error) { setPanelStatus('pending', `Erro ao excluir: ${error.message}`); return; } state.songs = state.songs.filter((item) => !idsEqual(item.id, songId)); rerenderAdminLists(); setPanelStatus('pending', 'Música pendente excluída com sucesso.'); }
-
-    async function saveEditedSuggestion() {
-      const supabase = createSupabaseClient(); editStatus.textContent = 'Salvando alterações...';
-      const payload = { song_title: normalizeText(editTitle.value), artist: normalizeText(editArtist.value), style: normalizeText(editStyle.value), lyrics: sanitizeLyrics(editLyrics.value) };
-      if (state.editMode === 'song') {
-        const songId = state.editSongId; if (!songId) return;
-        const { data, error } = await supabase.from('songs').update(payload).eq('id', songId).select('*').single();
-        if (error) { editStatus.textContent = `Erro ao salvar: ${error.message}`; return; }
-        const idx = state.songs.findIndex((item) => idsEqual(item.id, songId)); if (idx >= 0) state.songs[idx] = data;
-        rerenderAdminLists(); editStatus.textContent = 'Alterações salvas com sucesso.'; setTimeout(() => closeEditModal(), 350); return;
-      }
-      const suggestionId = state.editSuggestionId; if (!suggestionId) return;
-      const { data, error } = await supabase.from('approved_suggestions').update(payload).eq('id', suggestionId).select('*').single();
-      if (error) { editStatus.textContent = `Erro ao salvar: ${error.message}`; return; }
-      mergeSuggestionRecord(data); rerenderAdminLists(); editStatus.textContent = 'Alterações salvas com sucesso.'; setTimeout(() => closeEditModal(), 350);
-    }
-
-    async function loadProfiles() { const supabase = createSupabaseClient(); const { data, error } = await supabase.from('profiles').select('id, email, display_name, is_admin').order('display_name', { ascending: true }); if (error) throw error; state.users = Array.isArray(data) ? data : []; }
-    async function loadSongs() { const supabase = createSupabaseClient(); const { data, error } = await supabase.from('songs').select('id, user_id, song_title, artist, style, lyrics').order('song_title', { ascending: true }); if (error) throw error; state.songs = Array.isArray(data) ? data : []; }
-    async function loadSuggestions() { const supabase = createSupabaseClient(); const { data, error } = await supabase.from('approved_suggestions').select('id, source_song_id, song_title, artist, style, lyrics, active').order('song_title', { ascending: true }); if (error) throw error; state.suggestions = Array.isArray(data) ? data : []; }
-    async function refreshData(targetPanel) { try { setMainStatus('Atualizando dados...'); if (targetPanel) setPanelStatus(targetPanel, 'Atualizando dados...'); await Promise.all([loadProfiles(), loadSongs(), loadSuggestions()]); rerenderAdminLists(); setMainStatus(''); if (targetPanel) setPanelStatus(targetPanel, 'Dados atualizados.'); } catch (error) { const message = error?.message || 'Não foi possível atualizar os dados.'; setMainStatus(message); if (targetPanel) setPanelStatus(targetPanel, message); } }
-    async function resolveCurrentProfile(userId) { const supabase = createSupabaseClient(); const { data, error } = await supabase.from('profiles').select('id, email, display_name, is_admin').eq('id', userId).maybeSingle(); if (error) throw error; state.currentProfile = data || null; return data || null; }
-    function setAuthenticatedView(profile, sessionUser) { state.currentUser = sessionUser || null; state.currentProfile = profile || null; authCard.classList.add('hidden'); adminPanel.classList.remove('hidden'); accountLabel.textContent = profile?.display_name || profile?.email || sessionUser?.email || 'Conta conectada'; }
-    function setLoggedOutView() { state.currentUser = null; state.currentProfile = null; authCard.classList.remove('hidden'); adminPanel.classList.add('hidden'); emailInput.value = ''; passwordInput.value = ''; showPasswordToggle.checked = false; passwordInput.type = 'password'; setAuthStatus(''); setMainStatus(''); closeAllPanels(); closeDetailModal(); closeEditModal(); closeUserSongsModal(); }
-    async function bootstrapSession() { try { const supabase = createSupabaseClient(); const { data, error } = await supabase.auth.getSession(); if (error) throw error; const session = data?.session || null; if (!session?.user) { setLoggedOutView(); return; } const profile = await resolveCurrentProfile(session.user.id); if (!profile?.is_admin) { await supabase.auth.signOut(); setLoggedOutView(); setAuthStatus('Essa conta não possui acesso de administrador.'); return; } setAuthenticatedView(profile, session.user); await refreshData(); } catch (error) { setLoggedOutView(); setAuthStatus(error?.message || 'Não foi possível validar a sessão atual.'); } }
-    async function handleLogin() { const email = normalizeText(emailInput.value); const password = passwordInput.value; if (!email || !password) { setAuthStatus('Preencha e-mail e senha para continuar.'); return; } loginBtn.disabled = true; setAuthStatus('Entrando...'); try { const supabase = createSupabaseClient(); const { data, error } = await supabase.auth.signInWithPassword({ email, password }); if (error) throw error; const user = data?.user; if (!user) throw new Error('Sessão não iniciada.'); const profile = await resolveCurrentProfile(user.id); if (!profile?.is_admin) { await supabase.auth.signOut(); throw new Error('Essa conta não possui acesso de administrador.'); } setAuthenticatedView(profile, user); setAuthStatus(''); await refreshData(); } catch (error) { setLoggedOutView(); setAuthStatus(error?.message || 'Não foi possível entrar.'); } finally { loginBtn.disabled = false; } }
-    async function handleLogout() { try { const supabase = createSupabaseClient(); await supabase.auth.signOut(); } finally { setLoggedOutView(); } }
-
-    showPasswordToggle.addEventListener('change', () => { passwordInput.type = showPasswordToggle.checked ? 'text' : 'password'; });
-    loginBtn.addEventListener('click', handleLogin);
-    passwordInput.addEventListener('keydown', (event) => { if (event.key === 'Enter') handleLogin(); });
-    logoutBtn?.addEventListener('click', handleLogout);
-    openPendingBtn.addEventListener('click', () => openPanel('pending'));
-    openApprovedBtn.addEventListener('click', () => openPanel('approved'));
-    openInactiveBtn.addEventListener('click', () => openPanel('inactive'));
-    openUsersBtn.addEventListener('click', () => openPanel('users'));
-    document.querySelectorAll('[data-close-panel]').forEach((button) => button.addEventListener('click', closeAllPanels));
-    document.querySelectorAll('[data-close-detail]').forEach((button) => button.addEventListener('click', closeDetailModal));
-    document.querySelectorAll('[data-close-edit]').forEach((button) => button.addEventListener('click', closeEditModal));
-    document.querySelectorAll('[data-close-user-songs]').forEach((button) => button.addEventListener('click', closeUserSongsModal));
-    document.querySelectorAll('[data-refresh]').forEach((button) => button.addEventListener('click', () => refreshData(button.dataset.refresh)));
-    pendingSearch.addEventListener('input', () => { state.searches.pending = pendingSearch.value; renderPendingList(); });
-    approvedSearch.addEventListener('input', () => { state.searches.approved = approvedSearch.value; renderApprovedList(); });
-    inactiveSearch.addEventListener('input', () => { state.searches.inactive = inactiveSearch.value; renderInactiveList(); });
-    usersSearch.addEventListener('input', () => { state.searches.users = usersSearch.value; renderUsersList(); });
-    saveEditBtn.addEventListener('click', saveEditedSuggestion);
-    detailModal.addEventListener('click', (event) => { if (event.target === detailModal) closeDetailModal(); });
-    editModal.addEventListener('click', (event) => { if (event.target === editModal) closeEditModal(); });
-    userSongsModal.addEventListener('click', (event) => { if (event.target === userSongsModal) closeUserSongsModal(); });
-
-    createSupabaseClient();
-    bootstrapSession();
+    function setAuthStatus(m) { authStatus.textContent = m || ''; } function setMainStatus(m) { mainStatus.textContent = m || ''; } function setPanelStatus(p,m){ if(p==='pending') pendingStatus.textContent=m||''; if(p==='approved') approvedStatus.textContent=m||''; if(p==='inactive') inactiveStatus.textContent=m||''; if(p==='users') usersStatus.textContent=m||''; }
+    function normalizeText(v){ return String(v||'').trim(); } function normalizeMatchText(v){ return normalizeText(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' '); } function sanitizeLyrics(v){ return String(v||'').replace(/\r\n/g,'\n').replace(/\r/g,'\n').trim(); } function escapeHtml(v){ return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/'/g,'&#39;'); } function idsEqual(a,b){ return String(a??'')===String(b??''); }
+    function closeAllSwipes(){ document.querySelectorAll('.swipe-row.revealed, .swipe-row.swiping').forEach((row)=>row.classList.remove('revealed','swiping')); state.revealedRowKey=null; }
+    function buildSongSignature(song){ const title=normalizeMatchText(song?.song_title||song?.title||''); const artist=normalizeMatchText(song?.artist||''); if(!title) return ''; return artist ? `${title}::${artist}` : title; }
+    function getUserEmail(userId){ const profile=state.users.find((item)=>idsEqual(item.id,userId)); return profile?.email || 'Conta sem e-mail visível'; }
+    function getOriginEmailBySongId(songId){ const song=state.songs.find((item)=>idsEqual(item.id,songId)); return song ? getUserEmail(song.user_id) : 'Conta sem e-mail visível'; }
+    function getSuggestionById(id){ return state.suggestions.find((item)=>idsEqual(item.id,id)) || null; }
+    function getSuggestionBySongId(songId){ return state.suggestions.find((item)=>idsEqual(item.source_song_id,songId)) || null; }
+    function getActiveSuggestionBySongId(songId){ return state.suggestions.find((item)=>idsEqual(item.source_song_id,songId) && item.active===true) || null; }
+    function getActiveSuggestionBySongSignature(song){ const signature=buildSongSignature(song); if(!signature) return null; return state.suggestions.find((item)=>item.active===true && buildSongSignature(item)===signature) || null; }
+    function getPendingSongs(){ return state.songs.filter((song)=>!getActiveSuggestionBySongId(song.id) && !getActiveSuggestionBySongSignature(song)).sort((a,b)=>(a.song_title||'').localeCompare((b.song_title||''),'pt-BR',{sensitivity:'base'})); }
+    function getApprovedSuggestions(){ return state.suggestions.filter((item)=>item.active===true).sort((a,b)=>(a.song_title||'').localeCompare((b.song_title||''),'pt-BR',{sensitivity:'base'})); }
+    function getInactiveSuggestions(){ return state.suggestions.filter((item)=>item.active===false).sort((a,b)=>(a.song_title||'').localeCompare((b.song_title||''),'pt-BR',{sensitivity:'base'})); }
+    function applySearch(items,panel){ const q=normalizeText(state.searches[panel]).toLowerCase(); return q ? items.filter((item)=>JSON.stringify(item).toLowerCase().includes(q)) : items; }
+    function getPendingBadge(){ return '<span class="mini-badge warning">Pendente</span>'; } function getApprovedBadge(){ return '<span class="mini-badge success">Ativa</span>'; } function getInactiveBadge(){ return '<span class="mini-badge danger">Inativa</span>'; }
+    function isMulti(panel){ return state.multiSelect.active && state.multiSelect.panel===panel; } function clearMultiSelect(){ state.multiSelect.active=false; state.multiSelect.panel=null; state.multiSelect.selected.clear(); state.multiSelect.busy=false; } function toggleMultiSelect(panel){ const same=state.multiSelect.active && state.multiSelect.panel===panel; if(same) clearMultiSelect(); else { state.multiSelect.active=true; state.multiSelect.panel=panel; state.multiSelect.selected.clear(); state.multiSelect.busy=false; closeAllSwipes(); } rerenderAdminLists(); } function toggleItemSelection(id){ if(!state.multiSelect.active || state.multiSelect.busy) return; const key=String(id); if(state.multiSelect.selected.has(key)) state.multiSelect.selected.delete(key); else state.multiSelect.selected.add(key); rerenderAdminLists(); } function getSelectedIds(){ return Array.from(state.multiSelect.selected); }
+    function mergeSuggestionRecord(record){ if(!record) return; const indexById=state.suggestions.findIndex((item)=>idsEqual(item.id,record.id)); if(indexById>=0) state.suggestions[indexById]=record; else { const indexBySong=state.suggestions.findIndex((item)=>idsEqual(item.source_song_id,record.source_song_id)); if(indexBySong>=0) state.suggestions[indexBySong]=record; else state.suggestions.unshift(record); } }
+    function createActionBtn(label, fn, variant='primary'){ const btn=document.createElement('button'); btn.type='button'; btn.className=`btn ${variant==='secondary' ? 'btn-secondary' : 'btn-primary'}`; btn.textContent=label; btn.onclick=fn; return btn; }
+    function createMultiToolbar(panel){ const wrap=document.createElement('div'); wrap.className='multi-toolbar'; wrap.appendChild(createActionBtn(isMulti(panel) ? 'Cancelar seleção' : 'Selecionar', ()=>toggleMultiSelect(panel), 'secondary')); if(!isMulti(panel)) return wrap; const count=document.createElement('span'); count.className='multi-counter'; count.textContent=`${getSelectedIds().length} selecionada${getSelectedIds().length===1 ? '' : 's'}`; wrap.appendChild(count); if(panel==='pending'){ wrap.appendChild(createActionBtn('Aprovar', ()=>batchAction('approve', panel))); wrap.appendChild(createActionBtn('Excluir', ()=>batchAction('delete', panel))); } if(panel==='approved'){ wrap.appendChild(createActionBtn('Desabilitar', ()=>batchAction('disable', panel))); wrap.appendChild(createActionBtn('Excluir', ()=>batchAction('delete', panel))); } if(panel==='inactive'){ wrap.appendChild(createActionBtn('Aprovar', ()=>batchAction('activate', panel))); wrap.appendChild(createActionBtn('Excluir', ()=>batchAction('delete', panel))); } return wrap; }
+    function createSelectableRow(item,title,meta,extra){ const row=document.createElement('div'); row.className=`selectable-row ${state.multiSelect.selected.has(String(item.id)) ? 'selected' : ''}`; row.innerHTML=`<div class="selectable-card"><div class="check-shell"></div><div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(title)}</h3></div><div class="row-meta">${escapeHtml(meta || '')}</div>${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}</div></div>`; row.addEventListener('click', ()=>toggleItemSelection(item.id)); return row; }
+    function rerenderAdminLists(){ renderPendingList(); renderApprovedList(); renderInactiveList(); renderUsersList(); }
+    function createSwipeRow({ key, revealWidth, actions, onOpenDetail, title, meta, extra, badge }){ const row=document.createElement('div'); row.className='swipe-row'; row.dataset.key=key; row.style.setProperty('--swipe-reveal-width', `${revealWidth}px`); const actionsWrap=document.createElement('div'); actionsWrap.className='swipe-actions'; actions.forEach((action)=>{ const button=document.createElement('button'); button.type='button'; button.className=`action-btn ${action.className}`; button.setAttribute('aria-label', action.aria); button.innerHTML=`<span class="action-fallback">${action.icon || ''}</span>`; button.addEventListener('pointerdown', (event)=>{ event.stopPropagation(); }); button.addEventListener('click', (event)=>{ event.preventDefault(); event.stopPropagation(); action.onClick(); closeAllSwipes(); }); actionsWrap.appendChild(button); }); const content=document.createElement('button'); content.type='button'; content.className='swipe-content'; content.innerHTML=`<div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(title)}</h3>${badge || ''}</div><div class="row-meta">${escapeHtml(meta || '')}</div>${extra ? `<div class="row-user">${escapeHtml(extra)}</div>` : ''}</div>`; content.addEventListener('click', (event)=>{ if(row.classList.contains('revealed')){ event.preventDefault(); closeAllSwipes(); return; } onOpenDetail(); }); attachSwipe(row, content, key, revealWidth); row.appendChild(actionsWrap); row.appendChild(content); return row; }
+    function attachSwipe(row, card, key, revealWidth){ let startX=0, currentX=0, swiping=false, pointerId=null, horizontalLocked=false, verticalLock=false, startY=0; const beginSwipe=(event)=>{ if(event.pointerType==='mouse' && event.button!==0) return; closeAllSwipes(); startX=event.clientX; startY=event.clientY; currentX=0; swiping=true; horizontalLocked=false; verticalLock=false; pointerId=event.pointerId; row.classList.add('swiping'); row.setPointerCapture?.(pointerId); }; const moveSwipe=(event)=>{ if(!swiping || event.pointerId!==pointerId) return; const deltaX=event.clientX-startX; const deltaY=event.clientY-startY; if(!horizontalLocked && !verticalLock){ if(Math.abs(deltaY)>10 && Math.abs(deltaY)>Math.abs(deltaX)){ verticalLock=true; row.classList.remove('swiping'); return; } if(Math.abs(deltaX)>10 && Math.abs(deltaX)>Math.abs(deltaY)) horizontalLocked=true; } if(!horizontalLocked) return; event.preventDefault(); currentX=Math.max(-revealWidth, Math.min(0, deltaX)); card.style.transform=`translateX(${currentX}px)`; }; const endSwipe=(event)=>{ if(!swiping || event.pointerId!==pointerId) return; swiping=false; pointerId=null; row.classList.remove('swiping'); card.style.transform=''; if(!horizontalLocked) return; if(currentX <= -(revealWidth * .35)){ closeAllSwipes(); row.classList.add('revealed'); state.revealedRowKey=key; } else { row.classList.remove('revealed'); if(state.revealedRowKey===key) state.revealedRowKey=null; } }; row.addEventListener('pointerdown', beginSwipe); row.addEventListener('pointermove', moveSwipe); row.addEventListener('pointerup', endSwipe); row.addEventListener('pointercancel', endSwipe); row.addEventListener('lostpointercapture', endSwipe); }
+    async function batchAction(type,panel){ const ids=getSelectedIds(); if(!ids.length || state.multiSelect.busy) return; if(type==='delete'){ const confirmed=window.confirm(`Tem certeza que deseja excluir ${ids.length} música${ids.length===1 ? '' : 's'}? Essa ação não pode ser desfeita.`); if(!confirmed) return; } state.multiSelect.busy=true; setPanelStatus(panel, 'Executando ação em lote...'); try { const supabase=createSupabaseClient(); if(panel==='pending' && type==='approve'){ const songsToApprove=state.songs.filter((item)=>ids.includes(String(item.id))); const upserts=songsToApprove.map((song)=>{ const existing=getSuggestionBySongId(song.id); const payload={ source_song_id:song.id, song_title:song.song_title || '', artist:song.artist || '', style:song.style || '', lyrics:sanitizeLyrics(song.lyrics || ''), active:true }; if(existing) return supabase.from('approved_suggestions').update(payload).eq('id', existing.id).select('*').single(); return supabase.from('approved_suggestions').insert(payload).select('*').single(); }); const results=await Promise.all(upserts); const failed=results.find((r)=>r.error); if(failed) throw failed.error; results.forEach((r)=>mergeSuggestionRecord(r.data)); } if(panel==='pending' && type==='delete'){ const tasks=ids.map((id)=>supabase.from('songs').delete().eq('id', id)); const results=await Promise.all(tasks); const failed=results.find((r)=>r.error); if(failed) throw failed.error; state.songs=state.songs.filter((item)=>!ids.includes(String(item.id))); } if(panel==='approved' && type==='disable'){ const tasks=ids.map((id)=>supabase.from('approved_suggestions').update({ active:false }).eq('id', id).select('*').single()); const results=await Promise.all(tasks); const failed=results.find((r)=>r.error); if(failed) throw failed.error; results.forEach((r)=>mergeSuggestionRecord(r.data)); } if(panel==='approved' && type==='delete'){ const tasks=ids.map((id)=>supabase.from('approved_suggestions').delete().eq('id', id)); const results=await Promise.all(tasks); const failed=results.find((r)=>r.error); if(failed) throw failed.error; state.suggestions=state.suggestions.filter((item)=>!ids.includes(String(item.id))); } if(panel==='inactive' && type==='activate'){ const tasks=ids.map((id)=>supabase.from('approved_suggestions').update({ active:true }).eq('id', id).select('*').single()); const results=await Promise.all(tasks); const failed=results.find((r)=>r.error); if(failed) throw failed.error; results.forEach((r)=>mergeSuggestionRecord(r.data)); } if(panel==='inactive' && type==='delete'){ const tasks=ids.map((id)=>supabase.from('approved_suggestions').delete().eq('id', id)); const results=await Promise.all(tasks); const failed=results.find((r)=>r.error); if(failed) throw failed.error; state.suggestions=state.suggestions.filter((item)=>!ids.includes(String(item.id))); } state.multiSelect.selected.clear(); rerenderAdminLists(); setPanelStatus(panel, 'Ação em lote concluída com sucesso.'); } catch(error){ setPanelStatus(panel, `Erro na ação em lote: ${error?.message || 'falha desconhecida'}`); } finally { state.multiSelect.busy=false; rerenderAdminLists(); } }
+    function renderPendingList(){ const items=applySearch(getPendingSongs().map((song)=>({ ...song, account_email:getUserEmail(song.user_id) })), 'pending'); pendingList.innerHTML=''; pendingList.appendChild(createMultiToolbar('pending')); if(!items.length){ pendingList.innerHTML += '<div class="empty">Nenhuma música pendente encontrada.</div>'; setPanelStatus('pending', 'Use a seleção múltipla para aprovar ou excluir em lote.'); return; } items.forEach((song)=>{ if(isMulti('pending')) pendingList.appendChild(createSelectableRow(song, song.song_title || 'Sem título', `${song.artist || 'Sem artista'} • ${song.style || 'Sem estilo'}`, `Conta: ${song.account_email}`)); else pendingList.appendChild(createSwipeRow({ key:`pending-${song.id}`, revealWidth:140, actions:[ { icon:'✔', className:'approve', aria:'Aprovar música', onClick:()=>handleApproveSong(song.id) }, { icon:'✎', className:'edit', aria:'Editar música', onClick:()=>openSongEditFromPending(song.id) }, { icon:'🗑', className:'delete', aria:'Excluir música', onClick:()=>handleDeletePendingSong(song.id) } ], onOpenDetail:()=>openSongDetail(song), title:song.song_title || 'Sem título', meta:`${song.artist || 'Sem artista'} • ${song.style || 'Sem estilo'}`, extra:`Conta: ${song.account_email}`, badge:getPendingBadge() })); }); setPanelStatus('pending', `${items.length} música${items.length>1 ? 's' : ''} pendente${items.length>1 ? 's' : ''}.`); }
+    function renderApprovedList(){ const items=applySearch(getApprovedSuggestions(), 'approved'); approvedList.innerHTML=''; approvedList.appendChild(createMultiToolbar('approved')); if(!items.length){ approvedList.innerHTML += '<div class="empty">Nenhuma música aprovada ativa encontrada.</div>'; setPanelStatus('approved', 'Use a seleção múltipla para desabilitar ou excluir em lote.'); return; } items.forEach((item)=>{ if(isMulti('approved')) approvedList.appendChild(createSelectableRow(item, item.song_title || 'Sem título', `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`, `Origem: ${getOriginEmailBySongId(item.source_song_id)}`)); else approvedList.appendChild(createSwipeRow({ key:`approved-${item.id}`, revealWidth:140, actions:[ { icon:'⏸', className:'disable', aria:'Desabilitar música', onClick:()=>handleDisableSuggestion(item.id) }, { icon:'✎', className:'edit', aria:'Editar música', onClick:()=>openEditModal(item.id) }, { icon:'🗑', className:'delete', aria:'Excluir música', onClick:()=>handleDeleteSuggestion(item.id, 'approved') } ], onOpenDetail:()=>openSuggestionDetail(item, 'approved'), title:item.song_title || 'Sem título', meta:`${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`, extra:`Origem: ${getOriginEmailBySongId(item.source_song_id)}`, badge:getApprovedBadge() })); }); setPanelStatus('approved', `${items.length} música${items.length>1 ? 's' : ''} aprovada${items.length>1 ? 's' : ''} ativa${items.length>1 ? 's' : ''}.`); }
+    function renderInactiveList(){ const items=applySearch(getInactiveSuggestions(), 'inactive'); inactiveList.innerHTML=''; inactiveList.appendChild(createMultiToolbar('inactive')); if(!items.length){ inactiveList.innerHTML += '<div class="empty">Nenhuma música inativa encontrada.</div>'; setPanelStatus('inactive', 'Use a seleção múltipla para aprovar ou excluir em lote.'); return; } items.forEach((item)=>{ if(isMulti('inactive')) inactiveList.appendChild(createSelectableRow(item, item.song_title || 'Sem título', `${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`, `Origem: ${getOriginEmailBySongId(item.source_song_id)}`)); else inactiveList.appendChild(createSwipeRow({ key:`inactive-${item.id}`, revealWidth:140, actions:[ { icon:'✔', className:'approve', aria:'Ativar música', onClick:()=>handleActivateSuggestion(item.id) }, { icon:'✎', className:'edit', aria:'Editar música', onClick:()=>openEditModal(item.id) }, { icon:'🗑', className:'delete', aria:'Excluir música', onClick:()=>handleDeleteSuggestion(item.id, 'inactive') } ], onOpenDetail:()=>openSuggestionDetail(item, 'inactive'), title:item.song_title || 'Sem título', meta:`${item.artist || 'Sem artista'} • ${item.style || 'Sem estilo'}`, extra:`Origem: ${getOriginEmailBySongId(item.source_song_id)}`, badge:getInactiveBadge() })); }); setPanelStatus('inactive', `${items.length} música${items.length>1 ? 's' : ''} inativa${items.length>1 ? 's' : ''}.`); }
+    function renderUsersList(){ const items=applySearch(state.users.filter((user)=>user.email || user.display_name).sort((a,b)=>(a.display_name || a.email || '').localeCompare((b.display_name || b.email || ''), 'pt-BR', { sensitivity:'base' })), 'users'); usersList.innerHTML=''; if(!items.length){ usersList.innerHTML='<div class="empty">Nenhum usuário encontrado.</div>'; setPanelStatus('users', 'Toque em um usuário para abrir a lista das músicas dele.'); return; } items.forEach((user)=>{ const count=state.songs.filter((song)=>song.user_id===user.id).length; const button=document.createElement('button'); button.type='button'; button.className='swipe-row'; button.innerHTML=`<div class="swipe-content" style="transform:none;"><div class="row-main"><div class="row-top"><h3 class="row-title">${escapeHtml(user.display_name || user.email || 'Usuário sem nome')}</h3><span class="mini-badge ${user.is_admin ? 'success' : 'warning'}">${user.is_admin ? 'Admin' : 'Usuário'}</span></div><div class="row-meta">${escapeHtml(user.email || 'Conta sem e-mail visível')}</div><div class="row-user">${count} música${count !== 1 ? 's' : ''} cadastrada${count !== 1 ? 's' : ''}</div></div></div>`; button.addEventListener('click', ()=>openUserSongs(user)); usersList.appendChild(button); }); setPanelStatus('users', `${items.length} usuário${items.length>1 ? 's' : ''} listado${items.length>1 ? 's' : ''}.`); }
+    function openPanel(panelName){ closeAllPanels(); state.activePanel=panelName; if(panelName==='pending') pendingPanel.classList.add('active'); if(panelName==='approved') approvedPanel.classList.add('active'); if(panelName==='inactive') inactivePanel.classList.add('active'); if(panelName==='users') usersPanel.classList.add('active'); closeAllSwipes(); }
+    function closeAllPanels(){ pendingPanel.classList.remove('active'); approvedPanel.classList.remove('active'); inactivePanel.classList.remove('active'); usersPanel.classList.remove('active'); state.activePanel=null; clearMultiSelect(); closeAllSwipes(); }
+    function openDetailModal(title, htmlContent){ detailModalTitle.textContent=title; detailModalBody.innerHTML=htmlContent; detailModal.classList.add('active'); }
+    function closeDetailModal(){ detailModal.classList.remove('active'); detailModalBody.innerHTML=''; }
+    function closeUserSongsModal(){ userSongsModal.classList.remove('active'); userSongsBody.innerHTML=''; }
+    function closeEditModal(){ editModal.classList.remove('active'); state.editSuggestionId=null; state.editSongId=null; state.editMode='suggestion'; editTitle.value=''; editArtist.value=''; editStyle.value=''; editLyrics.value=''; editStatus.textContent=''; }
+    function openSongDetail(song){ openDetailModal('Detalhes da música', `<div class="detail-block"><label>Nome da música</label><div>${escapeHtml(song.song_title || 'Sem título')}</div></div><div class="detail-block"><label>Artista</label><div>${escapeHtml(song.artist || 'Sem artista')}</div></div><div class="detail-block"><label>Estilo</label><div>${escapeHtml(song.style || 'Sem estilo')}</div></div><div class="detail-block"><label>Conta</label><div>${escapeHtml(getUserEmail(song.user_id))}</div></div><div class="detail-block"><label>Letra</label><div>${escapeHtml(song.lyrics || 'Sem letra cadastrada')}</div></div>`); }
+    function openSuggestionDetail(item, kind){ const title=kind==='approved' ? 'Música aprovada' : 'Música inativa'; openDetailModal(title, `<div class="detail-block"><label>Nome da música</label><div>${escapeHtml(item.song_title || 'Sem título')}</div></div><div class="detail-block"><label>Artista</label><div>${escapeHtml(item.artist || 'Sem artista')}</div></div><div class="detail-block"><label>Estilo</label><div>${escapeHtml(item.style || 'Sem estilo')}</div></div><div class="detail-block"><label>Origem</label><div>${escapeHtml(getOriginEmailBySongId(item.source_song_id))}</div></div><div class="detail-block"><label>Letra</label><div>${escapeHtml(item.lyrics || 'Sem letra cadastrada')}</div></div>`); }
+    function openUserSongs(user){ const userSongs=state.songs.filter((song)=>idsEqual(song.user_id, user.id)).sort((a,b)=>(a.song_title || '').localeCompare((b.song_title || ''), 'pt-BR', { sensitivity:'base' })); userSongsTitle.textContent=user.display_name || user.email || 'Usuário'; if(!userSongs.length) userSongsBody.innerHTML='<div class="empty">Esse usuário ainda não possui músicas cadastradas.</div>'; else userSongsBody.innerHTML=userSongs.map((song)=>`<div class="detail-block"><label>${escapeHtml(song.song_title || 'Sem título')}</label><div><strong>Artista:</strong> ${escapeHtml(song.artist || 'Sem artista')}</div><div><strong>Estilo:</strong> ${escapeHtml(song.style || 'Sem estilo')}</div><div><strong>Letra:</strong><br>${escapeHtml(song.lyrics || 'Sem letra cadastrada')}</div></div>`).join(''); userSongsModal.classList.add('active'); }
+    function openEditModal(suggestionId){ const suggestion=getSuggestionById(suggestionId); if(!suggestion) return; state.editSuggestionId=suggestionId; state.editSongId=null; state.editMode='suggestion'; editTitle.value=suggestion.song_title || ''; editArtist.value=suggestion.artist || ''; editStyle.value=suggestion.style || ''; editLyrics.value=suggestion.lyrics || ''; editStatus.textContent=''; editModal.classList.add('active'); }
+    function openSongEditFromPending(songId){ const song=state.songs.find((item)=>idsEqual(item.id, songId)); if(!song) return; state.editSuggestionId=null; state.editSongId=songId; state.editMode='song'; editTitle.value=song.song_title || ''; editArtist.value=song.artist || ''; editStyle.value=song.style || ''; editLyrics.value=song.lyrics || ''; editStatus.textContent='Ao salvar, esta música pendente será atualizada diretamente na tabela songs.'; editModal.classList.add('active'); }
+    async function handleApproveSong(songId){ const supabase=createSupabaseClient(); const song=state.songs.find((item)=>idsEqual(item.id, songId)); if(!song) return; setPanelStatus('pending', 'Aprovando música...'); const existing=getSuggestionBySongId(songId); const payload={ source_song_id:song.id, song_title:song.song_title || '', artist:song.artist || '', style:song.style || '', lyrics:sanitizeLyrics(song.lyrics || ''), active:true }; let result; if(existing) result=await supabase.from('approved_suggestions').update(payload).eq('id', existing.id).select('*').single(); else result=await supabase.from('approved_suggestions').insert(payload).select('*').single(); if(result.error){ setPanelStatus('pending', `Erro ao aprovar: ${result.error.message}`); return; } mergeSuggestionRecord(result.data); rerenderAdminLists(); setPanelStatus('pending', 'Música aprovada com sucesso.'); }
+    async function handleDisableSuggestion(suggestionId){ const supabase=createSupabaseClient(); setPanelStatus('approved', 'Desabilitando música...'); const { data, error }=await supabase.from('approved_suggestions').update({ active:false }).eq('id', suggestionId).select('*').single(); if(error){ setPanelStatus('approved', `Erro ao desabilitar: ${error.message}`); return; } mergeSuggestionRecord(data); rerenderAdminLists(); setPanelStatus('approved', 'Música desabilitada com sucesso.'); }
+    async function handleActivateSuggestion(suggestionId){ const supabase=createSupabaseClient(); setPanelStatus('inactive', 'Ativando música...'); const { data, error }=await supabase.from('approved_suggestions').update({ active:true }).eq('id', suggestionId).select('*').single(); if(error){ setPanelStatus('inactive', `Erro ao ativar: ${error.message}`); return; } mergeSuggestionRecord(data); rerenderAdminLists(); setPanelStatus('inactive', 'Música ativada com sucesso.'); }
+    async function handleDeleteSuggestion(suggestionId, panel='inactive'){ const confirmed=window.confirm('Tem certeza que deseja excluir esta música?'); if(!confirmed) return; const supabase=createSupabaseClient(); setPanelStatus(panel, 'Apagando música...'); const { error }=await supabase.from('approved_suggestions').delete().eq('id', suggestionId); if(error){ setPanelStatus(panel, `Erro ao apagar: ${error.message}`); return; } state.suggestions=state.suggestions.filter((item)=>!idsEqual(item.id, suggestionId)); rerenderAdminLists(); setPanelStatus(panel, 'Música apagada com sucesso.'); }
+    async function handleDeletePendingSong(songId){ const confirmed=window.confirm('Tem certeza que deseja excluir esta música pendente?'); if(!confirmed) return; const supabase=createSupabaseClient(); setPanelStatus('pending', 'Excluindo música pendente...'); const { error }=await supabase.from('songs').delete().eq('id', songId); if(error){ setPanelStatus('pending', `Erro ao excluir: ${error.message}`); return; } state.songs=state.songs.filter((item)=>!idsEqual(item.id, songId)); rerenderAdminLists(); setPanelStatus('pending', 'Música pendente excluída com sucesso.'); }
+    async function saveEditedSuggestion(){ const supabase=createSupabaseClient(); editStatus.textContent='Salvando alterações...'; const payload={ song_title:normalizeText(editTitle.value), artist:normalizeText(editArtist.value), style:normalizeText(editStyle.value), lyrics:sanitizeLyrics(editLyrics.value) }; if(state.editMode==='song'){ const songId=state.editSongId; if(!songId) return; const { data, error }=await supabase.from('songs').update(payload).eq('id', songId).select('*').single(); if(error){ editStatus.textContent=`Erro ao salvar: ${error.message}`; return; } const idx=state.songs.findIndex((item)=>idsEqual(item.id, songId)); if(idx>=0) state.songs[idx]=data; rerenderAdminLists(); editStatus.textContent='Alterações salvas com sucesso.'; setTimeout(()=>closeEditModal(), 350); return; } const suggestionId=state.editSuggestionId; if(!suggestionId) return; const { data, error }=await supabase.from('approved_suggestions').update(payload).eq('id', suggestionId).select('*').single(); if(error){ editStatus.textContent=`Erro ao salvar: ${error.message}`; return; } mergeSuggestionRecord(data); rerenderAdminLists(); editStatus.textContent='Alterações salvas com sucesso.'; setTimeout(()=>closeEditModal(), 350); }
+    async function loadProfiles(){ const supabase=createSupabaseClient(); const { data, error }=await supabase.from('profiles').select('id, email, display_name, is_admin').order('display_name', { ascending:true }); if(error) throw error; state.users=Array.isArray(data) ? data : []; }
+    async function loadSongs(){ const supabase=createSupabaseClient(); const { data, error }=await supabase.from('songs').select('id, user_id, song_title, artist, style, lyrics').order('song_title', { ascending:true }); if(error) throw error; state.songs=Array.isArray(data) ? data : []; }
+    async function loadSuggestions(){ const supabase=createSupabaseClient(); const { data, error }=await supabase.from('approved_suggestions').select('id, source_song_id, song_title, artist, style, lyrics, active').order('song_title', { ascending:true }); if(error) throw error; state.suggestions=Array.isArray(data) ? data : []; }
+    async function refreshData(targetPanel){ try { setMainStatus('Atualizando dados...'); if(targetPanel) setPanelStatus(targetPanel, 'Atualizando dados...'); await Promise.all([loadProfiles(), loadSongs(), loadSuggestions()]); rerenderAdminLists(); setMainStatus(''); if(targetPanel) setPanelStatus(targetPanel, 'Dados atualizados.'); } catch(error){ const message=error?.message || 'Não foi possível atualizar os dados.'; setMainStatus(message); if(targetPanel) setPanelStatus(targetPanel, message); } }
+    async function resolveCurrentProfile(userId){ const supabase=createSupabaseClient(); const { data, error }=await supabase.from('profiles').select('id, email, display_name, is_admin').eq('id', userId).maybeSingle(); if(error) throw error; state.currentProfile=data || null; return data || null; }
+    function setAuthenticatedView(profile, sessionUser){ state.currentUser=sessionUser || null; state.currentProfile=profile || null; authCard.classList.add('hidden'); adminPanel.classList.remove('hidden'); accountLabel && (accountLabel.textContent = profile?.display_name || profile?.email || sessionUser?.email || 'Conta conectada'); }
+    function setLoggedOutView(){ state.currentUser=null; state.currentProfile=null; authCard.classList.remove('hidden'); adminPanel.classList.add('hidden'); emailInput.value=''; passwordInput.value=''; showPasswordToggle.checked=false; passwordInput.type='password'; setAuthStatus(''); setMainStatus(''); closeAllPanels(); closeDetailModal(); closeEditModal(); closeUserSongsModal(); }
+    async function bootstrapSession(){ try { const supabase=createSupabaseClient(); const { data, error }=await supabase.auth.getSession(); if(error) throw error; const session=data?.session || null; if(!session?.user){ setLoggedOutView(); return; } const profile=await resolveCurrentProfile(session.user.id); if(!profile?.is_admin){ await supabase.auth.signOut(); setLoggedOutView(); setAuthStatus('Essa conta não possui acesso de administrador.'); return; } setAuthenticatedView(profile, session.user); await refreshData(); } catch(error){ setLoggedOutView(); setAuthStatus(error?.message || 'Não foi possível validar a sessão atual.'); } }
+    async function handleLogin(){ const email=normalizeText(emailInput.value); const password=passwordInput.value; if(!email || !password){ setAuthStatus('Preencha e-mail e senha para continuar.'); return; } loginBtn.disabled=true; setAuthStatus('Entrando...'); try { const supabase=createSupabaseClient(); const { data, error }=await supabase.auth.signInWithPassword({ email, password }); if(error) throw error; const user=data?.user; if(!user) throw new Error('Sessão não iniciada.'); const profile=await resolveCurrentProfile(user.id); if(!profile?.is_admin){ await supabase.auth.signOut(); throw new Error('Essa conta não possui acesso de administrador.'); } setAuthenticatedView(profile, user); setAuthStatus(''); await refreshData(); } catch(error){ setLoggedOutView(); setAuthStatus(error?.message || 'Não foi possível entrar.'); } finally { loginBtn.disabled=false; } }
+    showPasswordToggle.addEventListener('change', ()=>{ passwordInput.type=showPasswordToggle.checked ? 'text' : 'password'; }); loginBtn.addEventListener('click', handleLogin); passwordInput.addEventListener('keydown', (event)=>{ if(event.key==='Enter') handleLogin(); });
+    openPendingBtn.addEventListener('click', ()=>openPanel('pending')); openApprovedBtn.addEventListener('click', ()=>openPanel('approved')); openInactiveBtn.addEventListener('click', ()=>openPanel('inactive')); openUsersBtn.addEventListener('click', ()=>openPanel('users'));
+    document.querySelectorAll('[data-close-panel]').forEach((button)=>button.addEventListener('click', closeAllPanels)); document.querySelectorAll('[data-close-detail]').forEach((button)=>button.addEventListener('click', closeDetailModal)); document.querySelectorAll('[data-close-edit]').forEach((button)=>button.addEventListener('click', closeEditModal)); document.querySelectorAll('[data-close-user-songs]').forEach((button)=>button.addEventListener('click', closeUserSongsModal)); document.querySelectorAll('[data-refresh]').forEach((button)=>button.addEventListener('click', ()=>refreshData(button.dataset.refresh)));
+    pendingSearch.addEventListener('input', ()=>{ state.searches.pending=pendingSearch.value; renderPendingList(); }); approvedSearch.addEventListener('input', ()=>{ state.searches.approved=approvedSearch.value; renderApprovedList(); }); inactiveSearch.addEventListener('input', ()=>{ state.searches.inactive=inactiveSearch.value; renderInactiveList(); }); usersSearch.addEventListener('input', ()=>{ state.searches.users=usersSearch.value; renderUsersList(); }); saveEditBtn.addEventListener('click', saveEditedSuggestion); detailModal.addEventListener('click', (event)=>{ if(event.target===detailModal) closeDetailModal(); }); editModal.addEventListener('click', (event)=>{ if(event.target===editModal) closeEditModal(); }); userSongsModal.addEventListener('click', (event)=>{ if(event.target===userSongsModal) closeUserSongsModal(); });
+    createSupabaseClient(); bootstrapSession();
   </script>
 </body>
 </html>
