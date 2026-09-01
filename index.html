@@ -22,6 +22,8 @@
 .catalog-list{display:grid;gap:8px;max-height:56dvh;overflow:auto;padding-right:2px}.song-row{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 13px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02)),rgba(15,21,34,.94);border:1px solid rgba(255,255,255,.06);transition:border-color .18s ease,transform .18s ease,background .18s ease}.song-row:hover{border-color:rgba(133,208,255,.20)}.song-main{display:grid;gap:5px;min-width:0}.song-title{margin:0;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.song-meta{color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.song-submeta{color:var(--soft);font-size:10px;line-height:1.35}.song-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.empty{padding:30px 18px;border-radius:22px;border:1px dashed rgba(184,224,255,.14);background:rgba(255,255,255,.03);color:var(--muted);text-align:center;line-height:1.6}.stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.stat{padding:11px 12px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07)}.stat-label{font-size:10px;color:var(--soft);text-transform:uppercase;letter-spacing:.06em}.stat-value{margin-top:4px;font-size:20px;font-weight:850;letter-spacing:-.04em}.import-zone{padding:14px;border-radius:20px;border:1px dashed rgba(133,208,255,.22);background:linear-gradient(180deg,rgba(116,200,255,.05),rgba(74,137,255,.02)),rgba(8,14,25,.64);text-align:center;cursor:pointer;transition:border-color .18s ease,background .18s ease}.import-zone.dragover{border-color:rgba(133,208,255,.52);background:rgba(74,137,255,.10)}.import-zone strong{display:block;font-size:13px}.import-zone span{display:block;margin-top:4px;color:var(--muted);font-size:11px;line-height:1.45}
 .modal{position:fixed;inset:0;z-index:90;display:none;padding:max(12px,calc(var(--safe-top) + 6px)) max(10px,calc(var(--safe-right) + 8px)) max(12px,calc(var(--safe-bottom) + 8px)) max(10px,calc(var(--safe-left) + 8px));background:rgba(1,3,8,.72);backdrop-filter:blur(16px)}.modal.active{display:block}.modal-card{height:100%;border-radius:30px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(11,17,30,.96),rgba(7,11,19,.98)),var(--glass);box-shadow:var(--shadow-xl),inset 0 1px 0 rgba(255,255,255,.05);display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}.modal-head{padding:16px 14px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;gap:10px}.modal-head h3{margin:0;font-size:18px;letter-spacing:-.02em}.modal-body{overflow:auto;padding:14px;display:grid;gap:12px;align-content:start}.modal-foot{padding:14px;border-top:1px solid rgba(255,255,255,.08);display:grid;gap:8px}.icon-btn{width:42px;min-width:42px;height:42px;border-radius:15px;background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(10,17,29,.82);color:#fff;border:1px solid rgba(255,255,255,.10);cursor:pointer;font-size:18px;box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,.05)}.detail-block{padding:15px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:grid;gap:8px}.detail-block label{color:var(--soft);font-size:12px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}.detail-block div{color:#fff;line-height:1.7;white-space:pre-wrap;word-break:break-word}.confirm-text{font-size:13px;line-height:1.6;color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:max(20px,calc(var(--safe-bottom) + 20px));transform:translate(-50%,20px);z-index:120;opacity:0;pointer-events:none;min-width:min(90vw,360px);padding:12px 14px;border-radius:16px;background:rgba(7,12,20,.94);border:1px solid rgba(133,208,255,.20);box-shadow:var(--shadow-lg);color:#fff;font-size:12px;line-height:1.4;text-align:center;transition:opacity .2s ease,transform .2s ease}.toast.show{opacity:1;transform:translate(-50%,0)}.toast.success{border-color:rgba(72,214,138,.30)}.toast.error{border-color:rgba(255,111,111,.30)}
+
+.tabs{display:flex;gap:8px;overflow:auto;padding:2px 2px 0;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab-btn{min-height:42px;flex:0 0 auto;padding:9px 14px;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.10);color:var(--muted);font-size:12px;font-weight:800;cursor:pointer;transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease}.tab-btn:hover{transform:translateY(-1px)}.tab-btn.active{background:linear-gradient(180deg,rgba(116,200,255,.18),rgba(74,137,255,.10));border-color:rgba(133,208,255,.30);color:#fff}.tab-panel{display:none}.tab-panel.active{display:grid;gap:12px}.project-context{font-size:12px;line-height:1.7}.project-context p{margin:0 0 10px}.project-context p:last-child{margin-bottom:0}.project-context code{color:#bfeaff;background:rgba(116,200,255,.08);padding:2px 5px;border-radius:6px}
 @media(max-width:680px){.two-col,.actions-grid,.stats-grid{grid-template-columns:1fr}.admin-topbar{align-items:flex-start}.top-actions{flex-direction:column}.song-row{grid-template-columns:minmax(0,1fr)}.song-actions{justify-content:flex-start}.catalog-list{max-height:52dvh}.card{padding:14px}.admin-shell{max-width:620px}}
 </style>
 </head>
@@ -47,41 +49,73 @@
 <section id="adminPanel" class="hidden">
   <div class="admin-shell">
     <header class="admin-topbar">
-      <div class="admin-title"><h1>Palco Pro Adm</h1><p>Gerenciador do catálogo de sugestões.</p></div>
+      <div class="admin-title"><h1>Palco Pro Adm</h1><p>Gerenciador profissional do catálogo de sugestões.</p></div>
       <div class="top-actions"><button id="quickExportBtn" class="btn btn-success btn-small" type="button">Baixar catálogo</button><button id="logoutBtn" class="btn btn-secondary btn-small" type="button">Sair</button></div>
     </header>
 
+    <nav class="tabs" aria-label="Navegação administrativa">
+      <button class="tab-btn active" data-tab="catalog" type="button">🎵 Catálogo</button>
+      <button class="tab-btn" data-tab="editor" type="button">✚ Cadastrar</button>
+      <button class="tab-btn" data-tab="file" type="button">📂 Arquivo</button>
+      <button class="tab-btn" data-tab="project" type="button">ℹ️ Projeto</button>
+    </nav>
+
     <div class="admin-content">
-      <section class="card">
-        <div class="card-head"><div><h2 id="formTitle">Cadastrar música</h2><p id="formSubtitle">A música será incluída no catálogo que o Palco Pro principal lê.</p></div><span id="editingBadge" class="badge">Nova música</span></div>
-        <div class="form-grid">
-          <div class="two-col">
-            <div class="field"><label for="songTitle">Nome da música</label><input id="songTitle" type="text" placeholder="Ex.: Evidências" /></div>
-            <div class="field"><label for="songArtist">Artista</label><input id="songArtist" type="text" placeholder="Ex.: Chitãozinho & Xororó" /></div>
+      <section class="tab-panel active" data-panel="catalog">
+        <section class="card">
+          <div class="card-head"><div><h2>Catálogo atual</h2><p>Visualize e administre exatamente a lista que será disponibilizada em Sugestões.</p></div><span id="catalogCounter" class="badge">0 músicas</span></div>
+          <div class="stats-grid" style="margin-bottom:12px"><div class="stat"><div class="stat-label">Total</div><div id="statTotal" class="stat-value">0</div></div><div class="stat"><div class="stat-label">Ativas</div><div id="statActive" class="stat-value">0</div></div><div class="stat"><div class="stat-label">Inativas</div><div id="statInactive" class="stat-value">0</div></div></div>
+          <div class="catalog-top">
+            <div class="catalog-toolbar"><div class="search-wrap"><input id="searchInput" type="text" placeholder="Buscar por música, artista ou estilo" aria-label="Buscar no catálogo" /><span id="searchCounter" class="search-counter">0 resultados</span></div><button id="newSongBtn" type="button" class="btn btn-primary btn-small">+ Nova música</button></div>
+            <div class="filter-row"><button class="filter-btn active" data-filter="all" type="button">Todas</button><button class="filter-btn" data-filter="active" type="button">Ativas</button><button class="filter-btn" data-filter="inactive" type="button">Inativas</button></div>
           </div>
-          <div class="field"><label for="songStyle">Estilo</label><input id="songStyle" type="text" placeholder="Ex.: Sertanejo" /></div>
-          <div class="field"><label for="songLyrics">Letra completa</label><textarea id="songLyrics" placeholder="Cole a letra da música aqui..."></textarea></div>
-          <div class="actions-grid"><button id="saveSongBtn" class="btn btn-primary" type="button">Salvar música</button><button id="cancelEditBtn" class="btn btn-secondary hidden" type="button">Cancelar edição</button></div>
-          <div id="formStatus" class="status-line"></div>
-        </div>
+          <div id="catalogList" class="catalog-list" style="margin-top:12px"></div>
+        </section>
       </section>
 
-      <section class="card">
-        <div class="card-head"><div><h2>Arquivo de catálogo</h2><p>Carregue o arquivo atual para continuar editando sem perder o conteúdo.</p></div><span id="fileStatus" class="badge draft">Nenhum arquivo anexado</span></div>
-        <div id="importZone" class="import-zone" role="button" tabindex="0"><strong>📂 Anexar catalogo.json</strong><span>Clique aqui ou arraste o arquivo para esta área. O conteúdo será carregado no painel.</span></div>
-        <input id="importFile" class="hidden" type="file" accept=".json,application/json" />
-        <div class="actions-grid" style="margin-top:10px"><button id="exportBtn" type="button" class="btn btn-success">Baixar catalogo.json</button><button id="clearBtn" type="button" class="btn btn-danger">Limpar catálogo</button></div>
-        <div id="catalogStatus" class="status-line" style="margin-top:8px"></div>
+      <section class="tab-panel" data-panel="editor">
+        <section class="card">
+          <div class="card-head"><div><h2 id="formTitle">Cadastrar música</h2><p id="formSubtitle">Cadastre uma música para aparecer no catálogo de sugestões.</p></div><span id="editingBadge" class="badge">Nova música</span></div>
+          <div class="form-grid">
+            <div class="two-col">
+              <div class="field"><label for="songTitle">Nome da música</label><input id="songTitle" type="text" autocomplete="off" placeholder="Ex.: Evidências" /></div>
+              <div class="field"><label for="songArtist">Artista</label><input id="songArtist" type="text" autocomplete="off" placeholder="Ex.: Chitãozinho & Xororó" /></div>
+            </div>
+            <div class="field"><label for="songStyle">Estilo</label><input id="songStyle" type="text" autocomplete="off" placeholder="Ex.: Sertanejo" /></div>
+            <div class="field"><label for="songLyrics">Letra completa</label><textarea id="songLyrics" placeholder="Cole a letra completa aqui..."></textarea></div>
+            <div class="actions-grid"><button id="saveSongBtn" class="btn btn-primary" type="button">Salvar música</button><button id="cancelEditBtn" class="btn btn-secondary hidden" type="button">Cancelar edição</button></div>
+            <div id="formStatus" class="status-line"></div>
+          </div>
+        </section>
       </section>
 
-      <section class="card">
-        <div class="card-head"><div><h2>Catálogo atual</h2><p>Lista completa das músicas atualmente carregadas no painel.</p></div><span id="catalogCounter" class="badge">0 músicas</span></div>
-        <div class="stats-grid" style="margin-bottom:12px"><div class="stat"><div class="stat-label">Total</div><div id="statTotal" class="stat-value">0</div></div><div class="stat"><div class="stat-label">Ativas</div><div id="statActive" class="stat-value">0</div></div><div class="stat"><div class="stat-label">Inativas</div><div id="statInactive" class="stat-value">0</div></div></div>
-        <div class="catalog-top">
-          <div class="catalog-toolbar"><div class="search-wrap"><input id="searchInput" type="text" placeholder="Buscar por música, artista ou estilo" /><span id="searchCounter" class="search-counter">0 resultados</span></div><button id="newSongBtn" type="button" class="btn btn-primary btn-small">+ Nova música</button></div>
-          <div class="filter-row"><button class="filter-btn active" data-filter="all" type="button">Todas</button><button class="filter-btn" data-filter="active" type="button">Ativas</button><button class="filter-btn" data-filter="inactive" type="button">Inativas</button></div>
-        </div>
-        <div id="catalogList" class="catalog-list" style="margin-top:12px"></div>
+      <section class="tab-panel" data-panel="file">
+        <section class="card">
+          <div class="card-head"><div><h2>Arquivo do catálogo</h2><p>Anexe o <strong>catalogo.json</strong> que está atualmente no Palco Pro principal para editar a versão real.</p></div><span id="fileStatus" class="badge draft">Nenhum arquivo anexado</span></div>
+          <div id="importZone" class="import-zone" role="button" tabindex="0" aria-label="Anexar catalogo.json"><strong>📂 Anexar o catalogo.json atual</strong><span>Clique aqui ou arraste o arquivo para esta área. O catálogo será carregado imediatamente na aba “Catálogo”.</span><span id="importHint" style="margin-top:8px;color:#9edcff">Arquivo esperado: catalogo.json</span></div>
+          <input id="importFile" class="hidden" type="file" accept=".json,application/json" />
+          <div class="actions-grid" style="margin-top:10px"><button id="exportBtn" type="button" class="btn btn-success">Baixar catalogo.json atualizado</button><button id="clearBtn" type="button" class="btn btn-danger">Limpar catálogo atual</button></div>
+          <div id="catalogStatus" class="status-line" style="margin-top:8px"></div>
+        </section>
+        <section class="card">
+          <div class="card-head"><div><h2>Fluxo correto</h2><p>Use sempre esta sequência para atualizar as sugestões do aplicativo principal.</p></div><span class="badge">Manual</span></div>
+          <div class="note"><strong>1.</strong> Anexe o <strong>catalogo.json</strong> atual.<br><strong>2.</strong> Edite, cadastre, exclua ou desative as músicas.<br><strong>3.</strong> Clique em <strong>Baixar catalogo.json atualizado</strong>.<br><strong>4.</strong> Substitua o arquivo <strong>catalogo.json</strong> no repositório do Palco Pro principal.</div>
+        </section>
+      </section>
+
+      <section class="tab-panel" data-panel="project">
+        <section class="card">
+          <div class="card-head"><div><h2>Contexto do projeto</h2><p>Notas permanentes para manter este painel e futuras alterações alinhados com o projeto.</p></div><span class="badge">Palco Pro</span></div>
+          <div class="project-context note">
+            <p><strong>Aplicativo principal:</strong> Palco Pro, voltado para músicos, com aparência de teleprompter.</p>
+            <p><strong>Repertório pessoal:</strong> armazenado localmente no dispositivo do usuário. Não depende de conta ou Supabase.</p>
+            <p><strong>Teleprompter:</strong> a letra desliza continuamente como um teleprompter, sem destaque individual de estrofe.</p>
+            <p><strong>Backup:</strong> o app principal possui exportação/importação do repertório pessoal.</p>
+            <p><strong>Reconhecimento por fala:</strong> mantido no projeto, mas temporariamente desativado no principal.</p>
+            <p><strong>Catálogo de sugestões:</strong> este painel edita o arquivo <code>catalogo.json</code>. O arquivo é colocado manualmente no mesmo diretório do <code>index.html</code> principal.</p>
+            <p><strong>Regra:</strong> não reintroduzir Supabase, usuários, sincronização por conta, tokens ou GitHub Actions no fluxo do catálogo.</p>
+          </div>
+        </section>
       </section>
     </div>
   </div>
@@ -92,6 +126,19 @@
 <div id="confirmModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="confirmTitle">Confirmar ação</h3><button class="icon-btn" type="button" data-close-confirm>✕</button></div><div id="confirmBody" class="modal-body"></div><div class="modal-foot"><button id="confirmBtn" class="btn btn-danger" type="button">Confirmar</button><button type="button" class="btn btn-secondary" data-close-confirm>Cancelar</button></div></div></div>
 <div id="toast" class="toast" aria-live="polite"></div>
 
+<!--
+PALCO PRO — CONTEXTO DO PROJETO
+
+Este arquivo é o painel administrativo do Palco Pro.
+Objetivo: administrar manualmente o catálogo público de músicas usado pela aba “Sugestões” do index.html principal.
+Arquitetura aprovada: sem Supabase, sem banco de dados, sem GitHub Actions e sem publicação automática.
+Fluxo: anexar o catalogo.json atual -> visualizar -> cadastrar/editar/excluir/ativar/desativar -> baixar um novo catalogo.json -> substituir manualmente o arquivo no mesmo diretório do index.html principal.
+O index principal mantém repertório pessoal no dispositivo, backup/restauração e teleprompter contínuo.
+O catálogo público não é o repertório pessoal. Ao salvar uma sugestão no app, ela é copiada para o repertório local do usuário.
+Reconhecimento por fala: desativado por enquanto no index principal.
+Formato esperado do catalogo.json: array de objetos com id, title, artist, style, lyrics, active. O campo active=false torna a música invisível nas Sugestões.
+Não reintroduzir Supabase, login de usuário, sincronização em nuvem ou tokens no catálogo.
+-->
 <script>
 (() => {
 'use strict';
@@ -128,14 +175,15 @@ function askDelete(id){const s=state.songs.find(x=>x.id===id);if(!s)return;els.c
 function askClear(){if(!state.songs.length){showToast('O catálogo já está vazio.','success');return}els.confirmTitle.textContent='Limpar catálogo';els.confirmBody.innerHTML=`<div class="confirm-text">Isso removerá <strong>${state.songs.length} músicas</strong> deste painel. Você ainda poderá anexar um arquivo novamente.</div>`;els.confirmBtn.textContent='Limpar tudo';state.confirmAction=()=>{state.songs=[];persist();renderCatalog();clearForm();closeConfirm();setStatus('Catálogo limpo.','success');showToast('Catálogo limpo.','success')};els.confirmModal.classList.add('active')}
 function closeConfirm(){els.confirmModal.classList.remove('active');state.confirmAction=null}
 function exportCatalog(){const payload=state.songs.map(normalizeSong);const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='catalogo.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);els.fileStatus.textContent='Catálogo exportado';els.fileStatus.className='badge';setStatus(`✅ catalogo.json baixado com ${payload.length} música${payload.length===1?'':'s'}.`,'success');showToast('catalogo.json pronto para substituir no Palco Pro.','success')}
-function importCatalog(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const parsed=JSON.parse(String(reader.result||''));const arr=Array.isArray(parsed)?parsed:(Array.isArray(parsed?.songs)?parsed.songs:null);if(!arr)throw new Error('O JSON precisa conter uma lista de músicas.');const normalized=arr.map(normalizeSong);const invalid=normalized.find(s=>!s.title||!s.lyrics);if(invalid)throw new Error('Existe uma música sem nome ou sem letra completa.');state.songs=normalized;state.lastFileName=file.name;persist();renderCatalog();clearForm();els.fileStatus.textContent=`${file.name} carregado`;els.fileStatus.className='badge';setStatus(`✅ Catálogo carregado: ${state.songs.length} música${state.songs.length===1?'':'s'}.`,'success');showToast('Catálogo carregado com sucesso.','success')}catch(error){setStatus(`Não foi possível carregar o arquivo: ${error.message}`,'error');showToast('Erro ao carregar catálogo.','error')}};reader.readAsText(file)}
+function importCatalog(file){if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const parsed=JSON.parse(String(reader.result||''));const arr=Array.isArray(parsed)?parsed:(Array.isArray(parsed?.songs)?parsed.songs:null);if(!arr)throw new Error('O JSON precisa conter uma lista de músicas.');const normalized=arr.map(normalizeSong);const invalid=normalized.find(s=>!s.title||!s.lyrics);if(invalid)throw new Error('Existe uma música sem nome ou sem letra completa.');state.songs=normalized;state.lastFileName=file.name;persist();renderCatalog();clearForm();els.fileStatus.textContent=`${file.name} carregado`;els.fileStatus.className='badge';setStatus(`✅ Catálogo carregado: ${state.songs.length} música${state.songs.length===1?'':'s'}.`,'success');showToast('Catálogo carregado com sucesso.','success');document.querySelector('.tab-btn[data-tab="catalog"]').click()}catch(error){setStatus(`Não foi possível carregar o arquivo: ${error.message}`,'error');showToast('Erro ao carregar catálogo.','error')}};reader.readAsText(file)}
 function handleLogin(){if(normalize(els.loginInput.value)===LOGIN&&els.passwordInput.value===PASSWORD){sessionStorage.setItem(SESSION_KEY,'1');els.authCard.classList.add('hidden');els.adminPanel.classList.remove('hidden');loadLocal();showToast('Acesso autorizado.','success');return}els.authStatus.textContent='Login ou senha incorretos.'}
 function logout(){sessionStorage.removeItem(SESSION_KEY);els.adminPanel.classList.add('hidden');els.authCard.classList.remove('hidden');els.loginInput.value='';els.passwordInput.value='';els.showPassword.checked=false;els.passwordInput.type='password'}
 function init(){
  els.showPassword.addEventListener('change',()=>els.passwordInput.type=els.showPassword.checked?'text':'password');els.loginBtn.addEventListener('click',handleLogin);[els.loginInput,els.passwordInput].forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin()}));els.logoutBtn.addEventListener('click',logout);
- els.saveSong.addEventListener('click',saveSong);els.cancelEdit.addEventListener('click',clearForm);els.newSong.addEventListener('click',()=>{clearForm();els.songTitle.focus();document.querySelector('.admin-content').scrollTo({top:0,behavior:'smooth'})});els.exportBtn.addEventListener('click',exportCatalog);els.quickExport.addEventListener('click',exportCatalog);els.clearBtn.addEventListener('click',askClear);els.search.addEventListener('input',renderCatalog);document.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click',()=>setFilter(b.dataset.filter)));
+ els.saveSong.addEventListener('click',saveSong);els.cancelEdit.addEventListener('click',clearForm);els.newSong.addEventListener('click',()=>{document.querySelector('.tab-btn[data-tab="editor"]').click();clearForm();els.songTitle.focus();document.querySelector('.admin-content').scrollTo({top:0,behavior:'smooth'})});els.exportBtn.addEventListener('click',exportCatalog);els.quickExport.addEventListener('click',exportCatalog);els.clearBtn.addEventListener('click',askClear);els.search.addEventListener('input',renderCatalog);document.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click',()=>setFilter(b.dataset.filter)));
  els.importZone.addEventListener('click',()=>els.importFile.click());els.importZone.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();els.importFile.click()}});els.importFile.addEventListener('change',e=>importCatalog(e.target.files?.[0]));['dragenter','dragover'].forEach(type=>els.importZone.addEventListener(type,e=>{e.preventDefault();els.importZone.classList.add('dragover')}));['dragleave','drop'].forEach(type=>els.importZone.addEventListener(type,e=>{e.preventDefault();els.importZone.classList.remove('dragover')}));els.importZone.addEventListener('drop',e=>{const file=e.dataTransfer.files?.[0];if(file)importCatalog(file)});
- els.catalogList.addEventListener('click',e=>{const edit=e.target.closest('[data-edit]');const view=e.target.closest('[data-view]');const toggle=e.target.closest('[data-toggle]');const del=e.target.closest('[data-delete]');if(edit)beginEdit(edit.dataset.edit);else if(view)showLyrics(view.dataset.view);else if(toggle)toggleActive(toggle.dataset.toggle);else if(del)askDelete(del.dataset.delete)});
+ els.catalogList.addEventListener('click',e=>{const edit=e.target.closest('[data-edit]');const view=e.target.closest('[data-view]');const toggle=e.target.closest('[data-toggle]');const del=e.target.closest('[data-delete]');if(edit){beginEdit(edit.dataset.edit);document.querySelector('.tab-btn[data-tab="editor"]').click();}else if(view)showLyrics(view.dataset.view);else if(toggle)toggleActive(toggle.dataset.toggle);else if(del)askDelete(del.dataset.delete)});
+  document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{const target=btn.dataset.tab;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));document.querySelectorAll('.tab-panel').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===target));if(target==='catalog')renderCatalog();}));
  els.detailModal.querySelectorAll('[data-close-detail]').forEach(b=>b.addEventListener('click',closeDetail));els.confirmModal.querySelectorAll('[data-close-confirm]').forEach(b=>b.addEventListener('click',closeConfirm));els.confirmBtn.addEventListener('click',()=>state.confirmAction?.());
  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDetail();closeConfirm()}});
  if(sessionStorage.getItem(SESSION_KEY)==='1'){els.authCard.classList.add('hidden');els.adminPanel.classList.remove('hidden');loadLocal()}else{els.loginInput.focus()}
