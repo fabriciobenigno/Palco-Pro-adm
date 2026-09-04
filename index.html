@@ -6,6 +6,13 @@
 <meta name="theme-color" content="#020409" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Palco Pro Adm" />
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+<link rel="apple-touch-icon" href="./icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="mobile-web-app-capable" content="yes" />
 <title>Palco Pro Admin</title>
 <meta name="description" content="Painel administrativo local do Palco Pro para gerenciamento do catálogo de músicas." />
@@ -84,6 +91,112 @@
   .tabs{overflow:auto}
   .card{border-radius:26px;padding:15px}
 }
+
+/* Fluxo normal da página: nenhum cabeçalho, barra, toolbar ou área de importação/exportação acompanha a rolagem. */
+.admin-shell,.admin-topbar,.tabs,.admin-content,.tab-panel,.card,.catalog-top,.catalog-toolbar,.catalog-toolbar-actions,.import-zone{
+  position:static !important;
+  top:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+  left:auto !important;
+  inset:auto !important;
+}
+.admin-shell{
+  width:100%;
+  max-width:860px;
+}
+html,body{
+  overflow-x:hidden !important;
+  overflow-y:auto !important;
+  -webkit-overflow-scrolling:touch;
+}
+body{
+  overscroll-behavior-y:auto !important;
+  touch-action:pan-y;
+}
+.app{
+  overflow:visible !important;
+  width:100%;
+}
+.tabs{
+  z-index:auto !important;
+}
+
+/* app-like mobile refinements */
+
+@media(max-width:680px){
+  html,body{
+    width:100%;
+    min-width:0;
+  }
+  .app{
+    padding:max(10px,calc(var(--safe-top) + 6px)) max(10px,calc(var(--safe-right) + 8px)) max(12px,calc(var(--safe-bottom) + 8px)) max(10px,calc(var(--safe-left) + 8px));
+  }
+  .admin-shell{
+    width:100%;
+    max-width:none;
+    gap:10px;
+  }
+  .admin-topbar{
+    width:100%;
+    padding:13px 14px;
+    border-radius:22px;
+  }
+  .admin-title h1{font-size:20px;}
+  .admin-title p{font-size:11px;}
+  .top-actions{width:auto;}
+  .tabs{
+    width:100%;
+    gap:7px;
+    flex-wrap:wrap;
+  }
+  .tab-btn{
+    min-height:40px;
+    padding:8px 11px;
+    font-size:11px;
+  }
+  .card{
+    width:100%;
+    padding:13px;
+    border-radius:24px;
+  }
+  .catalog-toolbar-actions{
+    width:100%;
+  }
+  .catalog-toolbar-actions .btn{
+    flex:1 1 0;
+  }
+  .catalog-toolbar .search-wrap{
+    flex:1 1 100%;
+    width:100%;
+  }
+  .song-row{
+    width:100%;
+    padding:11px 12px;
+  }
+  .song-actions{
+    width:100%;
+  }
+  .song-actions .btn{
+    flex:1 1 calc(50% - 6px);
+  }
+  .received-actions .btn{
+    flex:1 1 100%;
+  }
+  .received-head{
+    flex-direction:column;
+  }
+  .received-status{
+    align-self:flex-start;
+  }
+  .received-bulk{
+    width:100%;
+  }
+  .received-bulk .btn{
+    width:100%;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -302,6 +415,13 @@ function init(){
 }
 init();
 })();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
