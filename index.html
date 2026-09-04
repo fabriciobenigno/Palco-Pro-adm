@@ -29,14 +29,15 @@
     .received-status { flex:0 0 auto; min-height:24px; display:inline-flex; align-items:center; padding:4px 8px; border-radius:999px; font-size:10px; font-weight:800; white-space:nowrap; }
     .received-status.exists { background:rgba(255,204,104,.10); border:1px solid rgba(255,204,104,.20); color:#ffdf94; }
     .received-status.new { background:rgba(72,214,138,.10); border:1px solid rgba(72,214,138,.20); color:#a9f3c9; }
-    .received-detail { display:none; margin-top:10px; padding:10px; border-radius:14px; background:rgba(0,0,0,.18); border:1px solid rgba(255,255,255,.06); color:var(--soft); font-size:10px; line-height:1.5; white-space:pre-wrap; overflow:auto; max-height:260px; }
+    .received-detail { display:none; margin-top:10px; padding:10px; border-radius:14px; background:rgba(0,0,0,.18); border:1px solid rgba(255,255,255,.06); color:var(--soft); font-size:10px; line-height:1.5; white-space:pre-wrap; overflow:visible; max-height:none; }
     .received-row.open .received-detail { display:block; }
 
 .hidden{display:none!important}
 .app{position:relative;z-index:1;width:100%;min-height:100dvh;height:auto;min-height:100%;overflow:visible;padding:max(16px,calc(var(--safe-top) + 8px)) max(14px,calc(var(--safe-right) + 10px)) max(16px,calc(var(--safe-bottom) + 8px)) max(14px,calc(var(--safe-left) + 10px));background:linear-gradient(180deg,rgba(4,9,19,.50),rgba(4,8,16,.26)),radial-gradient(circle at 50% -10%,rgba(89,164,255,.14),transparent 28%)}
 .auth-card{height:100%;display:grid;place-items:center}.auth-shell{width:100%;max-width:440px;display:grid;gap:16px;padding:8px 2px}.auth-brand{position:relative;overflow:hidden;border-radius:30px;padding:26px 22px 20px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03)),linear-gradient(180deg,rgba(8,14,25,.82),rgba(6,10,18,.92));border:1px solid var(--line-strong);box-shadow:var(--shadow-xl),inset 0 1px 0 rgba(255,255,255,.08)}.auth-chip{display:inline-flex;align-items:center;gap:8px;min-height:30px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(178,224,255,.14);color:rgba(234,243,255,.88);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.auth-chip-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(180deg,var(--blue-1),var(--blue-2));box-shadow:0 0 18px rgba(116,200,255,.7)}.auth-brand h1{margin:14px 0 8px;font-size:clamp(28px,8.4vw,38px);line-height:.98;letter-spacing:-.05em;font-weight:800}.auth-brand p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.auth-form{display:grid;gap:12px;padding:18px 16px 16px;border-radius:28px;background:linear-gradient(180deg,rgba(8,13,24,.84),rgba(7,11,19,.94)),var(--glass);border:1px solid var(--line);box-shadow:var(--shadow-lg),inset 0 1px 0 rgba(255,255,255,.05)}
 .panel-title{display:grid;gap:6px}.panel-title h2{margin:0;font-size:18px;letter-spacing:-.03em;font-weight:700}.panel-title p{margin:0;color:var(--muted);font-size:12px;line-height:1.55}.field{display:grid;gap:8px}.field label{color:rgba(236,243,255,.88);font-size:12px;font-weight:700;letter-spacing:.02em}input,textarea{width:100%;border:1px solid rgba(163,205,255,.12);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03)),rgba(5,9,17,.72);color:#fff;border-radius:18px;padding:14px 15px;outline:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}input:focus,textarea:focus{border-color:rgba(133,208,255,.42);box-shadow:0 0 0 3px rgba(74,137,255,.10),inset 0 1px 0 rgba(255,255,255,.05)}textarea{min-height:250px;resize:vertical;line-height:1.6}input::placeholder,textarea::placeholder{color:rgba(227,235,255,.36)}
-.toggle-password-row{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;padding:2px 2px 0}.toggle-password-row input{width:18px;height:18px;accent-color:#6cb7ff;margin:0;flex:0 0 18px}.btn{position:relative;overflow:hidden;color:#fff;cursor:pointer;min-height:48px;border-radius:18px;padding:12px 15px;font-weight:800;letter-spacing:.01em;box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,.06);transition:transform .18s ease,filter .18s ease,opacity .18s ease}.btn:hover{filter:brightness(1.06)}.btn:active{transform:translateY(1px)}.btn:disabled{opacity:.55;cursor:default;filter:none}.btn-primary{background:linear-gradient(135deg,var(--blue-1),var(--blue-2) 58%,var(--blue-3));border:1px solid rgba(184,228,255,.32);color:#061120;text-shadow:0 1px 0 rgba(255,255,255,.22)}.btn-secondary{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(11,18,30,.72);border:1px solid rgba(255,255,255,.12);color:#f2f7ff}.btn-danger{background:linear-gradient(180deg,var(--red-1),var(--red-2));border:1px solid rgba(255,180,180,.24)}.btn-success{background:linear-gradient(135deg,var(--green-1),var(--green-2));border:1px solid rgba(180,255,216,.25);color:#061b11}.btn-amber{background:linear-gradient(135deg,var(--amber-1),var(--amber-2));border:1px solid rgba(255,227,158,.25);color:#241a07}.btn-small{min-height:40px;padding:9px 12px;border-radius:14px;font-size:12px}.status-line{min-height:18px;color:var(--muted);font-size:12px;line-height:1.45;padding-inline:2px}.status-success{color:#a9f3c9}.status-error{color:#ffc2c2}.status-warn{color:#ffdf94}
+.toggle-password-row{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;padding:2px 2px 0}.toggle-password-row input{width:18px;height:18px;accent-color:#6cb7ff;margin:0;flex:0 0 18px}.btn{position:relative;overflow:hidden;color:#fff;cursor:pointer;min-height:48px;border-radius:18px;padding:12px 15px;font-weight:800;letter-spacing:.01em;box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,.06);transition:transform .18s cubic-bezier(.2,.8,.2,1),filter .18s ease,box-shadow .18s ease,opacity .18s ease}.btn::after{content:"";position:absolute;inset:-60% -30%;background:linear-gradient(110deg,transparent 38%,rgba(255,255,255,.24) 50%,transparent 62%);transform:translateX(-65%) rotate(8deg);opacity:0;pointer-events:none;transition:transform .42s ease,opacity .2s ease}.btn:hover{filter:brightness(1.08);transform:translateY(-1px) scale(1.018);box-shadow:0 15px 32px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.10)}.btn:hover::after{transform:translateX(65%) rotate(8deg);opacity:.75}.btn:active,.btn.tactile-pressed{transform:translateY(1px) scale(.975);filter:brightness(1.13) saturate(1.05);box-shadow:0 7px 16px rgba(0,0,0,.28),inset 0 2px 8px rgba(0,0,0,.14),0 0 0 2px rgba(141,216,255,.10)}.btn:active::after,.btn.tactile-pressed::after{transform:translateX(72%) rotate(8deg);opacity:.9;transition-duration:.22s}.btn:disabled{opacity:.55;cursor:default;filter:none;transform:none;box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,.06)}
+.btn-primary{background:linear-gradient(135deg,var(--blue-1),var(--blue-2) 58%,var(--blue-3));border:1px solid rgba(184,228,255,.32);color:#061120;text-shadow:0 1px 0 rgba(255,255,255,.22)}.btn-secondary{background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(11,18,30,.72);border:1px solid rgba(255,255,255,.12);color:#f2f7ff}.btn-danger{background:linear-gradient(180deg,var(--red-1),var(--red-2));border:1px solid rgba(255,180,180,.24)}.btn-success{background:linear-gradient(135deg,var(--green-1),var(--green-2));border:1px solid rgba(180,255,216,.25);color:#061b11}.btn-amber{background:linear-gradient(135deg,var(--amber-1),var(--amber-2));border:1px solid rgba(255,227,158,.25);color:#241a07}.btn-small{min-height:40px;padding:9px 12px;border-radius:14px;font-size:12px}.status-line{min-height:18px;color:var(--muted);font-size:12px;line-height:1.45;padding-inline:2px}.status-success{color:#a9f3c9}.status-error{color:#ffc2c2}.status-warn{color:#ffdf94}
 .admin-shell{display:grid;grid-template-rows:auto auto;gap:12px;max-width:860px;margin:0 auto}.admin-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border-radius:26px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02)),linear-gradient(180deg,rgba(8,13,24,.90),rgba(7,11,19,.96));border:1px solid var(--line-strong);box-shadow:var(--shadow-xl),inset 0 1px 0 rgba(255,255,255,.06)}.admin-title{display:grid;gap:4px;min-width:0}.admin-title h1{margin:0;font-size:22px;letter-spacing:-.04em}.admin-title p{margin:0;color:var(--muted);font-size:12px;line-height:1.4}.top-actions{display:flex;gap:8px;flex-shrink:0}.admin-content{min-height:0;overflow:visible;display:grid;gap:12px;padding-bottom:2px}.card{padding:16px;border-radius:28px;background:linear-gradient(180deg,rgba(13,19,31,.92),rgba(7,11,19,.96));border:1px solid var(--line);box-shadow:var(--shadow-lg),inset 0 1px 0 rgba(255,255,255,.04)}.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}.card-head h2{margin:0;font-size:17px;letter-spacing:-.03em}.card-head p{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.45}.badge{display:inline-flex;align-items:center;min-height:22px;padding:3px 8px;border-radius:999px;background:rgba(116,200,255,.10);border:1px solid rgba(116,200,255,.18);color:#bfeaff;font-size:10px;font-weight:800;letter-spacing:.02em;white-space:nowrap}.badge.inactive{background:rgba(255,204,104,.10);border-color:rgba(255,204,104,.18);color:#ffdf94}.badge.draft{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.10);color:var(--muted)}
 .form-grid{display:grid;gap:12px}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}.actions-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.note{padding:11px 12px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);color:var(--soft);font-size:11px;line-height:1.55}.note strong{color:#fff}
 .catalog-top{display:grid;gap:10px}.catalog-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.catalog-toolbar .search-wrap{flex:1 1 220px;position:relative}.search-wrap input{padding-right:90px}.search-counter{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--soft)}.filter-row{display:flex;flex-wrap:wrap;gap:8px}.filter-btn{min-height:34px;padding:7px 11px;border-radius:999px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.10);color:var(--muted);font-size:11px;font-weight:800;cursor:pointer}.filter-btn.active{background:linear-gradient(180deg,rgba(116,200,255,.18),rgba(74,137,255,.10));border-color:rgba(133,208,255,.30);color:#fff}
@@ -214,6 +215,34 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
 @media(max-width:680px){.tabs{flex-wrap:nowrap!important;overflow-x:auto!important;padding-bottom:2px!important}.tab-btn{min-height:40px;padding:8px 11px;font-size:11px}.song-row{--swipe-width:318px}.song-actions{gap:5px!important;padding-inline:6px!important}.song-actions .badge{display:none}.song-actions .btn{min-width:58px;padding-inline:8px}}
 .catalog-list,.catalog-list *{scrollbar-width:none}.catalog-list::-webkit-scrollbar{display:none}
 
+/* === FEEDBACK TÁTIL: SENSAÇÃO DE TOQUE NO CELULAR === */
+@media (hover:none) and (pointer:coarse){
+  .btn{
+    -webkit-touch-callout:none;
+    -webkit-user-select:none;
+    user-select:none;
+    transition:transform .14s cubic-bezier(.2,.8,.2,1),filter .14s ease,box-shadow .14s ease,background .14s ease;
+  }
+  .btn:hover{transform:none;filter:none;box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,.06)}
+  .btn:active,.btn.tactile-pressed{transform:scale(.965);filter:brightness(1.11) saturate(1.05);box-shadow:0 8px 18px rgba(0,0,0,.28),inset 0 2px 7px rgba(0,0,0,.14),0 0 0 2px rgba(141,216,255,.10)}
+  .btn:active::after,.btn.tactile-pressed::after{opacity:.82}
+}
+
+
+
+/* === TOQUES FINAIS: SWIPE BIDIRECIONAL + CONFIRMAÇÃO CINEMATOGRÁFICA === */
+.song-card{will-change:transform}
+.song-row.is-swiping .song-card{transition:none!important}
+.catalog-list{overscroll-behavior-y:contain}
+.confirmation-overlay{position:fixed;inset:0;z-index:250;display:grid;place-items:center;padding:24px;background:rgba(1,4,9,.54);backdrop-filter:blur(10px);opacity:0;visibility:hidden;transition:opacity .22s ease,visibility .22s ease}
+.confirmation-overlay.show{opacity:1;visibility:visible}
+.confirmation-card{width:min(88vw,360px);padding:28px 24px 24px;border-radius:30px;background:linear-gradient(180deg,rgba(16,25,40,.96),rgba(7,12,20,.98));border:1px solid rgba(141,216,255,.18);box-shadow:0 28px 90px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.08);text-align:center;transform:translateY(12px) scale(.96);opacity:0;transition:transform .35s cubic-bezier(.2,.85,.25,1),opacity .28s ease}
+.confirmation-overlay.show .confirmation-card{transform:translateY(0) scale(1);opacity:1}
+.confirmation-icon{width:70px;height:70px;margin:0 auto 16px;border-radius:999px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(104,226,165,.24),rgba(36,168,103,.12));border:1px solid rgba(125,245,190,.26);box-shadow:0 0 0 8px rgba(93,213,147,.05),0 14px 38px rgba(0,0,0,.28);font-size:34px;color:#c8ffdf;animation:confirmationPop .5s cubic-bezier(.2,.85,.25,1) both}
+.confirmation-title{margin:0;font-size:21px;font-weight:850;letter-spacing:-.03em;color:#fff}
+.confirmation-text{margin:8px 0 0;color:rgba(232,241,255,.72);font-size:13px;line-height:1.55}
+.confirmation-song{margin-top:12px;color:#bfeaff;font-size:13px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@keyframes confirmationPop{0%{transform:scale(.55) rotate(-8deg);opacity:0}70%{transform:scale(1.08) rotate(2deg)}100%{transform:scale(1) rotate(0);opacity:1}}
 </style>
 </head>
 <body>
@@ -323,7 +352,7 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
 
 <div id="receivedEditModal" class="modal"><div class="modal-card"><div class="modal-head"><h3>Cadastro recebido</h3><button class="icon-btn" type="button" data-close-received-edit>✕</button></div><div class="modal-body"><div class="received-editor"><div class="detail-block"><label for="receivedEditTitle">Música</label><input id="receivedEditTitle" type="text" /></div><div class="detail-block"><label for="receivedEditArtist">Artista</label><input id="receivedEditArtist" type="text" /></div><div class="detail-block"><label for="receivedEditUser">Usuário</label><input id="receivedEditUser" type="text" readonly /></div><div class="detail-block"><label for="receivedEditLyrics">Letra</label><textarea id="receivedEditLyrics"></textarea></div></div></div><div class="modal-foot"><div class="received-editor-actions"><button id="saveReceivedEditBtn" type="button" class="btn btn-primary">Salvar alterações</button><button type="button" class="btn btn-secondary" data-close-received-edit>Fechar</button></div></div></div></div><div id="detailModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="detailTitle">Detalhes da música</h3><button class="icon-btn" type="button" data-close-detail>✕</button></div><div id="detailBody" class="modal-body"></div><div class="modal-foot"><button type="button" class="btn btn-secondary" data-close-detail>Fechar</button></div></div></div>
 <div id="styleModal" class="modal"><div class="modal-card"><div class="modal-head"><h3>Alterar nome do estilo</h3><button class="icon-btn" type="button" data-close-style>✕</button></div><div class="modal-body"><div class="style-modal-copy">Digite o novo nome do estilo para todas as músicas selecionadas.</div><div class="field"><label for="bulkStyleInput">Novo estilo</label><input id="bulkStyleInput" type="text" placeholder="Ex.: Sertanejo" /></div></div><div class="modal-foot"><button id="continueStyleBtn" type="button" class="btn btn-primary">Continuar</button><button type="button" class="btn btn-secondary" data-close-style>Cancelar</button></div></div></div><div id="confirmModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="confirmTitle">Confirmar ação</h3><button class="icon-btn" type="button" data-close-confirm>✕</button></div><div id="confirmBody" class="modal-body"></div><div class="modal-foot"><button id="confirmBtn" class="btn btn-danger" type="button">Confirmar</button><button type="button" class="btn btn-secondary" data-close-confirm>Cancelar</button></div></div></div>
-<div id="toast" class="toast" aria-live="polite"></div>
+<div id="toast" class="toast" aria-live="polite"></div><div id="confirmationOverlay" class="confirmation-overlay" aria-live="polite" aria-hidden="true"><div class="confirmation-card" role="status"><div class="confirmation-icon">✓</div><h3 class="confirmation-title">Música cadastrada</h3><p class="confirmation-text">A música foi adicionada ao catálogo com sucesso.</p><div id="confirmationSong" class="confirmation-song"></div></div></div>
 
 <!--
 PALCO PRO — CONTEXTO DO PROJETO
@@ -351,7 +380,7 @@ const state={songs:[],editingId:null,filter:'all',confirmAction:null,lastFileNam
 const els={
  authCard:$('authCard'),adminPanel:$('adminPanel'),loginInput:$('loginInput'),passwordInput:$('passwordInput'),showPassword:$('showPasswordToggle'),loginBtn:$('loginBtn'),authStatus:$('authStatus'),logoutBtn:$('logoutBtn'), refreshCatalog:$('refreshCatalogBtn'),
  songTitle:$('songTitle'),songArtist:$('songArtist'),songStyle:$('songStyle'),songLyrics:$('songLyrics'),formTitle:$('formTitle'),formSubtitle:$('formSubtitle'),editingBadge:$('editingBadge'),saveSong:$('saveSongBtn'),cancelEdit:$('cancelEditBtn'),formStatus:$('formStatus'),
- importZone:$('importZone'),importFile:$('importFile'),exportBtn:$('exportBtn'),quickExport:$('quickExportBtn'),clearBtn:$('clearBtn'),fileStatus:$('fileStatus'),catalogStatus:$('catalogStatus'),search:$('searchInput'),searchCounter:$('searchCounter'),catalogList:$('catalogList'),catalogCounter:$('catalogCounter'),statTotal:$('statTotal'),statActive:$('statActive'),statInactive:$('statInactive'),newSong:$('newSongBtn'),receivedList:$('receivedList'),receivedCounter:$('receivedCounter'),refreshReceived:$('refreshReceivedBtn'),receivedStatus:$('receivedStatus'),receivedBulk:$('receivedBulk'),receivedBulkCount:$('receivedBulkCount'),selectAllReceived:$('selectAllReceivedBtn'),clearReceivedSelection:$('clearReceivedSelectionBtn'),approveSelectedReceived:$('approveSelectedReceivedBtn'),receivedEditModal:$('receivedEditModal'),receivedEditTitle:$('receivedEditTitle'),receivedEditArtist:$('receivedEditArtist'),receivedEditUser:$('receivedEditUser'),receivedEditLyrics:$('receivedEditLyrics'),saveReceivedEdit:$('saveReceivedEditBtn'),bulkActions:$('bulkActions'),bulkCount:$('bulkCount'),selectAll:$('selectAllBtn'),clearSelection:$('clearSelectionBtn'),changeStyle:$('changeStyleBtn'),styleModal:$('styleModal'),bulkStyleInput:$('bulkStyleInput'),continueStyle:$('continueStyleBtn'),linkCatalog:$('linkCatalogBtn'),detailModal:$('detailModal'),detailTitle:$('detailTitle'),detailBody:$('detailBody'),confirmModal:$('confirmModal'),confirmTitle:$('confirmTitle'),confirmBody:$('confirmBody'),confirmBtn:$('confirmBtn'),toast:$('toast')
+ importZone:$('importZone'),importFile:$('importFile'),exportBtn:$('exportBtn'),quickExport:$('quickExportBtn'),clearBtn:$('clearBtn'),fileStatus:$('fileStatus'),catalogStatus:$('catalogStatus'),search:$('searchInput'),searchCounter:$('searchCounter'),catalogList:$('catalogList'),catalogCounter:$('catalogCounter'),statTotal:$('statTotal'),statActive:$('statActive'),statInactive:$('statInactive'),newSong:$('newSongBtn'),receivedList:$('receivedList'),receivedCounter:$('receivedCounter'),refreshReceived:$('refreshReceivedBtn'),receivedStatus:$('receivedStatus'),receivedBulk:$('receivedBulk'),receivedBulkCount:$('receivedBulkCount'),selectAllReceived:$('selectAllReceivedBtn'),clearReceivedSelection:$('clearReceivedSelectionBtn'),approveSelectedReceived:$('approveSelectedReceivedBtn'),receivedEditModal:$('receivedEditModal'),receivedEditTitle:$('receivedEditTitle'),receivedEditArtist:$('receivedEditArtist'),receivedEditUser:$('receivedEditUser'),receivedEditLyrics:$('receivedEditLyrics'),saveReceivedEdit:$('saveReceivedEditBtn'),bulkActions:$('bulkActions'),bulkCount:$('bulkCount'),selectAll:$('selectAllBtn'),clearSelection:$('clearSelectionBtn'),changeStyle:$('changeStyleBtn'),styleModal:$('styleModal'),bulkStyleInput:$('bulkStyleInput'),continueStyle:$('continueStyleBtn'),linkCatalog:$('linkCatalogBtn'),detailModal:$('detailModal'),detailTitle:$('detailTitle'),detailBody:$('detailBody'),confirmModal:$('confirmModal'),confirmTitle:$('confirmTitle'),confirmBody:$('confirmBody'),confirmBtn:$('confirmBtn'),toast:$('toast'),confirmationOverlay:$('confirmationOverlay'),confirmationSong:$('confirmationSong')
 };
 function normalize(v){return String(v??'').trim()}
 function sanitizeLyrics(v){return String(v??'').replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim()}
@@ -391,9 +420,21 @@ function renderCatalog(){
   }
   updateBulkUI();
 }
+function showConfirmationAnimation(title){
+  if(!els.confirmationOverlay)return;
+  els.confirmationSong.textContent=title||'';
+  els.confirmationOverlay.classList.add('show');
+  els.confirmationOverlay.setAttribute('aria-hidden','false');
+  clearTimeout(showConfirmationAnimation.timer);
+  showConfirmationAnimation.timer=setTimeout(()=>{
+    els.confirmationOverlay.classList.remove('show');
+    els.confirmationOverlay.setAttribute('aria-hidden','true');
+  },1700);
+}
+
 function clearForm(){state.editingId=null;els.formTitle.textContent='Cadastrar música';els.formSubtitle.textContent='A música será incluída no catálogo que o Palco Pro principal lê.';els.editingBadge.textContent='Nova música';els.editingBadge.className='badge';els.saveSong.textContent='Salvar música';els.cancelEdit.classList.add('hidden');els.songTitle.value='';els.songArtist.value='';els.songStyle.value='';els.songLyrics.value='';els.formStatus.textContent=''}
 function beginEdit(id){const s=state.songs.find(x=>x.id===id);if(!s)return;state.editingId=id;els.formTitle.textContent='Editar música';els.formSubtitle.textContent='Atualize os dados e salve. A alteração ficará pronta para o próximo catalogo.json.';els.editingBadge.textContent='Edição';els.editingBadge.className='badge';els.saveSong.textContent='Salvar alterações';els.cancelEdit.classList.remove('hidden');els.songTitle.value=s.title;els.songArtist.value=s.artist;els.songStyle.value=s.style;els.songLyrics.value=s.lyrics;els.formStatus.textContent='Você está editando esta música.';els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})}
-async function saveSong(){const title=normalize(els.songTitle.value),artist=normalize(els.songArtist.value),style=normalize(els.songStyle.value),lyrics=sanitizeLyrics(els.songLyrics.value);if(!title){setStatus('Informe o nome da música.','error');els.songTitle.focus();return}if(!lyrics){setStatus('Cole a letra completa antes de salvar.','error');els.songLyrics.focus();return}const duplicate=state.songs.some(s=>s.id!==state.editingId&&normalizeSearch(s.title)===normalizeSearch(title)&&normalizeSearch(s.artist)===normalizeSearch(artist));if(duplicate){setStatus('Essa música já existe no catálogo para este artista.','error');return}const editing=!!state.editingId;if(editing){const idx=state.songs.findIndex(s=>s.id===state.editingId);if(idx<0)return;state.songs[idx]={...state.songs[idx],title,artist,style,lyrics}}else{state.songs.unshift({id:makeId(),title,artist,style,lyrics,active:true})}await persist();const publicado=await publishCatalogToServer();if(!publicado.sucesso){setStatus('Alteração salva localmente, mas não foi publicada no catálogo principal: '+publicado.mensagem,'error');showToast('Falha ao publicar catálogo.','error');return}renderCatalog();clearForm();setStatus(editing?'✅ Música atualizada no catálogo principal.':'✅ Música adicionada ao catálogo principal.','success');showToast(editing?'Música atualizada.':'Música adicionada.','success')}
+async function saveSong(){const title=normalize(els.songTitle.value),artist=normalize(els.songArtist.value),style=normalize(els.songStyle.value),lyrics=sanitizeLyrics(els.songLyrics.value);if(!title){setStatus('Informe o nome da música.','error');els.songTitle.focus();return}if(!lyrics){setStatus('Cole a letra completa antes de salvar.','error');els.songLyrics.focus();return}const duplicate=state.songs.some(s=>s.id!==state.editingId&&normalizeSearch(s.title)===normalizeSearch(title)&&normalizeSearch(s.artist)===normalizeSearch(artist));if(duplicate){setStatus('Essa música já existe no catálogo para este artista.','error');return}const editing=!!state.editingId;if(editing){const idx=state.songs.findIndex(s=>s.id===state.editingId);if(idx<0)return;state.songs[idx]={...state.songs[idx],title,artist,style,lyrics}}else{state.songs.unshift({id:makeId(),title,artist,style,lyrics,active:true})}await persist();const publicado=await publishCatalogToServer();if(!publicado.sucesso){setStatus('Alteração salva localmente, mas não foi publicada no catálogo principal: '+publicado.mensagem,'error');showToast('Falha ao publicar catálogo.','error');return}renderCatalog();clearForm();setStatus(editing?'✅ Música atualizada no catálogo principal.':'✅ Música adicionada ao catálogo principal.','success');showToast(editing?'Música atualizada.':'Música adicionada.','success');if(!editing)showConfirmationAnimation(title)}
 function toggleSelected(id,checked){if(checked)state.selectedIds.add(id);else state.selectedIds.delete(id);renderCatalog()}
 function toggleAllVisible(){const visible=filtered();const allSelected=visible.length>0&&visible.every(s=>state.selectedIds.has(s.id));if(allSelected)visible.forEach(s=>state.selectedIds.delete(s.id));else visible.forEach(s=>state.selectedIds.add(s.id));renderCatalog()}
 function clearSelection(){state.selectedIds.clear();renderCatalog()}
@@ -443,16 +484,75 @@ async function refreshMainCatalog(){
   }
 }
 function initCatalogSwipe(){
-  let activeRow=null,startX=0,startY=0,moved=false;
-  els.catalogList.addEventListener('pointerdown',e=>{const row=e.target.closest('.song-row[data-song-swipe]');if(!row||e.target.closest('.song-actions'))return;activeRow=row;startX=e.clientX;startY=e.clientY;moved=false;try{row.setPointerCapture(e.pointerId)}catch(_){}});
-  els.catalogList.addEventListener('pointermove',e=>{if(!activeRow)return;const dx=e.clientX-startX,dy=e.clientY-startY;if(Math.abs(dx)>8||Math.abs(dy)>8)moved=true;if(Math.abs(dx)<=Math.abs(dy))return;e.preventDefault();});
-  const finish=e=>{if(!activeRow)return;const row=activeRow,dx=e.clientX-startX,dy=e.clientY-startY;if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)){if(dx<0){els.catalogList.querySelectorAll('.song-row.revealed').forEach(other=>{if(other!==row)other.classList.remove('revealed')});row.classList.add('revealed')}else row.classList.remove('revealed')}else if(!moved&&row.classList.contains('revealed'))row.classList.remove('revealed');row.classList.remove('swiping');activeRow=null};
-  els.catalogList.addEventListener('pointerup',finish);
-  els.catalogList.addEventListener('pointercancel',()=>{if(activeRow){activeRow.classList.remove('swiping');activeRow=null}});
-  document.addEventListener('click',e=>{if(e.target.closest('.song-row[data-song-swipe]'))return;els.catalogList.querySelectorAll('.song-row.revealed').forEach(row=>row.classList.remove('revealed'))});
+  let activeRow=null,startX=0,startY=0,startOffset=0,currentDx=0,moved=false,pointerId=null;
+  const getWidth=row=>Math.min(Number.parseFloat(getComputedStyle(row).getPropertyValue('--swipe-width'))||330,row.parentElement?.clientWidth||330);
+  const closeOthers=row=>els.catalogList.querySelectorAll('.song-row.revealed').forEach(other=>{if(other!==row){other.classList.remove('revealed');other.classList.remove('is-swiping');other.querySelector('.song-card')?.style.removeProperty('transform')}});
+  const setVisual=(row,offset,animate=false)=>{
+    const card=row?.querySelector('.song-card'); if(!card)return;
+    card.style.transition=animate?'transform .22s ease':'none';
+    card.style.transform=`translateX(${offset}px)`;
+  };
+  const finish=()=>{
+    if(!activeRow)return;
+    const row=activeRow, width=getWidth(row), threshold=Math.max(52,Math.min(120,width*.18));
+    const finalOffset=startOffset+currentDx;
+    const open=finalOffset < -threshold || (startOffset<0 && finalOffset < -width*.38);
+    row.classList.remove('is-swiping');
+    if(open){
+      closeOthers(row); row.classList.add('revealed'); setVisual(row,-width,true);
+    }else{
+      row.classList.remove('revealed'); setVisual(row,0,true);
+    }
+    activeRow=null;pointerId=null;currentDx=0;startOffset=0;
+  };
+  els.catalogList.addEventListener('pointerdown',e=>{
+    const row=e.target.closest('.song-row[data-song-swipe]');
+    if(!row||e.target.closest('.song-actions'))return;
+    activeRow=row;pointerId=e.pointerId;startX=e.clientX;startY=e.clientY;moved=false;currentDx=0;
+    const width=getWidth(row); startOffset=row.classList.contains('revealed')?-width:0;
+    row.classList.add('is-swiping'); setVisual(row,startOffset,false);
+    try{row.setPointerCapture(e.pointerId)}catch(_){}
+  });
+  els.catalogList.addEventListener('pointermove',e=>{
+    if(!activeRow||e.pointerId!==pointerId)return;
+    const dx=e.clientX-startX,dy=e.clientY-startY;
+    if(Math.abs(dx)>8||Math.abs(dy)>8)moved=true;
+    if(Math.abs(dx)<=Math.abs(dy))return;
+    const width=getWidth(activeRow);
+    currentDx=dx;
+    let offset=startOffset+dx;
+    offset=Math.max(-width,Math.min(8,offset));
+    setVisual(activeRow,offset,false);
+    e.preventDefault();
+  });
+  els.catalogList.addEventListener('pointerup',e=>{if(e.pointerId===pointerId)finish()});
+  els.catalogList.addEventListener('pointercancel',e=>{if(e.pointerId===pointerId){if(activeRow){activeRow.classList.remove('is-swiping');activeRow.classList.remove('revealed');setVisual(activeRow,0,true)}activeRow=null;pointerId=null}});
+  els.catalogList.addEventListener('click',e=>{
+    if(moved){moved=false;return;}
+    if(e.target.closest('.song-actions'))return;
+    const row=e.target.closest('.song-row[data-song-swipe]');
+    if(row?.classList.contains('revealed')){row.classList.remove('revealed');setVisual(row,0,true);e.preventDefault();e.stopPropagation();}
+  },true);
+  document.addEventListener('click',e=>{
+    if(e.target.closest('.song-row[data-song-swipe]'))return;
+    els.catalogList.querySelectorAll('.song-row.revealed').forEach(row=>{row.classList.remove('revealed');setVisual(row,0,true)});
+  });
 }
 
 function init(){
+  // Feedback visual imediato para toque: apenas classe CSS, sem interferir nos eventos existentes.
+  document.addEventListener('pointerdown', e=>{
+    const btn=e.target.closest('button, [role=button]');
+    if(!btn || btn.disabled || btn.getAttribute('aria-disabled')==='true') return;
+    btn.classList.add('tactile-pressed');
+  }, {passive:true});
+  const clearTap=e=>{
+    const btn=e.target.closest('button, [role=button]');
+    if(btn) btn.classList.remove('tactile-pressed');
+  };
+  document.addEventListener('pointerup', clearTap, {passive:true});
+  document.addEventListener('pointercancel', clearTap, {passive:true});
+  document.addEventListener('pointerleave', clearTap, {passive:true});
  initCatalogSwipe();
  els.showPassword.addEventListener('change',()=>els.passwordInput.type=els.showPassword.checked?'text':'password');els.loginBtn.addEventListener('click',handleLogin);[els.loginInput,els.passwordInput].forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin()}));els.logoutBtn.addEventListener('click',logout);els.refreshCatalog?.addEventListener('click',refreshMainCatalog);els.refreshReceived.addEventListener('click',loadReceived);els.selectAllReceived.addEventListener('click',()=>{const all=state.received.length>0&&state.received.every((_,i)=>state.receivedSelected.has(i));state.receivedSelected=all?new Set():new Set(state.received.map((_,i)=>i));renderReceived()});els.clearReceivedSelection.addEventListener('click',()=>{state.receivedSelected.clear();renderReceived()});els.approveSelectedReceived.addEventListener('click',authorizeSelectedReceived);els.saveReceivedEdit.addEventListener('click',saveReceivedEditor);els.receivedEditModal.querySelectorAll('[data-close-received-edit]').forEach(b=>b.addEventListener('click',closeReceivedEditor));
  els.saveSong.addEventListener('click',saveSong);els.cancelEdit.addEventListener('click',clearForm);els.newSong.addEventListener('click',()=>{document.querySelector('.tab-btn[data-tab="editor"]').click();clearForm();els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})});els.exportBtn.addEventListener('click',exportCatalog);els.quickExport.addEventListener('click',exportCatalog);els.clearBtn.addEventListener('click',askClear);els.selectAll.addEventListener('click',toggleAllVisible);els.clearSelection.addEventListener('click',clearSelection);els.changeStyle.addEventListener('click',openStyleModal);els.continueStyle.addEventListener('click',continueStyleChange);els.styleModal.querySelectorAll('[data-close-style]').forEach(b=>b.addEventListener('click',closeStyleModal));els.linkCatalog.addEventListener('click',linkCatalog);els.search.addEventListener('input',renderCatalog);document.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click',()=>setFilter(b.dataset.filter)));
