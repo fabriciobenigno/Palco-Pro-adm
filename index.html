@@ -16,6 +16,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <title>Palco Pro Admin</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>if(window.pdfjsLib){window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}</script>
 <meta name="description" content="Painel administrativo local do Palco Pro para gerenciamento do catálogo de músicas." />
 <style>
 :root{--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);--safe-right:env(safe-area-inset-right,0px);--bg-1:#020409;--bg-2:#08111e;--bg-3:#04070d;--text:#f7f9ff;--muted:rgba(232,239,255,.74);--soft:rgba(214,225,255,.54);--line:rgba(160,196,255,.14);--line-strong:rgba(184,223,255,.24);--blue-1:#8dd8ff;--blue-2:#4a89ff;--blue-3:#6ec9ff;--green-1:rgba(72,214,138,.98);--green-2:rgba(27,168,94,.95);--red-1:rgba(255,111,111,.98);--red-2:rgba(238,65,65,.94);--amber-1:rgba(255,204,104,.98);--amber-2:rgba(233,166,44,.94);--shadow-xl:0 24px 80px rgba(0,0,0,.45);--shadow-lg:0 18px 46px rgba(0,0,0,.30);--shadow-md:0 12px 26px rgba(0,0,0,.24);--glass:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));}
@@ -429,7 +430,7 @@ function detectWatermarkBoxFromCanvas(canvas){
 }
 function sampleBackgroundColor(canvas,box){const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)return{r:1,g:1,b:1};const pts=[[box.x-5,box.y+box.height*.25],[box.x+box.width+5,box.y+box.height*.25],[box.x-5,box.y+box.height*.75],[box.x+box.width+5,box.y+box.height*.75],[box.x+box.width*.5,box.y-5],[box.x+box.width*.5,box.y+box.height+5]];let R=0,G=0,B=0;pts.forEach(([xx,yy])=>{const x=Math.max(0,Math.min(canvas.width-1,Math.round(xx))),y=Math.max(0,Math.min(canvas.height-1,Math.round(yy)));const p=ctx.getImageData(x,y,1,1).data;R+=p[0];G+=p[1];B+=p[2];});return{r:R/pts.length/255,g:G/pts.length/255,b:B/pts.length/255};}
 async function processAttachedPdfWithWatermark(file){
- if(!window.pdfjsLib)throw new Error('O leitor de PDF ainda não está disponível.');
+ if(!window.pdfjsLib)throw new Error('O leitor de PDF ainda não foi carregado. Recarregue o painel e tente novamente.');
  const pdfLib=await loadExternalScriptOnce(PDF_LIB_URL,'PDFLib');
  const originalBytes=new Uint8Array(await file.arrayBuffer());
  const detectDoc=await pdfjsLib.getDocument({data:originalBytes.slice()}).promise;
@@ -519,20 +520,12 @@ function updateFormPdfUI(song=null){
   }
 }
 function selectFormPdf(){els.catalogPdfInput.value='';els.catalogPdfInput.dataset.formMode='1';els.catalogPdfInput.click()}
-async function handleFormPdfSelection(file){
+function handleFormPdfSelection(file){
   if(!file)return;
-  if(state.pdfProcessing)return;
-  state.pdfProcessing=true;
-  if(els.songPdfStatus)els.songPdfStatus.textContent='Preparando o PDF com a marca Palco Pro…';
-  if(els.selectSongPdfBtn)els.selectSongPdfBtn.disabled=true;
-  try{
-    const processed=await processPdfFileToFile(file);
-    selectedFormPdf=processed;
-    const count=processed.detectedWatermarks||0;
-    if(els.songPdfStatus)els.songPdfStatus.textContent=count?`PDF pronto. Marca Palco Pro aplicada em ${count} página(s).`:'PDF pronto. Nenhuma marca original identificada.';
-    showToast(count?'PDF preparado com a marca Palco Pro':'PDF preparado.','success');
-  }catch(error){selectedFormPdf=null;updateFormPdfUI(state.editingId?state.songs.find(s=>s.id===state.editingId):null);showToast(error?.message||'Não foi possível preparar o PDF.','error');}
-  finally{state.pdfProcessing=false;if(els.selectSongPdfBtn)els.selectSongPdfBtn.disabled=false;if(els.catalogPdfInput)els.catalogPdfInput.value='';}
+  if(file.type!=='application/pdf'&&!/\.pdf$/i.test(file.name||'')){showToast('Selecione um arquivo PDF.','error');return}
+  selectedFormPdf=file;
+  els.songPdfStatus.textContent='PDF selecionado: '+file.name+'. Será processado ao salvar.';
+  els.viewSongPdfBtn?.classList.add('hidden');
 }
 
 function clearForm(){selectedFormPdf=null;els.catalogPdfInput.value='';delete els.catalogPdfInput.dataset.formMode;state.editingId=null;els.formTitle.textContent='Cadastrar música';els.formSubtitle.textContent='A música será incluída no catálogo que o Palco Pro principal lê.';els.editingBadge.textContent='Nova música';els.editingBadge.className='badge';els.saveSong.textContent='Salvar música';els.cancelEdit.classList.add('hidden');els.songTitle.value='';els.songArtist.value='';els.songStyle.value='';els.songLyrics.value='';els.formStatus.textContent='';updateFormPdfUI(null)}
