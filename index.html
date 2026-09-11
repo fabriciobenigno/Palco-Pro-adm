@@ -16,6 +16,7 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <title>Palco Pro Admin</title>
 <meta name="description" content="Painel administrativo local do Palco Pro para gerenciamento do catálogo de músicas." />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 :root{--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);--safe-right:env(safe-area-inset-right,0px);--bg-1:#020409;--bg-2:#08111e;--bg-3:#04070d;--text:#f7f9ff;--muted:rgba(232,239,255,.74);--soft:rgba(214,225,255,.54);--line:rgba(160,196,255,.14);--line-strong:rgba(184,223,255,.24);--blue-1:#8dd8ff;--blue-2:#4a89ff;--blue-3:#6ec9ff;--green-1:rgba(72,214,138,.98);--green-2:rgba(27,168,94,.95);--red-1:rgba(255,111,111,.98);--red-2:rgba(238,65,65,.94);--amber-1:rgba(255,204,104,.98);--amber-2:rgba(233,166,44,.94);--shadow-xl:0 24px 80px rgba(0,0,0,.45);--shadow-lg:0 18px 46px rgba(0,0,0,.30);--shadow-md:0 12px 26px rgba(0,0,0,.24);--glass:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;min-height:100%;overflow:visible;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;background:radial-gradient(circle at 18% 14%,rgba(108,186,255,.18),transparent 0 24%),radial-gradient(circle at 82% 10%,rgba(90,125,255,.16),transparent 0 18%),radial-gradient(circle at 50% 120%,rgba(45,87,180,.20),transparent 0 34%),linear-gradient(180deg,var(--bg-1) 0%,var(--bg-2) 38%,var(--bg-3) 100%);background-color:var(--bg-1)}body{position:relative;min-height:100dvh;overscroll-behavior:auto}button,input,textarea{font:inherit}button{border:0}
@@ -383,6 +384,9 @@ const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbweGCvcOlO76O2CRV
 const MAIN_CATALOG_URL='https://fabriciobenigno.github.io/Palco-Pro/catalogo.json';
 const CATALOG_KEY='palco-pro-admin-catalog-v4';
 const SESSION_KEY='palco-pro-admin-session-v4';
+const WATERMARK_LOGO_URL='./marca-dagua-palco-pro.png';
+const PDF_LIB_URL='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js';
+const processedPdfFiles=new WeakSet();
 const $=id=>document.getElementById(id);
 const state={songs:[],editingId:null,filter:'all',confirmAction:null,lastFileName:'',selectedIds:new Set(),catalogHandle:null,received:[],receivedSelected:new Set(),receivedEditingIndex:null};
 const els={
@@ -399,6 +403,14 @@ function normalizeSong(song){return{id:normalize(song?.id)||makeId(),title:norma
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
 async function fetchJson(url,options={},timeoutMs=15000){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeoutMs);try{const response=await fetch(url,{...options,signal:controller.signal,cache:'no-store'});const text=await response.text();let data=null;try{data=JSON.parse(text)}catch(_){throw new Error('Resposta inválida do servidor.')}if(!response.ok)throw new Error('HTTP '+response.status);return data}finally{clearTimeout(timer)}}
 function fileToDataUrl(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result||''));reader.onerror=()=>reject(new Error('Não foi possível ler o PDF selecionado.'));reader.readAsDataURL(file)})}
+function loadExternalScriptOnce(src,globalName){return new Promise((resolve,reject)=>{if(globalName&&window[globalName])return resolve(window[globalName]);const existing=document.querySelector(`script[data-palco-external="${src}"]`);if(existing){existing.addEventListener('load',()=>resolve(globalName?window[globalName]:true),{once:true});existing.addEventListener('error',()=>reject(new Error('Não foi possível carregar a biblioteca necessária.')),{once:true});return}const script=document.createElement('script');script.src=src;script.async=true;script.dataset.palcoExternal=src;script.onload=()=>globalName&&!window[globalName]?reject(new Error('Biblioteca não ficou disponível.')):resolve(globalName?window[globalName]:true);script.onerror=()=>reject(new Error('Não foi possível carregar a biblioteca necessária.'));document.head.appendChild(script)})}
+function uint8ArrayToPdfDataUrl(bytes){let binary='';const chunkSize=0x8000;for(let i=0;i<bytes.length;i+=chunkSize)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+chunkSize,bytes.length)));return `data:application/pdf;base64,${btoa(binary)}`}
+async function loadWatermarkLogoBytes(){const response=await fetch(WATERMARK_LOGO_URL,{cache:'no-store'});if(!response.ok)throw new Error('A logo do Palco Pro não pôde ser carregada.');return new Uint8Array(await response.arrayBuffer())}
+function isWatermarkYellowPixel(r,g,b){const max=Math.max(r,g,b),min=Math.min(r,g,b),saturation=max?(max-min)/max:0;return r>120&&g>120&&b<165&&saturation>0.24&&g>b*1.28}
+function detectWatermarkBoxFromCanvas(canvas){const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)return null;const w=canvas.width,h=canvas.height,xStart=Math.floor(w*.68),yEnd=Math.floor(h*.25),rw=w-xStart,data=ctx.getImageData(xStart,0,rw,yEnd).data,step=w>1400?2:1;let minX=w,maxX=-1,minY=h,maxY=-1,count=0;for(let y=4;y<yEnd;y+=step)for(let x=xStart;x<w;x+=step){const i=((y*rw)+(x-xStart))*4;if(!isWatermarkYellowPixel(data[i],data[i+1],data[i+2]))continue;count++;if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y}if(count<15||maxX<minX)return null;const yellowW=maxX-minX+1,yellowH=maxY-minY+1;if(yellowW<w*.035||yellowW>w*.35||yellowH<4||yellowH>h*.10)return null;const topPad=Math.max(10,yellowH*.72),sidePad=Math.max(2,yellowW*.015),bottomPad=Math.max(2,yellowH*.06),x=Math.max(0,Math.floor(minX-sidePad)),y=Math.max(0,Math.floor(minY-topPad)),right=Math.min(w,Math.ceil(maxX+sidePad+1)),bottom=Math.min(h,Math.ceil(maxY+bottomPad+1));return{x,y,width:Math.max(1,right-x),height:Math.max(1,bottom-y)}}
+function sampleBackgroundColor(canvas,box){const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)return{r:1,g:1,b:1};const pts=[[box.x-5,box.y+box.height*.25],[box.x+box.width+5,box.y+box.height*.25],[box.x-5,box.y+box.height*.75],[box.x+box.width+5,box.y+box.height*.75],[box.x+box.width*.5,box.y-5],[box.x+box.width*.5,box.y+box.height+5]];let R=0,G=0,B=0;pts.forEach(([xx,yy])=>{const x=Math.max(0,Math.min(canvas.width-1,Math.round(xx))),y=Math.max(0,Math.min(canvas.height-1,Math.round(yy))),p=ctx.getImageData(x,y,1,1).data;R+=p[0];G+=p[1];B+=p[2]});return{r:R/pts.length/255,g:G/pts.length/255,b:B/pts.length/255}}
+async function processAttachedPdfWithWatermark(file){if(!window.pdfjsLib)throw new Error('O leitor de PDF ainda não está disponível.');const pdfLib=await loadExternalScriptOnce(PDF_LIB_URL,'PDFLib');const originalBytes=new Uint8Array(await file.arrayBuffer()),detectDoc=await pdfjsLib.getDocument({data:originalBytes.slice()}).promise,outDoc=await pdfLib.PDFDocument.load(originalBytes),logo=await outDoc.embedPng(await loadWatermarkLogoBytes());let detectedCount=0;try{for(let idx=0;idx<detectDoc.numPages;idx++){const pdfJsPage=await detectDoc.getPage(idx+1),base=pdfJsPage.getViewport({scale:1}),scale=Math.max(.8,Math.min(1.5,1200/Math.max(1,base.width))),viewport=pdfJsPage.getViewport({scale}),canvas=document.createElement('canvas');canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);const ctx=canvas.getContext('2d',{alpha:false,willReadFrequently:true});if(!ctx)continue;ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);await pdfJsPage.render({canvasContext:ctx,viewport}).promise;const box=detectWatermarkBoxFromCanvas(canvas);if(!box)continue;const page=outDoc.getPage(idx),ph=page.getHeight(),x=box.x/scale,y=ph-(box.y+box.height)/scale,w=box.width/scale,h=box.height/scale,bg=sampleBackgroundColor(canvas,box);page.drawRectangle({x,y,width:w,height:h,color:pdfLib.rgb(bg.r,bg.g,bg.b)});const aspect=logo.width/logo.height,maxW=w*.96,maxH=h*.8;let dw=maxW,dh=dw/aspect;if(dh>maxH){dh=maxH;dw=dh*aspect}page.drawImage(logo,{x:x+(w-dw)/2,y:y+(h-dh)/2,width:dw,height:dh});detectedCount++}}finally{try{detectDoc.destroy()}catch(_){}}const output=await outDoc.save({useObjectStreams:true});return{dataUrl:uint8ArrayToPdfDataUrl(output),detectedCount,pageCount:outDoc.getPageCount()}}
+async function preparePdfForUpload(file){if(processedPdfFiles.has(file))return{file};const result=await processAttachedPdfWithWatermark(file),base64=result.dataUrl.split(',')[1]||'',binary=atob(base64),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);const processed=new File([bytes],file.name,{type:'application/pdf',lastModified:Date.now()});processedPdfFiles.add(processed);return{file:processed,result}}
 function showToast(message,type='success'){els.toast.textContent=message;els.toast.className=`toast show ${type}`;clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>els.toast.classList.remove('show'),2200)}
 function setStatus(message,type=''){if(els.formStatus){els.formStatus.textContent=message||'';els.formStatus.className=`status-line ${type?'status-'+type:''}`}if(els.catalogStatus){els.catalogStatus.textContent=message||'';els.catalogStatus.className=`status-line ${type?'status-'+type:''}`}}
 async function persist(){const payload=JSON.stringify(state.songs.map(normalizeSong),null,2);localStorage.setItem(CATALOG_KEY,payload);if(state.catalogHandle){try{const writable=await state.catalogHandle.createWritable();await writable.write(payload);await writable.close();els.fileStatus.textContent='catalogo.json sincronizado';els.fileStatus.className='badge'}catch(error){els.catalogStatus.textContent='Alteração local salva, mas não foi possível escrever no catalogo.json: '+error.message;els.catalogStatus.className='status-line status-warn'}}}
@@ -443,96 +455,6 @@ function showConfirmationAnimation(title){
   },1700);
 }
 
-const WATERMARK_LOGO_URL='./marca-dagua-palco-pro.png';
-const PDF_JS_URL='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-const PDF_LIB_URL='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js';
-let pdfProcessingPromise=null;
-function loadExternalScriptOnce(src,globalName){
-  return new Promise((resolve,reject)=>{
-    if(globalName&&window[globalName]){resolve(window[globalName]);return}
-    const selector=`script[data-palco-external="${src}"]`;
-    const existing=document.querySelector(selector);
-    if(existing){
-      existing.addEventListener('load',()=>resolve(globalName?window[globalName]:true),{once:true});
-      existing.addEventListener('error',()=>reject(new Error('Não foi possível carregar a biblioteca necessária.')),{once:true});
-      return;
-    }
-    const script=document.createElement('script');script.src=src;script.async=true;script.dataset.palcoExternal=src;
-    script.onload=()=>globalName&&!window[globalName]?reject(new Error('Biblioteca não ficou disponível.')):resolve(globalName?window[globalName]:true);
-    script.onerror=()=>reject(new Error('Não foi possível carregar a biblioteca necessária.'));
-    document.head.appendChild(script);
-  });
-}
-function uint8ArrayToPdfDataUrl(bytes){
-  let binary='';const chunkSize=0x8000;
-  for(let i=0;i<bytes.length;i+=chunkSize)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+chunkSize,bytes.length)));
-  return `data:application/pdf;base64,${btoa(binary)}`;
-}
-async function loadWatermarkLogoBytes(){
-  const response=await fetch(WATERMARK_LOGO_URL,{cache:'no-store'});
-  if(!response.ok)throw new Error('A logo do Palco Pro não pôde ser carregada.');
-  return new Uint8Array(await response.arrayBuffer());
-}
-function isWatermarkYellowPixel(r,g,b){
-  const max=Math.max(r,g,b),min=Math.min(r,g,b);const saturation=max?(max-min)/max:0;
-  return r>120&&g>120&&b<165&&saturation>0.24&&g>b*1.28;
-}
-function detectWatermarkBoxFromCanvas(canvas){
-  const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)return null;
-  const w=canvas.width,h=canvas.height,xStart=Math.floor(w*0.68),yEnd=Math.floor(h*0.25),rw=w-xStart;
-  const data=ctx.getImageData(xStart,0,rw,yEnd).data;const step=w>1400?2:1;
-  let minX=w,maxX=-1,minY=h,maxY=-1,count=0;
-  for(let y=4;y<yEnd;y+=step){for(let x=xStart;x<w;x+=step){const i=((y*rw)+(x-xStart))*4;if(!isWatermarkYellowPixel(data[i],data[i+1],data[i+2]))continue;count++;if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;}}
-  if(count<15||maxX<minX)return null;
-  const yellowW=maxX-minX+1,yellowH=maxY-minY+1;
-  if(yellowW<w*0.035||yellowW>w*0.35||yellowH<4||yellowH>h*0.10)return null;
-  const topPad=Math.max(10,yellowH*0.72),sidePad=Math.max(2,yellowW*0.015),bottomPad=Math.max(2,yellowH*0.06);
-  const x=Math.max(0,Math.floor(minX-sidePad)),y=Math.max(0,Math.floor(minY-topPad));
-  const right=Math.min(w,Math.ceil(maxX+sidePad+1)),bottom=Math.min(h,Math.ceil(maxY+bottomPad+1));
-  return{x,y,width:Math.max(1,right-x),height:Math.max(1,bottom-y)};
-}
-function sampleBackgroundColor(canvas,box){
-  const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)return{r:1,g:1,b:1};
-  const pts=[[box.x-5,box.y+box.height*.25],[box.x+box.width+5,box.y+box.height*.25],[box.x-5,box.y+box.height*.75],[box.x+box.width+5,box.y+box.height*.75],[box.x+box.width*.5,box.y-5],[box.x+box.width*.5,box.y+box.height+5]];
-  let R=0,G=0,B=0;
-  pts.forEach(([xx,yy])=>{const x=Math.max(0,Math.min(canvas.width-1,Math.round(xx))),y=Math.max(0,Math.min(canvas.height-1,Math.round(yy)));const p=ctx.getImageData(x,y,1,1).data;R+=p[0];G+=p[1];B+=p[2];});
-  return{r:R/pts.length/255,g:G/pts.length/255,b:B/pts.length/255};
-}
-async function processAttachedPdfWithWatermark(file){
-  if(!pdfProcessingPromise)pdfProcessingPromise=Promise.all([loadExternalScriptOnce(PDF_JS_URL,'pdfjsLib'),loadExternalScriptOnce(PDF_LIB_URL,'PDFLib')]);
-  const [pdfjsLib,pdfLib]=await pdfProcessingPromise;
-  if(pdfjsLib.GlobalWorkerOptions)pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-  const originalBytes=new Uint8Array(await file.arrayBuffer());
-  const detectDoc=await pdfjsLib.getDocument({data:originalBytes.slice()}).promise;
-  const outDoc=await pdfLib.PDFDocument.load(originalBytes);
-  const logo=await outDoc.embedPng(await loadWatermarkLogoBytes());
-  let detectedCount=0;
-  try{
-    for(let idx=0;idx<detectDoc.numPages;idx++){
-      const pdfJsPage=await detectDoc.getPage(idx+1),base=pdfJsPage.getViewport({scale:1});
-      const scale=Math.max(.8,Math.min(1.5,1200/Math.max(1,base.width))),viewport=pdfJsPage.getViewport({scale});
-      const canvas=document.createElement('canvas');canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
-      const ctx=canvas.getContext('2d',{alpha:false,willReadFrequently:true});if(!ctx)continue;ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
-      await pdfJsPage.render({canvasContext:ctx,viewport}).promise;
-      const box=detectWatermarkBoxFromCanvas(canvas);if(!box)continue;
-      const page=outDoc.getPage(idx),pw=page.getWidth(),ph=page.getHeight();
-      const x=box.x/scale,y=ph-(box.y+box.height)/scale,w=box.width/scale,h=box.height/scale,bg=sampleBackgroundColor(canvas,box);
-      page.drawRectangle({x,y,width:w,height:h,color:pdfLib.rgb(bg.r,bg.g,bg.b)});
-      const aspect=logo.width/logo.height,maxW=w*.96,maxH=h*.8;let dw=maxW,dh=dw/aspect;if(dh>maxH){dh=maxH;dw=dh*aspect;}
-      page.drawImage(logo,{x:x+(w-dw)/2,y:y+(h-dh)/2,width:dw,height:dh});detectedCount++;
-    }
-  }finally{try{detectDoc.destroy()}catch(_){} }
-  const output=await outDoc.save({useObjectStreams:true});
-  return{dataUrl:uint8ArrayToPdfDataUrl(output),detectedCount,pageCount:outDoc.getPageCount()};
-}
-async function preparePdfForUpload(file){
-  if(!file)return file;
-  if(file.type!=='application/pdf'&&!/\.pdf$/i.test(file.name)){throw new Error('Selecione um arquivo PDF.');}
-  const result=await processAttachedPdfWithWatermark(file);
-  const binary=atob(result.dataUrl.split(',')[1]);const bytes=new Uint8Array(binary.length);
-  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-  return new File([bytes],file.name,{type:'application/pdf',lastModified:file.lastModified||Date.now()});
-}
 let selectedFormPdf=null;
 function updateFormPdfUI(song=null){
   if(!els.songPdfStatus)return;
@@ -549,11 +471,15 @@ function updateFormPdfUI(song=null){
   }
 }
 function selectFormPdf(){els.catalogPdfInput.value='';els.catalogPdfInput.dataset.formMode='1';els.catalogPdfInput.click()}
-function handleFormPdfSelection(file){
+async function handleFormPdfSelection(file){
   if(!file)return;
   if(file.type!=='application/pdf'&&!/\.pdf$/i.test(file.name)){showToast('Selecione um arquivo PDF.','error');return}
-  selectedFormPdf=file;
-  updateFormPdfUI(state.editingId?state.songs.find(s=>s.id===state.editingId):null);
+  try{
+    showToast('Preparando PDF com a marca Palco Pro...','success');
+    const prepared=await preparePdfForUpload(file);
+    selectedFormPdf=prepared.file;
+    updateFormPdfUI(state.editingId?state.songs.find(s=>s.id===state.editingId):null);
+  }catch(error){selectedFormPdf=null;updateFormPdfUI(state.editingId?state.songs.find(s=>s.id===state.editingId):null);showToast('Não foi possível preparar o PDF: '+error.message,'error')}
 }
 function clearForm(){selectedFormPdf=null;els.catalogPdfInput.value='';delete els.catalogPdfInput.dataset.formMode;state.editingId=null;els.formTitle.textContent='Cadastrar música';els.formSubtitle.textContent='A música será incluída no catálogo que o Palco Pro principal lê.';els.editingBadge.textContent='Nova música';els.editingBadge.className='badge';els.saveSong.textContent='Salvar música';els.cancelEdit.classList.add('hidden');els.songTitle.value='';els.songArtist.value='';els.songStyle.value='';els.songLyrics.value='';els.formStatus.textContent='';updateFormPdfUI(null)}
 function beginEdit(id){const s=state.songs.find(x=>x.id===id);if(!s)return;state.editingId=id;els.formTitle.textContent='Editar música';els.formSubtitle.textContent='Atualize os dados e salve. A alteração ficará pronta para o próximo catalogo.json.';els.editingBadge.textContent='Edição';els.editingBadge.className='badge';els.saveSong.textContent='Salvar alterações';els.cancelEdit.classList.remove('hidden');els.songTitle.value=s.title;els.songArtist.value=s.artist;els.songStyle.value=s.style;els.songLyrics.value=s.lyrics;selectedFormPdf=null;updateFormPdfUI(s);els.formStatus.textContent='Você está editando esta música.';els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})}
@@ -593,11 +519,11 @@ async function uploadCatalogPdfFile(songId,file){
   if(els.refreshCatalog){els.refreshCatalog.disabled=true;els.refreshCatalog.textContent='Enviando PDF...'}
   showToast('Enviando PDF...','success');
   try{
-    const processedFile=await preparePdfForUpload(file);
-    const pdfData=await fileToDataUrl(processedFile);
-    const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveSongPdf',songId:song.id,title:song.title,artist:song.artist,pdfData,pdfFileName:processedFile.name})},30000);
+    const prepared=await preparePdfForUpload(file);
+    const pdfData=await fileToDataUrl(prepared.file);
+    const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveSongPdf',songId:song.id,title:song.title,artist:song.artist,pdfData,pdfFileName:prepared.file.name})},30000);
     if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível salvar o PDF.');
-    song.pdfUrl=data.pdfUrl||'';song.pdfFileName=data.pdfFileName||processedFile.name;
+    song.pdfUrl=data.pdfUrl||'';song.pdfFileName=data.pdfFileName||file.name;
     localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs.map(normalizeSong)));renderCatalog();
     setStatus('✅ PDF salvo para '+song.title+'.','success');showToast('PDF salvo com sucesso.','success');return true;
   }catch(error){setStatus('Não foi possível salvar o PDF: '+(error.name==='AbortError'?'tempo limite excedido.':error.message),'error');showToast('Erro ao salvar PDF.','error');return false}
@@ -632,7 +558,7 @@ function getReceivedPdf(item){const pdfUrl=String(item?.cadastroCompleto?.pdfUrl
 function openReceivedEditor(index){const item=state.received?.[index];if(!item)return;state.receivedEditingIndex=index;els.receivedEditTitle.value=normalize(item.musica||item.title);els.receivedEditArtist.value=normalize(item.artista||item.artist);els.receivedEditUser.value=normalize(item.usuario);els.receivedEditLyrics.value=sanitizeLyrics(item.letra||item.lyrics);const pdfUrl=getReceivedPdf(item);els.receivedEditPdfStatus.textContent=pdfUrl?'📄 PDF anexado':'Nenhum PDF anexado';els.receivedEditPdfBtn.textContent=pdfUrl?'Alterar PDF':'Adicionar PDF';els.receivedEditViewPdf.classList.toggle('hidden',!pdfUrl);els.receivedEditViewPdf.onclick=()=>viewPdf(pdfUrl);els.receivedEditPdfBtn.onclick=()=>{els.receivedPdfInput.value='';els.receivedPdfInput.click()};els.receivedEditModal.classList.add('active')}
 function closeReceivedEditor(){els.receivedEditModal.classList.remove('active');state.receivedEditingIndex=null}
 async function saveReceivedEditor(){const index=state.receivedEditingIndex;const item=state.received?.[index];if(!item)return;const musica=normalize(els.receivedEditTitle.value),artista=normalize(els.receivedEditArtist.value),letra=sanitizeLyrics(els.receivedEditLyrics.value);const pdfUrl=String(item.cadastroCompleto?.pdfUrl||item.pdfUrl||'');const pdfDriveFileId=String(item.cadastroCompleto?.pdfDriveFileId||item.pdfDriveFileId||'');if(!musica||!artista||(!letra&&!pdfUrl&&!pdfDriveFileId)){showToast('Preencha música, artista e letra ou PDF.','error');return}if(!APPS_SCRIPT_URL){showToast('URL do Apps Script não configurada.','error');return}try{const completo={...(item.cadastroCompleto||item),id:String(item.id||''),title:musica,artist:artista,style:String(item.estilo||item.style||''),lyrics:letra,usuario:String(item.usuario||''),pdfDriveFileId,pdfFileId:pdfDriveFileId,pdfFileName:String(item.cadastroCompleto?.pdfFileName||item.pdfFileName||''),pdfUrl};const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'updateCadastro',id:String(item.id||''),musica,artista,estilo:String(item.estilo||item.style||''),usuario:String(item.usuario||''),letra,dataCadastro:String(item.dataCadastro||item.data||''),cadastroCompleto:completo,pdfDriveFileId,pdfFileName:completo.pdfFileName,pdfUrl})},20000);if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível salvar o cadastro.');state.received[index]={...item,musica,artista,letra,pdfDriveFileId,pdfUrl,cadastroCompleto:completo};closeReceivedEditor();renderReceived();showToast('Cadastro atualizado.','success')}catch(error){showToast('Erro ao salvar cadastro: '+error.message,'error')}}
-async function uploadReceivedPdf(file){const index=state.receivedEditingIndex;const item=state.received?.[index];if(!item||!file)return;if(file.type!=='application/pdf'&&!/\.pdf$/i.test(file.name)){showToast('Selecione um arquivo PDF.','error');return}try{const processedFile=await preparePdfForUpload(file);const pdfData=await fileToDataUrl(processedFile);const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveReceivedPdf',id:String(item.id||''),musica:String(item.musica||item.title||''),pdfData,pdfFileName:processedFile.name})},30000);if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível anexar o PDF.');const current=state.received[index]||item;const completo={...(current.cadastroCompleto||current),pdfFileId:data.pdfFileId||'',pdfDriveFileId:data.pdfDriveFileId||data.pdfFileId||'',pdfFileName:data.pdfFileName||processedFile.name,pdfMimeType:'application/pdf',pdfUrl:data.pdfUrl||''};state.received[index]={...current,pdfFileId:completo.pdfFileId,pdfDriveFileId:completo.pdfDriveFileId,pdfFileName:completo.pdfFileName,pdfUrl:completo.pdfUrl,cadastroCompleto:completo};els.receivedEditPdfStatus.textContent='📄 PDF anexado';els.receivedEditPdfBtn.textContent='Alterar PDF';els.receivedEditViewPdf.classList.remove('hidden');els.receivedEditViewPdf.onclick=()=>viewPdf(getReceivedPdf(state.received[index]));renderReceived();showToast('PDF anexado ao cadastro.','success')}catch(error){showToast('Erro ao anexar PDF: '+error.message,'error')}}
+async function uploadReceivedPdf(file){const index=state.receivedEditingIndex;const item=state.received?.[index];if(!item||!file)return;if(file.type!=='application/pdf'&&!/\.pdf$/i.test(file.name)){showToast('Selecione um arquivo PDF.','error');return}try{const prepared=await preparePdfForUpload(file);const pdfData=await fileToDataUrl(prepared.file);const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveReceivedPdf',id:String(item.id||''),musica:String(item.musica||item.title||''),pdfData,pdfFileName:prepared.file.name})},30000);if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível anexar o PDF.');const current=state.received[index]||item;const completo={...(current.cadastroCompleto||current),pdfFileId:data.pdfFileId||'',pdfDriveFileId:data.pdfDriveFileId||data.pdfFileId||'',pdfFileName:data.pdfFileName||file.name,pdfMimeType:'application/pdf',pdfUrl:data.pdfUrl||''};state.received[index]={...current,pdfFileId:completo.pdfFileId,pdfDriveFileId:completo.pdfDriveFileId,pdfFileName:completo.pdfFileName,pdfUrl:completo.pdfUrl,cadastroCompleto:completo};els.receivedEditPdfStatus.textContent='📄 PDF anexado';els.receivedEditPdfBtn.textContent='Alterar PDF';els.receivedEditViewPdf.classList.remove('hidden');els.receivedEditViewPdf.onclick=()=>viewPdf(getReceivedPdf(state.received[index]));renderReceived();showToast('PDF anexado ao cadastro.','success')}catch(error){showToast('Erro ao anexar PDF: '+error.message,'error')}}
 
 async function deleteReceivedCadastro(index){const item=state.received?.[index];if(!item)return;const title=item.musica||item.title||'esta música';els.confirmTitle.textContent='Excluir cadastro recebido';els.confirmBody.innerHTML=`<div class="confirm-text">Excluir <strong>${escapeHtml(title)}</strong> da aba <strong>Cadastros recebidos</strong>?<br><br>Esta ação <strong>não exclui nem altera</strong> a música do catalogo.json.</div>`;els.confirmBtn.textContent='Excluir cadastro';state.confirmAction=async()=>{if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='COLE_AQUI_A_MESMA_URL_DO_APPS_SCRIPT_DO_INDEX_PRINCIPAL'){showToast('URL do Apps Script não configurada.','error');return}closeConfirm();try{const response=await fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'deleteCadastro',id:String(item.id||''),musica:String(item.musica||item.title||''),usuario:String(item.usuario||'')})});const data=await response.json();if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível excluir o cadastro.');state.received.splice(index,1);renderReceived();els.receivedStatus.textContent='✅ Cadastro removido da lista de recebidos.';els.receivedStatus.className='status-line status-success';showToast('Cadastro excluído.','success')}catch(error){els.receivedStatus.textContent='Não foi possível excluir o cadastro: '+error.message;els.receivedStatus.className='status-line status-error';showToast('Erro ao excluir cadastro.','error')}};els.confirmModal.classList.add('active')}
 async function authorizeReceivedCadastro(index){const item=state.received?.[index];if(!item)return;const title=item.musica||item.title||'esta música';const match=findCatalogMatch(item);if(match){showToast('Esta música já existe no catálogo.','error');return}els.confirmTitle.textContent='Adicionar às sugestões';els.confirmBody.innerHTML=`<div class="confirm-text">Adicionar <strong>${escapeHtml(title)}</strong> ao catálogo de sugestões do Palco Pro?<br><br>O Apps Script publicará no <strong>catalogo.json do repositório principal</strong> e removerá o cadastro recebido após a publicação.</div>`;els.confirmBtn.textContent='Sim, adicionar';state.confirmAction=async()=>{if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='COLE_AQUI_A_MESMA_URL_DO_APPS_SCRIPT_DO_INDEX_PRINCIPAL'){showToast('URL do Apps Script não configurada.','error');return}closeConfirm();els.receivedStatus.textContent='Publicando no catálogo principal...';els.receivedStatus.className='status-line';try{const cadastro=item.cadastroCompleto||item;const response=await fetch(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'approveCadastro',cadastroCompleto:{id:String(cadastro.id||item.id||''),title:String(cadastro.title||cadastro.musica||item.musica||''),artist:String(cadastro.artist||cadastro.artista||item.artista||''),style:String(cadastro.style||cadastro.estilo||item.estilo||''),lyrics:String(cadastro.lyrics||cadastro.letra||item.letra||''),usuario:String(cadastro.usuario||item.usuario||''),dataCadastro:String(cadastro.dataCadastro||item.dataCadastro||item.data||'')}})});const data=await response.json();if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível publicar a música.');state.received.splice(index,1);renderReceived();await loadMainCatalog();els.receivedStatus.textContent='✅ Música adicionada ao catálogo principal com sucesso.';els.receivedStatus.className='status-line status-success';showToast('Música adicionada às sugestões.','success')}catch(error){els.receivedStatus.textContent='Não foi possível adicionar ao catálogo: '+error.message;els.receivedStatus.className='status-line status-error';showToast('Erro ao publicar música.','error')}};els.confirmModal.classList.add('active')}
