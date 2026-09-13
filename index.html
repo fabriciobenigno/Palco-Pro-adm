@@ -12,6 +12,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
 <link rel="apple-touch-icon" href="./icon-192.png" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="mobile-web-app-capable" content="yes" />
@@ -564,12 +565,16 @@ function sampleBackgroundColor(canvas,box){
 async function processAttachedPdfWithWatermark(file){
  if(!file)throw new Error('Nenhum PDF selecionado.');
  if(!window.pdfjsLib)throw new Error('O leitor de PDF ainda não está disponível.');
+ if(!window.PDFLib)throw new Error('A biblioteca de edição do PDF ainda não foi carregada. Atualize a página e tente novamente.');
  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
- const pdfLib=await loadExternalScriptOnce(PDF_LIB_URL,'PDFLib');
+ const pdfLib=window.PDFLib;
  const originalBytes=new Uint8Array(await file.arrayBuffer());
+ if(!originalBytes.length)throw new Error('O arquivo PDF está vazio.');
  const detectDoc=await pdfjsLib.getDocument({data:originalBytes.slice()}).promise;
- const outDoc=await pdfLib.PDFDocument.load(originalBytes);
- const logo=await outDoc.embedPng(await loadWatermarkLogoBytes());
+ const outDoc=await pdfLib.PDFDocument.load(originalBytes,{ignoreEncryption:false,updateMetadata:false});
+ const logoBytes=await loadWatermarkLogoBytes();
+ if(!logoBytes?.length)throw new Error('A imagem da marca Palco Pro não foi carregada.');
+ const logo=await outDoc.embedPng(logoBytes);
  let detectedCount=0;
  try{
   for(let idx=0;idx<detectDoc.numPages;idx++){
@@ -681,7 +686,7 @@ async function handleFormPdfSelection(file){
     updateFormPdfUI(state.editingId?state.songs.find(s=>s.id===state.editingId):null);
     showToast(`PDF processado: ${prepared.result?.detectedCount||0} marca(s) substituída(s).`,'success');
     await viewPdfData(prepared.file);
-  }catch(error){selectedFormPdf=null;updateFormPdfUI(state.editingId?state.songs.find(s=>s.id===state.editingId):null);showToast('Não foi possível preparar o PDF: '+error.message,'error')}
+  }catch(error){selectedFormPdf=null;updateFormPdfUI(state.editingId?state.songs.find(s=>s.id===state.editingId):null);console.error('[Palco Pro] Erro ao preparar PDF',error);showToast('Não foi possível preparar o PDF: '+(error?.message||'erro desconhecido'),'error')}
 }
 function clearForm(){selectedFormPdf=null;els.catalogPdfInput.value='';delete els.catalogPdfInput.dataset.formMode;state.editingId=null;els.formTitle.textContent='Cadastrar música';els.formSubtitle.textContent='A música será incluída no catálogo que o Palco Pro principal lê.';els.editingBadge.textContent='Nova música';els.editingBadge.className='badge';els.saveSong.textContent='Salvar música';els.cancelEdit.classList.add('hidden');els.songTitle.value='';els.songArtist.value='';els.songStyle.value='';els.songTone.value='';els.songLyrics.value='';els.formStatus.textContent='';updateFormPdfUI(null)}
 function beginEdit(id){const s=state.songs.find(x=>x.id===id);if(!s)return;state.editingId=id;els.formTitle.textContent='Editar música';els.formSubtitle.textContent='Atualize os dados e salve. A alteração ficará pronta para o próximo catalogo.json.';els.editingBadge.textContent='Edição';els.editingBadge.className='badge';els.saveSong.textContent='Salvar alterações';els.cancelEdit.classList.remove('hidden');els.songTitle.value=s.title;els.songArtist.value=s.artist;els.songStyle.value=s.style;els.songTone.value=s.tone||'';els.songLyrics.value=s.lyrics;selectedFormPdf=null;updateFormPdfUI(s);els.formStatus.textContent='Você está editando esta música.';els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})}
@@ -740,6 +745,7 @@ async function viewPdfData(fileOrDataUrl){
  if(!fileOrDataUrl)return;
  try{
   if(!window.pdfjsLib)throw new Error('Leitor de PDF indisponível.');
+  if(!window.PDFLib && fileOrDataUrl instanceof File)throw new Error('Editor de PDF ainda não está pronto.');
   pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   let bytes;
   if(typeof fileOrDataUrl==='string'){
