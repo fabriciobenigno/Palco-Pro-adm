@@ -643,7 +643,9 @@ async function uploadReceivedPdf(file){
   try{
     const prepared=await preparePdfForUpload(file);
     const pdfData=await fileToDataUrl(prepared.file);
-    const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveReceivedPdf',id:String(item.id||''),musica:String(item.musica||item.title||''),pdfData,pdfFileName:prepared.file.name})},30000);
+    const usuario=String(item.usuario||item.cadastroCompleto?.usuario||item.cadastroCompleto?.nomeUsuario||'').trim();
+    if(!usuario)throw new Error('Nome do usuário não informado no cadastro recebido.');
+    const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveReceivedPdf',id:String(item.id||''),musica:String(item.musica||item.title||''),usuario,pdfData,pdfFileName:prepared.file.name})},30000);
     if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível anexar o PDF.');
     const current=state.received[index]||item;const completo={...(current.cadastroCompleto||current),pdfFileId:data.pdfFileId||'',pdfDriveFileId:data.pdfDriveFileId||data.pdfFileId||'',pdfFileName:data.pdfFileName||prepared.file.name,pdfMimeType:'application/pdf',pdfUrl:data.pdfUrl||''};state.received[index]={...current,pdfFileId:completo.pdfFileId,pdfDriveFileId:completo.pdfDriveFileId,pdfFileName:completo.pdfFileName,pdfUrl:completo.pdfUrl,cadastroCompleto:completo};els.receivedEditPdfStatus.textContent='📄 PDF anexado';els.receivedEditPdfBtn.textContent='Alterar PDF';els.receivedEditViewPdf.classList.remove('hidden');els.receivedEditViewPdf.onclick=()=>viewPdf(getReceivedPdf(state.received[index]));renderReceived();showToast('PDF preparado e anexado ao cadastro.','success')
   }catch(error){showToast('Erro ao anexar PDF: '+error.message,'error')}
