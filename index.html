@@ -296,56 +296,67 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
 /* MOBILE RECEIVED SWIPE FIX */
 @media(max-width:680px){.received-row.revealed .received-card,.received-row.is-revealing .received-card{transform:translateX(calc(var(--received-swipe-width) * -1))!important}.received-actions{right:0!important;left:auto!important;top:0!important;bottom:0!important}.received-row{touch-action:pan-y}}
 
-/* === AJUSTE MOBILE FINAL: AÇÕES DOS CADASTROS RECEBIDOS === */
+/* === AÇÕES MOBILE DOS CADASTROS RECEBIDOS: ÍCONES COMPACTOS === */
 @media (max-width:680px){
   .received-row{
     --received-swipe-width:calc(100vw - 24px);
-    min-height:64px !important;
+    min-height:56px !important;
   }
   .received-card{
-    min-height:64px !important;
-    padding:12px 11px !important;
+    min-height:56px !important;
+    padding:10px 11px !important;
   }
   .received-actions{
     width:var(--received-swipe-width) !important;
     display:grid !important;
-    grid-template-columns:repeat(auto-fit,minmax(58px,1fr)) !important;
-    align-items:stretch !important;
+    grid-template-columns:repeat(auto-fit,minmax(44px,1fr)) !important;
+    align-items:center !important;
     justify-content:stretch !important;
-    gap:5px !important;
-    padding:7px 6px !important;
+    gap:4px !important;
+    padding:6px 7px !important;
   }
+  .received-actions .badge{display:none !important;}
   .received-actions .btn{
     display:flex !important;
     align-items:center !important;
     justify-content:center !important;
     width:100% !important;
     min-width:0 !important;
-    min-height:46px !important;
-    height:auto !important;
-    padding:6px 3px !important;
-    font-size:9px !important;
-    line-height:1.12 !important;
-    font-weight:800 !important;
-    white-space:normal !important;
-    overflow:visible !important;
-    text-overflow:clip !important;
-    word-break:normal !important;
+    max-width:none !important;
+    min-height:34px !important;
+    height:34px !important;
+    padding:0 !important;
+    border-radius:10px !important;
+    font-size:0 !important;
+    line-height:1 !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-indent:-9999px !important;
   }
-  .received-actions .btn::after{content:none !important;}
-  .received-actions .badge{display:none !important;}
+  .received-actions .btn::after{
+    display:block !important;
+    text-indent:0 !important;
+    font-size:15px !important;
+    line-height:1 !important;
+  }
+  .received-actions .btn[data-detail]::after{content:'👁️' !important;}
+  .received-actions .btn[data-edit-received]::after{content:'✏️' !important;}
+  .received-actions .btn[data-approve]::after{content:'✅' !important;}
+  .received-actions .btn[data-view-pdf]::after{content:'📄' !important;}
+  .received-actions .btn[data-delete-received]::after{content:'🗑️' !important;}
 }
 @media (max-width:390px){
   .received-actions{
-    gap:4px !important;
-    padding:6px 5px !important;
-    grid-template-columns:repeat(auto-fit,minmax(54px,1fr)) !important;
+    gap:3px !important;
+    padding:6px !important;
+    grid-template-columns:repeat(auto-fit,minmax(40px,1fr)) !important;
   }
   .received-actions .btn{
-    min-height:44px !important;
-    font-size:8.5px !important;
-    padding:5px 2px !important;
+    min-height:32px !important;
+    height:32px !important;
+    border-radius:9px !important;
   }
+  .received-actions .btn::after{font-size:14px !important;}
 }
 </style>
 </head>
