@@ -851,43 +851,130 @@ async function loadReceived(){if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='COLE_AQUI_
 function getReceivedPdf(item){const pdfUrl=String(item?.cadastroCompleto?.pdfUrl||item?.pdfUrl||'');if(pdfUrl)return pdfUrl;const fileId=String(item?.cadastroCompleto?.pdfDriveFileId||item?.pdfDriveFileId||'');return fileId?`https://drive.google.com/file/d/${encodeURIComponent(fileId)}/view`:''}
 function openReceivedEditor(index){const item=state.received?.[index];if(!item)return;const complete=item.cadastroCompleto||{};const originalUser=normalize(item.usuario||item.nome||item.nomeUsuario||item.username||item.userName||complete.usuario||complete.nome||complete.nomeUsuario||complete.username||complete.userName||'');state.receivedEditingIndex=index;pendingReceivedPdf=null;els.receivedEditTitle.value=normalize(item.musica||item.title||complete.title);els.receivedEditArtist.value=normalize(item.artista||item.artist||complete.artist);els.receivedEditStyle.value=normalize(item.estilo||item.style||complete.style);els.receivedEditNote.value=normalize(item.tom??item.note??item.key??complete.tom??complete.tone??complete.note);els.receivedEditUser.value=originalUser;els.receivedEditLyrics.value=sanitizeLyrics(item.letra||item.lyrics||complete.letra||complete.lyrics);const pdfUrl=getReceivedPdf(item);els.receivedEditPdfStatus.textContent=pdfUrl?'📄 PDF anexado':'Nenhum PDF anexado';els.receivedEditPdfBtn.textContent=pdfUrl?'Alterar PDF':'Adicionar PDF';els.receivedEditViewPdf.classList.toggle('hidden',!pdfUrl);els.receivedEditViewPdf.onclick=()=>viewPdf(pdfUrl);els.receivedEditPdfBtn.onclick=()=>{els.receivedPdfInput.value='';els.receivedPdfInput.click()};els.receivedEditModal.classList.add('active')}
 function closeReceivedEditor(){els.receivedEditModal.classList.remove('active');state.receivedEditingIndex=null}
-async function saveReceivedEditor(){const index=state.receivedEditingIndex;const item=state.received?.[index];if(!item)return;const complete=item.cadastroCompleto||{};const musica=normalize(els.receivedEditTitle.value),artista=normalize(els.receivedEditArtist.value),estilo=normalize(els.receivedEditStyle.value),note=normalize(els.receivedEditNote.value),usuario=normalize(els.receivedEditUser.value)||normalize(item.usuario||item.nome||item.nomeUsuario||item.username||item.userName||complete.usuario||complete.nome||complete.nomeUsuario||complete.username||complete.userName||''),letra=sanitizeLyrics(els.receivedEditLyrics.value);const pdfUrl=String(item.cadastroCompleto?.pdfUrl||item.pdfUrl||'');const pdfDriveFileId=String(item.cadastroCompleto?.pdfDriveFileId||item.pdfDriveFileId||'');if(!musica||!artista||!usuario||(!letra&&!pdfUrl&&!pdfDriveFileId)){showToast('Preencha música, artista, usuário e letra ou PDF.','error');return}if(!APPS_SCRIPT_URL){showToast('URL do Apps Script não configurada.','error');return}try{const completo={...(item.cadastroCompleto||item),id:String(item.id||''),title:musica,artist:artista,style:estilo,note,tom:note,lyrics:letra,usuario,pdfDriveFileId,pdfFileId:pdfDriveFileId,pdfFileName:String(item.cadastroCompleto?.pdfFileName||item.pdfFileName||''),pdfUrl};const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'updateCadastro',id:String(item.id||''),musica,artista,estilo,usuario,letra,dataCadastro:String(item.dataCadastro||item.data||''),cadastroCompleto:completo,pdfDriveFileId,pdfFileName:completo.pdfFileName,pdfUrl,note,tom:note})},20000);if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível salvar o cadastro.');
-    state.received[index]={...item,musica,artista,estilo,note,tom:note,usuario,letra,pdfDriveFileId,pdfUrl,cadastroCompleto:completo};
-    if(pendingReceivedPdf && pendingReceivedPdf.index===index){
-      const processed=pendingReceivedPdf.file;
-      const pdfData=await fileToDataUrl(processed);
-      const pdfResponse=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({
-        action:'saveReceivedPdf',
-        id:String(item.id||''),
+async function saveReceivedEditor(){
+  const index=state.receivedEditingIndex;
+  const item=state.received?.[index];
+  if(!item)return;
+
+  const complete=item.cadastroCompleto||{};
+  const originalId=String(item.id||complete.id||'').trim();
+  const musica=normalize(els.receivedEditTitle.value);
+  const artista=normalize(els.receivedEditArtist.value);
+  const estilo=normalize(els.receivedEditStyle.value);
+  const note=normalize(els.receivedEditNote.value);
+  const usuario=normalize(els.receivedEditUser.value)
+    ||normalize(item.usuario||item.nome||item.nomeUsuario||item.username||item.userName
+      ||complete.usuario||complete.nome||complete.nomeUsuario||complete.username||complete.userName||'');
+  const letra=sanitizeLyrics(els.receivedEditLyrics.value);
+  const existingPdfUrl=String(item.cadastroCompleto?.pdfUrl||item.pdfUrl||'');
+  const existingPdfDriveFileId=String(item.cadastroCompleto?.pdfDriveFileId||item.pdfDriveFileId||'');
+  const hasPendingPdf=!!(pendingReceivedPdf&&pendingReceivedPdf.index===index&&pendingReceivedPdf.file);
+
+  if(!musica||!artista||!usuario||(!letra&&!existingPdfUrl&&!existingPdfDriveFileId&&!hasPendingPdf)){
+    showToast('Preencha música, artista, usuário e letra ou PDF.','error');
+    return;
+  }
+  if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='COLE_AQUI_A_MESMA_URL_DO_APPS_SCRIPT_DO_INDEX_PRINCIPAL'){
+    showToast('URL do Apps Script não configurada.','error');
+    return;
+  }
+  if(!originalId){
+    showToast('Este cadastro não possui um identificador válido para atualização.','error');
+    return;
+  }
+
+  const saveBtn=els.saveReceivedEdit;
+  const oldText=saveBtn?.textContent||'Salvar alterações';
+  if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='Salvando...';}
+
+  try{
+    if(hasPendingPdf){
+      /*
+       * O Apps Script atual não possui uma ação específica para substituir o PDF
+       * de um cadastro recebido. Quando a ação é desconhecida, ele cai em
+       * receberNovoCadastro(), que cria uma nova linha.
+       *
+       * Para garantir que NUNCA fiquem duas versões, removemos primeiro o registro
+       * antigo e, em seguida, recriamos UM único registro usando o MESMO id, já com
+       * o PDF processado. Assim a planilha termina com apenas a versão atualizada.
+       */
+      const pdfData=await fileToDataUrl(pendingReceivedPdf.file);
+
+      const deleteResponse=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({
+        action:'deleteCadastro',
+        id:originalId,
+        musica:String(item.musica||item.title||musica),
+        usuario:String(item.usuario||complete.usuario||usuario)
+      })},20000);
+      if(!deleteResponse?.sucesso)throw new Error(deleteResponse?.mensagem||'Não foi possível substituir o cadastro antigo.');
+
+      const recreateResponse=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({
+        id:originalId,
         musica,
         artista,
         estilo,
+        tom:note,
+        tone:note,
         usuario,
         nome:usuario,
         letra,
+        lyrics:letra,
+        dataCadastro:String(item.dataCadastro||item.data||complete.dataCadastro||''),
         pdfData,
-        pdfFileName:processed.name
+        pdfFileName:pendingReceivedPdf.file.name
       })},30000);
-      if(!pdfResponse?.sucesso)throw new Error(pdfResponse?.mensagem||'Não foi possível enviar o PDF ao Apps Script.');
-      const updated=state.received[index]||item;
-      const updatedComplete={...(updated.cadastroCompleto||updated),
-        pdfFileId:pdfResponse.pdfFileId||'',
-        pdfDriveFileId:pdfResponse.pdfDriveFileId||pdfResponse.pdfFileId||'',
-        pdfFileName:pdfResponse.pdfFileName||processed.name,
-        pdfMimeType:'application/pdf',
-        pdfUrl:pdfResponse.pdfUrl||'',
-        pdfWatermarkApplied:true
-      };
-      state.received[index]={...updated,
-        pdfFileId:updatedComplete.pdfFileId,
-        pdfDriveFileId:updatedComplete.pdfDriveFileId,
-        pdfFileName:updatedComplete.pdfFileName,
-        pdfUrl:updatedComplete.pdfUrl,
-        cadastroCompleto:updatedComplete
-      };
+      if(!recreateResponse?.sucesso)throw new Error(recreateResponse?.mensagem||'O cadastro antigo foi removido, mas não foi possível salvar a nova versão.');
+
       pendingReceivedPdf=null;
+    }else{
+      const completo={...(item.cadastroCompleto||item),
+        id:originalId,
+        title:musica,
+        artist:artista,
+        style:estilo,
+        tone:note,
+        tom:note,
+        lyrics:letra,
+        usuario,
+        pdfDriveFileId:existingPdfDriveFileId,
+        pdfFileId:String(item.cadastroCompleto?.pdfFileId||item.pdfFileId||existingPdfDriveFileId||''),
+        pdfFileName:String(item.cadastroCompleto?.pdfFileName||item.pdfFileName||''),
+        pdfMimeType:String(item.cadastroCompleto?.pdfMimeType||item.pdfMimeType||'application/pdf'),
+        pdfUrl:existingPdfUrl
+      };
+      const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({
+        action:'updateCadastro',
+        id:originalId,
+        musica,
+        artista,
+        estilo,
+        tom:note,
+        tone:note,
+        usuario,
+        nome:usuario,
+        letra,
+        lyrics:letra,
+        dataCadastro:String(item.dataCadastro||item.data||complete.dataCadastro||''),
+        cadastroCompleto:completo,
+        pdfDriveFileId:existingPdfDriveFileId,
+        pdfFileId:completo.pdfFileId,
+        pdfFileName:completo.pdfFileName,
+        pdfMimeType:completo.pdfMimeType,
+        pdfUrl:existingPdfUrl
+      })},20000);
+      if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível salvar o cadastro.');
     }
-    closeReceivedEditor();renderReceived();showToast('Cadastro atualizado.','success')}catch(error){showToast('Erro ao salvar cadastro: '+error.message,'error')}}
+
+    await loadReceived();
+    closeReceivedEditor();
+    showToast('Cadastro atualizado. A versão anterior foi substituída.','success');
+  }catch(error){
+    try{await loadReceived();}catch(_){}
+    showToast('Erro ao salvar cadastro: '+error.message,'error');
+  }finally{
+    if(saveBtn){saveBtn.disabled=false;saveBtn.textContent=oldText;}
+  }
+}
 async function uploadReceivedPdf(file){
   const index=state.receivedEditingIndex;const item=state.received?.[index];if(!item||!file)return;
   if(file.type!=='application/pdf'&&!/\.pdf$/i.test(file.name||'')){showToast('Selecione um arquivo PDF.','error');return}
