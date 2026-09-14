@@ -295,6 +295,58 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
 
 /* MOBILE RECEIVED SWIPE FIX */
 @media(max-width:680px){.received-row.revealed .received-card,.received-row.is-revealing .received-card{transform:translateX(calc(var(--received-swipe-width) * -1))!important}.received-actions{right:0!important;left:auto!important;top:0!important;bottom:0!important}.received-row{touch-action:pan-y}}
+
+/* === AJUSTE MOBILE FINAL: AÇÕES DOS CADASTROS RECEBIDOS === */
+@media (max-width:680px){
+  .received-row{
+    --received-swipe-width:calc(100vw - 24px);
+    min-height:64px !important;
+  }
+  .received-card{
+    min-height:64px !important;
+    padding:12px 11px !important;
+  }
+  .received-actions{
+    width:var(--received-swipe-width) !important;
+    display:grid !important;
+    grid-template-columns:repeat(auto-fit,minmax(58px,1fr)) !important;
+    align-items:stretch !important;
+    justify-content:stretch !important;
+    gap:5px !important;
+    padding:7px 6px !important;
+  }
+  .received-actions .btn{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:100% !important;
+    min-width:0 !important;
+    min-height:46px !important;
+    height:auto !important;
+    padding:6px 3px !important;
+    font-size:9px !important;
+    line-height:1.12 !important;
+    font-weight:800 !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+    word-break:normal !important;
+  }
+  .received-actions .btn::after{content:none !important;}
+  .received-actions .badge{display:none !important;}
+}
+@media (max-width:390px){
+  .received-actions{
+    gap:4px !important;
+    padding:6px 5px !important;
+    grid-template-columns:repeat(auto-fit,minmax(54px,1fr)) !important;
+  }
+  .received-actions .btn{
+    min-height:44px !important;
+    font-size:8.5px !important;
+    padding:5px 2px !important;
+  }
+}
 </style>
 </head>
 <body>
