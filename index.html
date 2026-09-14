@@ -329,37 +329,50 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
 .received-action-icon{display:inline-flex!important;align-items:center;justify-content:center;font-size:15px!important;line-height:1!important;flex:0 0 auto!important}
 .received-action-label{display:inline!important;font-size:11px!important;line-height:1.1!important;font-weight:800!important}
 @media(max-width:680px){
-  .received-row{--received-swipe-width:min(calc(100vw - 20px),390px)!important;min-height:56px!important}
+  .received-row{--received-swipe-width:100%!important;min-height:56px!important;width:100%!important;max-width:100%!important}
   .received-card{min-height:56px!important;padding:10px 11px!important}
   .received-actions{
-    width:var(--received-swipe-width)!important;
+    width:100%!important;
+    max-width:100%!important;
     display:grid!important;
-    grid-template-columns:repeat(5,1fr)!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
     gap:4px!important;
     padding:6px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
   }
   .received-actions .received-state-badge{display:none!important}
   .received-actions .received-action-btn{
-    width:100%!important;
-    min-width:0!important;
-    min-height:36px!important;
-    height:36px!important;
-    padding:0!important;
-    border-radius:9px!important;
-    display:flex!important;
-    align-items:center!important;
-    justify-content:center!important;
-    gap:0!important;
+    width:100%!important;min-width:0!important;max-width:100%!important;
+    min-height:36px!important;height:36px!important;padding:0!important;
+    border-radius:9px!important;display:flex!important;align-items:center!important;justify-content:center!important;
+    gap:0!important;overflow:hidden!important;
   }
   .received-action-label{display:none!important}
-  .received-action-icon{display:flex!important;font-size:16px!important;line-height:1!important;width:100%!important;height:100%!important}
+  .received-action-icon{display:flex!important;align-items:center!important;justify-content:center!important;font-size:16px!important;line-height:1!important;width:100%!important;height:100%!important}
 }
 @media(max-width:390px){
-  .received-row{--received-swipe-width:calc(100vw - 16px)!important}
   .received-actions{gap:3px!important;padding:5px!important}
   .received-actions .received-action-btn{min-height:33px!important;height:33px!important;border-radius:8px!important}
   .received-action-icon{font-size:15px!important}
 }
+
+/* FINAL RECEIVED SWIPE MOBILE OVERRIDES */
+.received-row[data-received-swipe]{--received-swipe-width:100%;position:relative!important;overflow:hidden!important;}
+.received-row[data-received-swipe] .received-card{position:relative!important;z-index:2!important;transform:translate3d(0,0,0);will-change:transform;}
+.received-row[data-received-swipe].revealed .received-card,
+.received-row[data-received-swipe].is-revealing .received-card{transform:translate3d(calc(var(--received-swipe-width) * -1),0,0)!important;}
+.received-row[data-received-swipe] .received-actions{position:absolute!important;right:0!important;top:0!important;bottom:0!important;left:auto!important;width:var(--received-swipe-width)!important;max-width:none!important;z-index:1!important;box-sizing:border-box!important;}
+.received-row[data-received-swipe] .received-action-btn{box-sizing:border-box!important;}
+@media (max-width:680px){
+  .received-row[data-received-swipe]{width:100%!important;max-width:100%!important;min-width:0!important;}
+  .received-row[data-received-swipe] .received-actions{display:grid!important;grid-auto-flow:column!important;grid-template-columns:none!important;grid-auto-columns:1fr!important;align-items:center!important;justify-content:stretch!important;gap:4px!important;padding:6px!important;overflow:hidden!important;}
+  .received-row[data-received-swipe] .received-actions .received-state-badge{display:none!important;}
+  .received-row[data-received-swipe] .received-actions .received-action-btn{width:100%!important;min-width:0!important;max-width:none!important;height:40px!important;min-height:40px!important;padding:0!important;border-radius:10px!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;}
+  .received-row[data-received-swipe] .received-action-label{display:none!important;}
+  .received-row[data-received-swipe] .received-action-icon{display:flex!important;width:100%!important;height:100%!important;align-items:center!important;justify-content:center!important;font-size:17px!important;line-height:1!important;}
+}
+@media (max-width:390px){.received-row[data-received-swipe] .received-actions{gap:3px!important;padding:5px!important;}.received-row[data-received-swipe] .received-actions .received-action-btn{height:36px!important;min-height:36px!important;border-radius:9px!important}.received-row[data-received-swipe] .received-action-icon{font-size:15px!important;}}
 </style>
 </head>
 <body>
@@ -1120,7 +1133,57 @@ function initCatalogSwipe(){
   document.addEventListener('click',e=>{if(e.target.closest('.song-row[data-song-swipe]'))return;els.catalogList.querySelectorAll('.song-row.revealed,.song-row.is-revealing').forEach(row=>{row.classList.remove('revealed','is-revealing');setVisual(row,0,true)})});
 }
   els.pdfViewerScreen?.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;state.pdfSwipeStartX=e.clientX;state.pdfSwipeStartY=e.clientY;state.pdfSwipeTracking=true;try{els.pdfViewerScreen.setPointerCapture?.(e.pointerId)}catch(_){}});els.pdfViewerScreen?.addEventListener('pointerup',e=>{if(!state.pdfSwipeTracking)return;state.pdfSwipeTracking=false;const dx=e.clientX-state.pdfSwipeStartX,dy=e.clientY-state.pdfSwipeStartY;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.15)changeAdminPdfPage(dx<0?1:-1)});els.pdfViewerScreen?.addEventListener('pointercancel',()=>{state.pdfSwipeTracking=false});els.pdfViewerClose?.addEventListener('click',closePdfViewer);els.pdfViewerPrev?.addEventListener('click',()=>changeAdminPdfPage(-1));els.pdfViewerNext?.addEventListener('click',()=>changeAdminPdfPage(1));window.addEventListener('resize',()=>{if(state.pdfDoc&&els.pdfViewerScreen?.classList.contains('open'))renderAdminPdfPage(state.pdfPage).catch(()=>{})});
-function initReceivedSwipe(){let activeRow=null,startX=0,startY=0,startOffset=0,currentDx=0,pointerId=null,moved=false,dragging=false;const getWidth=row=>Number.parseFloat(getComputedStyle(row).getPropertyValue('--received-swipe-width'))||400;const closeOthers=row=>els.receivedList.querySelectorAll('.received-row.revealed,.received-row.is-revealing,.received-row.is-swiping').forEach(other=>{if(other!==row){other.classList.remove('revealed','is-revealing','is-swiping');other.querySelector('.received-card')?.style.removeProperty('transform')}});const setVisual=(row,offset,animate=false)=>{const card=row?.querySelector('.received-card');if(!card)return;card.style.transition=animate?'transform .22s ease':'none';card.style.transform=`translateX(${offset}px)`};const reset=()=>{activeRow=null;pointerId=null;currentDx=0;startOffset=0;dragging=false};const finish=()=>{if(!activeRow)return;const row=activeRow,width=getWidth(row),threshold=Math.max(48,Math.min(110,width*.18));const finalOffset=startOffset+currentDx;const open=finalOffset<-threshold||(startOffset<0&&finalOffset<-width*.38);row.classList.remove('is-swiping');if(open){closeOthers(row);row.classList.remove('is-revealing');row.classList.add('revealed');setVisual(row,-width,true)}else{row.classList.remove('revealed','is-revealing');setVisual(row,0,true)}reset()};els.receivedList.addEventListener('pointerdown',e=>{const row=e.target.closest('.received-row[data-received-swipe]');if(!row)return;if(e.target.closest('button,input'))return;activeRow=row;pointerId=e.pointerId;startX=e.clientX;startY=e.clientY;currentDx=0;moved=false;dragging=false;const width=getWidth(row);startOffset=row.classList.contains('revealed')?-width:0;row.classList.add('is-swiping');setVisual(row,startOffset,false)});els.receivedList.addEventListener('pointermove',e=>{if(!activeRow||e.pointerId!==pointerId)return;const dx=e.clientX-startX,dy=e.clientY-startY;if(Math.abs(dx)>8||Math.abs(dy)>8)moved=true;if(Math.abs(dx)<=8||Math.abs(dx)<=Math.abs(dy))return;if(!dragging){dragging=true;try{activeRow.setPointerCapture(e.pointerId)}catch(_){}}const width=getWidth(activeRow);currentDx=dx;let offset=startOffset+dx;offset=Math.max(-width,Math.min(8,offset));activeRow.classList.toggle('is-revealing',startOffset===0&&offset<-6);setVisual(activeRow,offset,false);e.preventDefault()});els.receivedList.addEventListener('pointerup',e=>{if(e.pointerId===pointerId)finish()});els.receivedList.addEventListener('pointercancel',()=>{if(activeRow){activeRow.classList.remove('is-swiping','is-revealing');setVisual(activeRow,startOffset,false)}reset()});els.receivedList.addEventListener('click',e=>{if(moved){moved=false;return}const row=e.target.closest('.received-row[data-received-swipe]');if(!row)return;if(e.target.closest('.received-actions'))return;if(row.classList.contains('revealed')){row.classList.remove('revealed','is-revealing');setVisual(row,0,true);e.preventDefault();e.stopPropagation()}},true);document.addEventListener('click',e=>{if(e.target.closest('.received-row[data-received-swipe]'))return;els.receivedList.querySelectorAll('.received-row.revealed,.received-row.is-revealing').forEach(row=>{row.classList.remove('revealed','is-revealing');setVisual(row,0,true)})})}
+function initReceivedSwipe(){
+  let activeRow=null,pointerId=null,startX=0,startY=0,startOffset=0,currentDx=0,moved=false,suppressNextClick=false;
+  const getWidth=row=>Math.max(1,row.clientWidth);
+  const actionCount=row=>row?.querySelectorAll('.received-actions .received-action-btn').length||1;
+  const setLayout=row=>{
+    if(!row)return;
+    const width=getWidth(row); row.style.setProperty('--received-swipe-width',`${width}px`);
+    const actions=row.querySelector('.received-actions');
+    if(actions){actions.style.gridTemplateColumns=`repeat(${actionCount(row)},minmax(0,1fr))`;}
+  };
+  const setVisual=(row,offset,animate)=>{const card=row?.querySelector('.received-card');if(!card)return;setLayout(row);card.style.transition=animate?'transform .22s cubic-bezier(.22,.8,.26,1)':'none';card.style.transform=`translate3d(${offset}px,0,0)`;};
+  const closeRow=row=>{if(!row)return;row.classList.remove('revealed','is-revealing','is-swiping');setVisual(row,0,true);};
+  const closeOthers=row=>els.receivedList.querySelectorAll('.received-row.revealed,.received-row.is-revealing').forEach(other=>{if(other!==row)closeRow(other);});
+  const reset=()=>{activeRow=null;pointerId=null;startOffset=0;currentDx=0;moved=false;};
+  const finish=()=>{
+    if(!activeRow)return;
+    const row=activeRow,width=getWidth(row),finalOffset=startOffset+currentDx,threshold=Math.max(42,Math.min(96,width*.14));
+    const opening=startOffset===0&&finalOffset<-threshold;
+    const closing=startOffset<0&&currentDx>threshold;
+    row.classList.remove('is-swiping','is-revealing');
+    if(opening){closeOthers(row);row.classList.add('revealed');setVisual(row,-width,true);}
+    else if(startOffset<0&&(!opening)){closeRow(row);if(moved)suppressNextClick=true;}
+    else{closeRow(row);}
+    reset();
+  };
+  els.receivedList.addEventListener('pointerdown',e=>{
+    const row=e.target.closest('.received-row[data-received-swipe]'); if(!row)return;
+    if(e.pointerType==='mouse'&&e.button!==0)return;
+    setLayout(row);activeRow=row;pointerId=e.pointerId;startX=e.clientX;startY=e.clientY;currentDx=0;moved=false;
+    startOffset=row.classList.contains('revealed')?-getWidth(row):0;row.classList.add('is-swiping');setVisual(row,startOffset,false);
+    try{row.setPointerCapture(e.pointerId);}catch(_){ }
+  });
+  els.receivedList.addEventListener('pointermove',e=>{
+    if(!activeRow||e.pointerId!==pointerId)return;
+    const dx=e.clientX-startX,dy=e.clientY-startY;
+    if(Math.abs(dx)>7||Math.abs(dy)>7)moved=true;
+    if(Math.abs(dx)<8||Math.abs(dx)<=Math.abs(dy))return;
+    const width=getWidth(activeRow);currentDx=dx;let offset=startOffset+dx;offset=Math.max(-width,Math.min(0,offset));
+    if(startOffset===0&&offset<-6)activeRow.classList.add('is-revealing');
+    if(startOffset<0)activeRow.classList.add('revealed');
+    setVisual(activeRow,offset,false);e.preventDefault();
+  },{passive:false});
+  els.receivedList.addEventListener('pointerup',e=>{if(e.pointerId===pointerId)finish();});
+  els.receivedList.addEventListener('pointercancel',()=>{if(activeRow){if(startOffset<0){activeRow.classList.add('revealed');setVisual(activeRow,-getWidth(activeRow),true);}else closeRow(activeRow);}reset();});
+  els.receivedList.addEventListener('click',e=>{
+    if(suppressNextClick){suppressNextClick=false;e.preventDefault();e.stopPropagation();return;}
+    const row=e.target.closest('.received-row[data-received-swipe]');if(!row)return;
+    if(row.classList.contains('revealed')&&!e.target.closest('.received-actions')){closeRow(row);e.preventDefault();e.stopPropagation();}
+  },true);
+  document.addEventListener('click',e=>{if(e.target.closest('.received-row[data-received-swipe]'))return;els.receivedList.querySelectorAll('.received-row.revealed,.received-row.is-revealing').forEach(closeRow);});
+}
 
 function init(){
   // Feedback visual imediato para toque: apenas classe CSS, sem interferir nos eventos existentes.
