@@ -296,67 +296,69 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
 /* MOBILE RECEIVED SWIPE FIX */
 @media(max-width:680px){.received-row.revealed .received-card,.received-row.is-revealing .received-card{transform:translateX(calc(var(--received-swipe-width) * -1))!important}.received-actions{right:0!important;left:auto!important;top:0!important;bottom:0!important}.received-row{touch-action:pan-y}}
 
-/* === AÇÕES MOBILE DOS CADASTROS RECEBIDOS: ÍCONES COMPACTOS === */
-@media (max-width:680px){
-  .received-row{
-    --received-swipe-width:calc(100vw - 24px);
-    min-height:56px !important;
-  }
-  .received-card{
-    min-height:56px !important;
-    padding:10px 11px !important;
-  }
-  .received-actions{
-    width:var(--received-swipe-width) !important;
-    display:grid !important;
-    grid-template-columns:repeat(auto-fit,minmax(44px,1fr)) !important;
-    align-items:center !important;
-    justify-content:stretch !important;
-    gap:4px !important;
-    padding:6px 7px !important;
-  }
-  .received-actions .badge{display:none !important;}
-  .received-actions .btn{
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    width:100% !important;
-    min-width:0 !important;
-    max-width:none !important;
-    min-height:34px !important;
-    height:34px !important;
-    padding:0 !important;
-    border-radius:10px !important;
-    font-size:0 !important;
-    line-height:1 !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-    text-indent:-9999px !important;
-  }
-  .received-actions .btn::after{
-    display:block !important;
-    text-indent:0 !important;
-    font-size:15px !important;
-    line-height:1 !important;
-  }
-  .received-actions .btn[data-detail]::after{content:'👁️' !important;}
-  .received-actions .btn[data-edit-received]::after{content:'✏️' !important;}
-  .received-actions .btn[data-approve]::after{content:'✅' !important;}
-  .received-actions .btn[data-view-pdf]::after{content:'📄' !important;}
-  .received-actions .btn[data-delete-received]::after{content:'🗑️' !important;}
+/* === AÇÕES DOS CADASTROS RECEBIDOS — DESKTOP + MOBILE === */
+.received-actions{
+  position:absolute!important;
+  inset:0 0 0 auto!important;
+  width:var(--received-swipe-width,560px)!important;
+  z-index:1!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:6px!important;
+  padding:7px 8px!important;
+  overflow:hidden!important;
+  background:linear-gradient(90deg,rgba(10,16,27,.92),rgba(7,11,19,.99))!important;
+  border-radius:20px!important;
 }
-@media (max-width:390px){
+.received-actions .received-state-badge{flex:0 0 auto!important;margin-right:2px!important}
+.received-actions .received-action-btn{
+  flex:0 0 auto!important;
+  width:auto!important;
+  min-width:0!important;
+  min-height:36px!important;
+  padding:6px 9px!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-indent:0!important;
+}
+.received-action-icon{display:inline-flex!important;align-items:center;justify-content:center;font-size:15px!important;line-height:1!important;flex:0 0 auto!important}
+.received-action-label{display:inline!important;font-size:11px!important;line-height:1.1!important;font-weight:800!important}
+@media(max-width:680px){
+  .received-row{--received-swipe-width:min(calc(100vw - 20px),390px)!important;min-height:56px!important}
+  .received-card{min-height:56px!important;padding:10px 11px!important}
   .received-actions{
-    gap:3px !important;
-    padding:6px !important;
-    grid-template-columns:repeat(auto-fit,minmax(40px,1fr)) !important;
+    width:var(--received-swipe-width)!important;
+    display:grid!important;
+    grid-template-columns:repeat(5,1fr)!important;
+    gap:4px!important;
+    padding:6px!important;
   }
-  .received-actions .btn{
-    min-height:32px !important;
-    height:32px !important;
-    border-radius:9px !important;
+  .received-actions .received-state-badge{display:none!important}
+  .received-actions .received-action-btn{
+    width:100%!important;
+    min-width:0!important;
+    min-height:36px!important;
+    height:36px!important;
+    padding:0!important;
+    border-radius:9px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:0!important;
   }
-  .received-actions .btn::after{font-size:14px !important;}
+  .received-action-label{display:none!important}
+  .received-action-icon{display:flex!important;font-size:16px!important;line-height:1!important;width:100%!important;height:100%!important}
+}
+@media(max-width:390px){
+  .received-row{--received-swipe-width:calc(100vw - 16px)!important}
+  .received-actions{gap:3px!important;padding:5px!important}
+  .received-actions .received-action-btn{min-height:33px!important;height:33px!important;border-radius:8px!important}
+  .received-action-icon{font-size:15px!important}
 }
 </style>
 </head>
@@ -874,15 +876,16 @@ function renderReceived(){
     row.dataset.receivedSwipe='1';
     const title=item.musica||item.title||'Sem título';
     const hasPdf=Boolean(item.cadastroCompleto?.pdfUrl||item.pdfUrl||item.cadastroCompleto?.pdfDriveFileId||item.pdfDriveFileId);
-    const approveButton=match?'':'<button type="button" class="btn btn-success btn-small" data-approve="'+index+'">✅ Aprovar</button>';
+    const action=(cls,dataAttr,index,label,icon)=>`<button type="button" class="btn ${cls} btn-small received-action-btn" ${dataAttr}="${index}" aria-label="${label}" title="${label}"><span class="received-action-icon" aria-hidden="true">${icon}</span><span class="received-action-label">${label}</span></button>`;
+    const approveButton=match?'':action('btn-success','data-approve',index,'Aprovar','✅');
     row.innerHTML=`
       <div class="received-actions">
-        <span class="badge ${match?'inactive':''}">${match?'Já no catálogo':'Novo'}</span>
-        <button type="button" class="btn btn-secondary btn-small" data-detail="${index}">👁️ Visualizar</button>
-        <button type="button" class="btn btn-primary btn-small" data-edit-received="${index}">✏️ Editar</button>
+        <span class="badge ${match?'inactive':''} received-state-badge">${match?'Já no catálogo':'Novo'}</span>
+        ${action('btn-secondary','data-detail',index,'Visualizar','👁️')}
+        ${action('btn-primary','data-edit-received',index,'Editar','✏️')}
         ${approveButton}
-        ${hasPdf?'<button type="button" class="btn btn-secondary btn-small" data-view-pdf="'+index+'">📄 PDF</button>':''}
-        <button type="button" class="btn btn-danger btn-small" data-delete-received="${index}">🗑️ Excluir</button>
+        ${hasPdf?action('btn-secondary','data-view-pdf',index,'PDF','📄'):''}
+        ${action('btn-danger','data-delete-received',index,'Excluir','🗑️')}
       </div>
       <div class="received-card">
         <input class="song-select received-select" type="checkbox" data-received-select="${index}" ${state.receivedSelected.has(index)?'checked':''} aria-label="Selecionar cadastro recebido">
@@ -892,6 +895,7 @@ function renderReceived(){
   });
   updateReceivedBulkUI();
 }
+
 function viewReceivedCadastro(index){
   const item=state.received?.[index];
   if(!item)return;
