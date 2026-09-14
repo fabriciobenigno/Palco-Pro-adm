@@ -518,7 +518,10 @@ async function processAttachedPdfWithWatermark(file) {
         // que a marca amarela seja detectada com a mesma tolerância do celular.
         // Nesses casos usamos apenas no desktop a posição padrão do cabeçalho
         // superior direito onde a marca original fica no modelo de partitura.
-        if(!box && window.matchMedia && window.matchMedia('(pointer:fine)').matches){
+        // Fallback para desktop somente na primeira página.
+        // Assim preservamos a correção para PCs sem aplicar uma logo em páginas
+        // que não possuem a marca original.
+        if(!box && idx === 0 && window.matchMedia && window.matchMedia('(pointer:fine)').matches){
           const fw=canvas.width, fh=canvas.height;
           box={
             x:Math.floor(fw*0.72),
