@@ -429,7 +429,7 @@ const state={songs:[],editingId:null,filter:'all',confirmAction:null,lastFileNam
 const els={
  authCard:$('authCard'),adminPanel:$('adminPanel'),loginInput:$('loginInput'),passwordInput:$('passwordInput'),showPassword:$('showPasswordToggle'),loginBtn:$('loginBtn'),authStatus:$('authStatus'),logoutBtn:$('logoutBtn'),refreshIndexBtn:$('refreshIndexBtn'), refreshCatalog:$('refreshCatalogBtn'),
  songTitle:$('songTitle'),songArtist:$('songArtist'),songStyle:$('songStyle'),songNote:$('songNote'),songLyrics:$('songLyrics'),selectSongPdfBtn:$('selectSongPdfBtn'),songPdfStatus:$('songPdfStatus'),viewSongPdfBtn:$('viewSongPdfBtn'),formTitle:$('formTitle'),formSubtitle:$('formSubtitle'),editingBadge:$('editingBadge'),saveSong:$('saveSongBtn'),cancelEdit:$('cancelEditBtn'),formStatus:$('formStatus'),
- importZone:$('importZone'),importFile:$('importFile'),exportBtn:$('exportBtn'),quickExport:$('quickExportBtn'),fileStatus:$('fileStatus'),catalogStatus:$('catalogStatus'),search:$('searchInput'),searchCounter:$('searchCounter'),catalogList:$('catalogList'),catalogCounter:$('catalogCounter'),statTotal:$('statTotal'),statActive:$('statActive'),statInactive:$('statInactive'),newSong:$('newSongBtn'),receivedList:$('receivedList'),receivedCounter:$('receivedCounter'),refreshReceived:$('refreshReceivedBtn'),receivedStatus:$('receivedStatus'),receivedBulk:$('receivedBulk'),receivedBulkCount:$('receivedBulkCount'),selectAllReceived:$('selectAllReceivedBtn'),clearReceivedSelection:$('clearReceivedSelectionBtn'),approveSelectedReceived:$('approveSelectedReceivedBtn'),receivedEditModal:$('receivedEditModal'),receivedEditTitle:$('receivedEditTitle'),receivedEditArtist:$('receivedEditArtist'),receivedEditStyle:$('receivedEditStyle'),receivedEditNote:$('receivedEditNote'),receivedEditUser:$('receivedEditUser'),receivedEditLyrics:$('receivedEditLyrics'),receivedEditPdfStatus:$('receivedEditPdfStatus'),receivedEditPdfBtn:$('receivedEditPdfBtn'),receivedEditViewPdf:$('receivedEditViewPdfBtn'),catalogPdfInput:$('catalogPdfInput'),receivedPdfInput:$('receivedPdfInput'),saveReceivedEdit:$('saveReceivedEditBtn'),bulkActions:$('bulkActions'),bulkCount:$('bulkCount'),selectAll:$('selectAllBtn'),clearSelection:$('clearSelectionBtn'),changeStyle:$('changeStyleBtn'),styleModal:$('styleModal'),bulkStyleInput:$('bulkStyleInput'),continueStyle:$('continueStyleBtn'),linkCatalog:$('linkCatalogBtn'),detailModal:$('detailModal'),detailTitle:$('detailTitle'),detailBody:$('detailBody'),confirmModal:$('confirmModal'),confirmTitle:$('confirmTitle'),confirmBody:$('confirmBody'),confirmBtn:$('confirmBtn'),toast:$('toast'),confirmationOverlay:$('confirmationOverlay'),confirmationSong:$('confirmationSong'),pdfViewerScreen:$('pdfViewerScreen'),pdfViewerPageWrap:$('pdfViewerPageWrap'),pdfViewerCanvas:$('pdfViewerCanvas'),pdfViewerPrev:$('pdfViewerPrev'),pdfViewerNext:$('pdfViewerNext'),pdfViewerClose:$('pdfViewerClose'),pdfViewerPageIndicator:$('pdfViewerPageIndicator'),pdfViewerHint:$('pdfViewerHint')
+ importZone:$('importZone'),importFile:$('importFile'),exportBtn:$('exportBtn'),quickExport:$('quickExportBtn'),fileStatus:$('fileStatus'),catalogStatus:$('catalogStatus'),search:$('searchInput'),searchCounter:$('searchCounter'),catalogList:$('catalogList'),catalogCounter:$('catalogCounter'),statTotal:$('statTotal'),statActive:$('statActive'),statInactive:$('statInactive'),newSong:$('newSongBtn'),receivedList:$('receivedList'),receivedCounter:$('receivedCounter'),refreshReceived:$('refreshReceivedBtn'),receivedStatus:$('receivedStatus'),receivedBulk:$('receivedBulk'),receivedBulkCount:$('receivedBulkCount'),selectAllReceived:$('selectAllReceivedBtn'),clearReceivedSelection:$('clearReceivedSelectionBtn'),approveSelectedReceived:$('approveSelectedReceivedBtn'),receivedEditModal:$('receivedEditModal'),receivedEditTitle:$('receivedEditTitle'),receivedEditArtist:$('receivedEditArtist'),receivedEditStyle:$('receivedEditStyle'),receivedEditNote:$('receivedEditNote'),receivedEditUser:$('receivedEditUser'),receivedEditLyrics:$('receivedEditLyrics'),receivedEditPdfStatus:$('receivedEditPdfStatus'),receivedEditPdfBtn:$('receivedEditPdfBtn'),receivedEditViewPdf:$('receivedEditViewPdfBtn'),catalogPdfInput:$('catalogPdfInput'),receivedPdfInput:$('receivedPdfInput'),saveReceivedEdit:$('saveReceivedEditBtn'),bulkActions:$('bulkActions'),bulkCount:$('bulkCount'),selectAll:$('selectAllBtn'),clearSelection:$('clearSelectionBtn'),changeStyle:$('changeStyleBtn'),styleModal:$('styleModal'),bulkStyleInput:$('bulkStyleInput'),continueStyle:$('continueStyleBtn'),linkCatalog:$('linkCatalogBtn'),detailModal:$('detailModal'),detailTitle:$('detailTitle'),detailBody:$('detailBody'),confirmModal:$('confirmModal'),confirmTitle:$('confirmTitle'),confirmBody:$('confirmBody'),confirmBtn:$('confirmBtn'),toast:$('toast'),confirmationOverlay:$('confirmationOverlay'),confirmationSong:$('confirmationSong'),pdfViewerScreen:$('pdfViewerScreen'),pdfViewerPageWrap:$('pdfViewerPageWrap'),pdfViewerCanvas:$('pdfViewerCanvas'),pdfPagePreview:$('pdfPagePreview'),pdfPagePreviewCanvas:$('pdfPagePreviewCanvas'),pdfViewerPrev:$('pdfViewerPrev'),pdfViewerNext:$('pdfViewerNext'),pdfViewerClose:$('pdfViewerClose'),pdfViewerPageIndicator:$('pdfViewerPageIndicator'),pdfViewerHint:$('pdfViewerHint')
 };
 function normalize(v){return String(v??'').trim()}
 function sanitizeLyrics(v){return String(v??'').replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim()}
@@ -590,12 +590,16 @@ function showConfirmationAnimation(title){
 }
 
 let selectedFormPdf=null;
+let pendingReceivedPdf=null;
 function updateFormPdfUI(song=null){
   if(!els.songPdfStatus)return;
   const hasExisting=!!song?.pdfUrl;
   if(selectedFormPdf){
-    els.songPdfStatus.textContent='Selecionado: '+selectedFormPdf.name;
-    els.viewSongPdfBtn?.classList.add('hidden');
+    const count=selectedFormPdf.detectedWatermarks||0;
+    els.songPdfStatus.textContent=count
+      ? `PDF processado. Marca Palco Pro aplicada em ${count} página(s).`
+      : 'PDF processado e pronto para visualização.';
+    els.viewSongPdfBtn?.classList.remove('hidden');
   }else if(hasExisting){
     els.songPdfStatus.textContent='PDF atual: '+(song.pdfFileName||'arquivo.pdf');
     els.viewSongPdfBtn?.classList.remove('hidden');
@@ -617,12 +621,13 @@ async function handleFormPdfSelection(file){
     const count=processed.detectedWatermarks||0;
     if(els.songPdfStatus)els.songPdfStatus.textContent=count?`PDF pronto. Marca Palco Pro aplicada em ${count} página(s).`:'PDF pronto. Nenhuma marca original identificada.';
     showToast(count?'PDF preparado com a marca Palco Pro':'PDF preparado.','success');
+    await openProcessedPdfPreview(processed,'Pré-visualização do PDF processado');
   }catch(error){selectedFormPdf=null;updateFormPdfUI(state.editingId?state.songs.find(s=>s.id===state.editingId):null);showToast(error?.message||'Não foi possível preparar o PDF.','error');}
   finally{state.pdfProcessing=false;if(els.selectSongPdfBtn)els.selectSongPdfBtn.disabled=false;if(els.catalogPdfInput)els.catalogPdfInput.value='';}
 }
 
-function clearForm(){selectedFormPdf=null;els.catalogPdfInput.value='';delete els.catalogPdfInput.dataset.formMode;state.editingId=null;els.formTitle.textContent='Cadastrar música';els.formSubtitle.textContent='A música será incluída no catálogo que o Palco Pro principal lê.';els.editingBadge.textContent='Nova música';els.editingBadge.className='badge';els.saveSong.textContent='Salvar música';els.cancelEdit.classList.add('hidden');els.songTitle.value='';els.songArtist.value='';els.songStyle.value='';if(els.songNote)els.songNote.value='';els.songLyrics.value='';els.formStatus.textContent='';updateFormPdfUI(null)}
-function beginEdit(id){const s=state.songs.find(x=>x.id===id);if(!s)return;state.editingId=id;els.formTitle.textContent='Editar música';els.formSubtitle.textContent='Atualize os dados e salve. A alteração ficará pronta para o próximo catalogo.json.';els.editingBadge.textContent='Edição';els.editingBadge.className='badge';els.saveSong.textContent='Salvar alterações';els.cancelEdit.classList.remove('hidden');els.songTitle.value=s.title;els.songArtist.value=s.artist;els.songStyle.value=s.style;if(els.songNote)els.songNote.value=normalize(s.note);els.songLyrics.value=s.lyrics;selectedFormPdf=null;updateFormPdfUI(s);els.formStatus.textContent='Você está editando esta música.';els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})}
+function clearForm(){selectedFormPdf=null;pendingReceivedPdf=null;els.catalogPdfInput.value='';delete els.catalogPdfInput.dataset.formMode;state.editingId=null;els.formTitle.textContent='Cadastrar música';els.formSubtitle.textContent='A música será incluída no catálogo que o Palco Pro principal lê.';els.editingBadge.textContent='Nova música';els.editingBadge.className='badge';els.saveSong.textContent='Salvar música';els.cancelEdit.classList.add('hidden');els.songTitle.value='';els.songArtist.value='';els.songStyle.value='';if(els.songNote)els.songNote.value='';els.songLyrics.value='';els.formStatus.textContent='';updateFormPdfUI(null)}
+function beginEdit(id){const s=state.songs.find(x=>x.id===id);if(!s)return;state.editingId=id;els.formTitle.textContent='Editar música';els.formSubtitle.textContent='Atualize os dados e salve. A alteração ficará pronta para o próximo catalogo.json.';els.editingBadge.textContent='Edição';els.editingBadge.className='badge';els.saveSong.textContent='Salvar alterações';els.cancelEdit.classList.remove('hidden');els.songTitle.value=s.title;els.songArtist.value=s.artist;els.songStyle.value=s.style;if(els.songNote)els.songNote.value=normalize(s.note);els.songLyrics.value=s.lyrics;selectedFormPdf=null;pendingReceivedPdf=null;updateFormPdfUI(s);els.formStatus.textContent='Você está editando esta música.';els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})}
 async function saveSong(){
  if(saveSong.busy)return;
  const title=normalize(els.songTitle.value),artist=normalize(els.songArtist.value),style=normalize(els.songStyle.value),note=normalize(els.songNote?.value),lyrics=sanitizeLyrics(els.songLyrics.value);
@@ -673,9 +678,99 @@ async function uploadCatalogPdf(file){return uploadCatalogPdfFile(pendingPdfSong
 function normalizePublicPdfUrl(url){const value=String(url||'').trim();const rawPrefix='https://raw.githubusercontent.com/fabriciobenigno/Palco-Pro/main/';if(value.startsWith(rawPrefix)){const path=value.slice(rawPrefix.length).split('/').map(part=>encodeURIComponent(decodeURIComponent(part))).join('/');return 'https://fabriciobenigno.github.io/Palco-Pro/'+path;}return value;}
 function closePdfViewer(){document.documentElement.style.setProperty('--page-swipe-x','0px');document.documentElement.style.setProperty('--page-preview-x','100vw');els.pdfViewerScreen?.classList.remove('open','page-swipe-active');els.pdfViewerScreen?.setAttribute('aria-hidden','true');els.pdfViewerPageIndicator?.classList.add('hidden');els.pdfViewerHint?.classList.add('hidden');els.pdfPagePreview?.classList.remove('active');state.pdfRenderToken++;try{state.pdfDoc?.destroy?.()}catch(_){}state.pdfDoc=null;state.pdfPage=1;state.pdfPageCount=0;state.pdfUrl='';state.pdfSwipeTracking=false;}
 async function renderAdminPdfPage(pageNumber=state.pdfPage){if(!state.pdfDoc||!els.pdfViewerCanvas||!els.pdfViewerPageWrap)return;pageNumber=Math.max(1,Math.min(Number(pageNumber)||1,state.pdfPageCount||1));state.pdfPage=pageNumber;const token=++state.pdfRenderToken;const page=await state.pdfDoc.getPage(pageNumber);if(token!==state.pdfRenderToken||!state.pdfDoc)return;const base=page.getViewport({scale:1});const maxW=Math.max(1,els.pdfViewerPageWrap.clientWidth-8);const maxH=Math.max(1,els.pdfViewerPageWrap.clientHeight-8);const scale=Math.min(maxW/base.width,maxH/base.height);const viewport=page.getViewport({scale:Math.max(.1,scale)});const dpr=Math.max(1,window.devicePixelRatio||1);els.pdfViewerCanvas.width=Math.ceil(viewport.width*dpr);els.pdfViewerCanvas.height=Math.ceil(viewport.height*dpr);els.pdfViewerCanvas.style.width=Math.ceil(viewport.width)+'px';els.pdfViewerCanvas.style.height=Math.ceil(viewport.height)+'px';const ctx=els.pdfViewerCanvas.getContext('2d',{alpha:false});if(!ctx)return;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#fff';ctx.fillRect(0,0,viewport.width,viewport.height);await page.render({canvasContext:ctx,viewport}).promise;if(token!==state.pdfRenderToken)return;if(els.pdfViewerPageIndicator){els.pdfViewerPageIndicator.textContent=`Folha ${state.pdfPage} de ${state.pdfPageCount}`;els.pdfViewerPageIndicator.classList.remove('hidden')}}
+
+async function openProcessedPdfPreview(fileOrDataUrl, title='PDF processado'){
+  try{
+    if(!window.pdfjsLib) throw new Error('O leitor de PDF ainda não está disponível.');
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    let bytes;
+    if(typeof fileOrDataUrl==='string'){
+      const base64=fileOrDataUrl.split(',')[1]||'';
+      const binary=atob(base64);
+      bytes=new Uint8Array(binary.length);
+      for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+    }else{
+      bytes=new Uint8Array(await fileOrDataUrl.arrayBuffer());
+    }
+    closePdfViewer();
+    state.pdfUrl='';
+    state.pdfDoc=await pdfjsLib.getDocument({data:bytes}).promise;
+    state.pdfPage=1;
+    state.pdfPageCount=state.pdfDoc.numPages||1;
+    els.pdfViewerScreen?.classList.add('open');
+    els.pdfViewerScreen?.setAttribute('aria-hidden','false');
+    els.pdfViewerHint?.classList.remove('hidden');
+    if(els.pdfViewerNote){
+      els.pdfViewerNote.textContent=title||'PDF processado';
+      els.pdfViewerNote.classList.remove('hidden');
+      setTimeout(()=>els.pdfViewerNote?.classList.add('hidden'),2200);
+    }
+    clearTimeout(openProcessedPdfPreview.hintTimer);
+    openProcessedPdfPreview.hintTimer=setTimeout(()=>els.pdfViewerHint?.classList.add('hidden'),2800);
+    await renderAdminPdfPage(1);
+  }catch(error){
+    console.error('Falha ao visualizar PDF processado:',error);
+    closePdfViewer();
+    showToast(error?.message||'Não foi possível visualizar o PDF processado.','error');
+  }
+}
 async function renderAdminPdfPreview(pageNumber){if(!state.pdfDoc||!els.pdfPagePreviewCanvas||!els.pdfViewerPageWrap)return false;try{const page=await state.pdfDoc.getPage(pageNumber);const base=page.getViewport({scale:1});const maxW=Math.max(1,els.pdfViewerPageWrap.clientWidth-8);const maxH=Math.max(1,els.pdfViewerPageWrap.clientHeight-8);const scale=Math.min(maxW/base.width,maxH/base.height);const viewport=page.getViewport({scale:Math.max(.1,scale)});const dpr=Math.max(1,window.devicePixelRatio||1);els.pdfPagePreviewCanvas.width=Math.ceil(viewport.width*dpr);els.pdfPagePreviewCanvas.height=Math.ceil(viewport.height*dpr);els.pdfPagePreviewCanvas.style.width=Math.ceil(viewport.width)+'px';els.pdfPagePreviewCanvas.style.height=Math.ceil(viewport.height)+'px';const ctx=els.pdfPagePreviewCanvas.getContext('2d',{alpha:false});if(!ctx)return false;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#fff';ctx.fillRect(0,0,viewport.width,viewport.height);await page.render({canvasContext:ctx,viewport}).promise;return true}catch(_){return false}}
-async function viewPdf(url){const value=normalizePublicPdfUrl(url);if(!value)return;try{if(!window.pdfjsLib)throw new Error('O leitor de PDF ainda não está disponível.');pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';closePdfViewer();state.pdfUrl=value;state.pdfDoc=await pdfjsLib.getDocument({url:value}).promise;state.pdfPageCount=state.pdfDoc.numPages||1;state.pdfPage=1;els.pdfViewerScreen.classList.add('open');els.pdfViewerScreen.setAttribute('aria-hidden','false');els.pdfViewerHint?.classList.remove('hidden');clearTimeout(viewPdf.hintTimer);viewPdf.hintTimer=setTimeout(()=>els.pdfViewerHint?.classList.add('hidden'),2800);await renderAdminPdfPage(1);}catch(error){console.warn('Falha ao abrir PDF no visualizador interno.',error);closePdfViewer();window.open(value,'_blank','noopener,noreferrer')}}
-async function changeAdminPdfPage(delta){if(!state.pdfDoc||state.pdfRenderToken<0)return;const next=state.pdfPage+delta;if(next<1||next>state.pdfPageCount)return;const width=Math.max(280,window.innerWidth||390);state.pdfRenderToken++;els.pdfViewerScreen.classList.add('page-swipe-active');document.documentElement.style.setProperty('--page-swipe-x','0px');document.documentElement.style.setProperty('--page-preview-x',delta>0?`${width}px`:`-${width}px`);const ready=await renderAdminPdfPreview(next);if(ready)els.pdfPagePreview.classList.add('active');await new Promise(r=>requestAnimationFrame(r));document.documentElement.style.setProperty('--page-swipe-x',delta>0?`-${width}px`:`${width}px`);document.documentElement.style.setProperty('--page-preview-x','0px');await new Promise(r=>setTimeout(r,285));els.pdfViewerScreen.classList.remove('page-swipe-active');els.pdfPagePreview.classList.remove('active');document.documentElement.style.setProperty('--page-swipe-x','0px');document.documentElement.style.setProperty('--page-preview-x','100vw');await renderAdminPdfPage(next);}
+function viewPdf(url){
+  if(typeof url==='string' && url.startsWith('data:application/pdf')){
+    return openProcessedPdfPreview(url,'PDF processado');
+  }
+  const value=normalizePublicPdfUrl(url);
+  if(!value)return;
+  const isDrive=/drive\.google\.com/i.test(value);
+  // Google Drive não permite o carregamento do PDF via pdf.js em todos os navegadores
+  // por causa de CORS/redirect. Nesse caso abrimos a visualização nativa imediatamente.
+  if(isDrive){ window.open(value,'_blank','noopener,noreferrer'); return; }
+  const popup=window.open('about:blank','_blank','noopener,noreferrer');
+  if(popup){ try{popup.document.title='Palco Pro — PDF';popup.document.body.innerHTML='<p style="font-family:system-ui;padding:24px">Abrindo PDF…</p>'; }catch(_){} }
+  (async()=>{
+    try{
+      if(!window.pdfjsLib)throw new Error('O leitor de PDF ainda não está disponível.');
+      pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      closePdfViewer();
+      state.pdfUrl=value;
+      state.pdfDoc=await pdfjsLib.getDocument({url:value}).promise;
+      state.pdfPageCount=state.pdfDoc.numPages||1;
+      state.pdfPage=1;
+      els.pdfViewerScreen.classList.add('open');
+      els.pdfViewerScreen.setAttribute('aria-hidden','false');
+      els.pdfViewerHint?.classList.remove('hidden');
+      clearTimeout(viewPdf.hintTimer);
+      viewPdf.hintTimer=setTimeout(()=>els.pdfViewerHint?.classList.add('hidden'),2800);
+      await renderAdminPdfPage(1);
+      if(popup && !popup.closed)popup.close();
+    }catch(error){
+      console.warn('Falha ao abrir PDF no visualizador interno.',error);
+      closePdfViewer();
+      if(popup && !popup.closed)popup.location.href=value; else window.open(value,'_blank','noopener,noreferrer');
+    }
+  })();
+}
+async function changeAdminPdfPage(delta){
+  if(!state.pdfDoc)return;
+  const next=state.pdfPage+delta;
+  if(next<1||next>state.pdfPageCount)return;
+  const width=Math.max(280,window.innerWidth||390);
+  state.pdfRenderToken++;
+  els.pdfViewerScreen.classList.add('page-swipe-active');
+  document.documentElement.style.setProperty('--page-swipe-x','0px');
+  document.documentElement.style.setProperty('--page-preview-x',delta>0?`${width}px`:`-${width}px`);
+  const ready=await renderAdminPdfPreview(next);
+  if(ready)els.pdfPagePreview?.classList.add('active');
+  await new Promise(r=>requestAnimationFrame(r));
+  document.documentElement.style.setProperty('--page-swipe-x',delta>0?`-${width}px`:`${width}px`);
+  document.documentElement.style.setProperty('--page-preview-x','0px');
+  await new Promise(r=>setTimeout(r,285));
+  els.pdfViewerScreen.classList.remove('page-swipe-active');
+  els.pdfPagePreview?.classList.remove('active');
+  document.documentElement.style.setProperty('--page-swipe-x','0px');
+  document.documentElement.style.setProperty('--page-preview-x','100vw');
+  await renderAdminPdfPage(next);
+}
 
 function toggleSelected(id,checked){if(checked)state.selectedIds.add(id);else state.selectedIds.delete(id);renderCatalog()}
 function toggleAllVisible(){const visible=filtered();const allSelected=visible.length>0&&visible.every(s=>state.selectedIds.has(s.id));if(allSelected)visible.forEach(s=>state.selectedIds.delete(s.id));else visible.forEach(s=>state.selectedIds.add(s.id));renderCatalog()}
@@ -728,22 +823,57 @@ function renderReceived(){
 }
 async function loadReceived(){if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='COLE_AQUI_A_MESMA_URL_DO_APPS_SCRIPT_DO_INDEX_PRINCIPAL'){els.receivedStatus.textContent='Configure a URL do Apps Script nesta página.';els.receivedStatus.className='status-line status-error';return}els.receivedStatus.textContent='Consultando cadastros...';els.receivedStatus.className='status-line';try{const response=await fetch(APPS_SCRIPT_URL+'?action=listCadastros&ts='+Date.now(),{cache:'no-store'});if(!response.ok)throw new Error('HTTP '+response.status);const data=await response.json();if(!data?.sucesso)throw new Error(data?.mensagem||'Resposta inválida.');state.received=Array.isArray(data.cadastros)?data.cadastros:[];state.receivedSelected.clear();renderReceived();els.receivedStatus.textContent=`Atualizado em ${new Date().toLocaleString('pt-BR')}.`;els.receivedStatus.className='status-line status-success'}catch(error){els.receivedStatus.textContent='Não foi possível consultar os cadastros: '+error.message;els.receivedStatus.className='status-line status-error'}}
 function getReceivedPdf(item){const pdfUrl=String(item?.cadastroCompleto?.pdfUrl||item?.pdfUrl||'');if(pdfUrl)return pdfUrl;const fileId=String(item?.cadastroCompleto?.pdfDriveFileId||item?.pdfDriveFileId||'');return fileId?`https://drive.google.com/file/d/${encodeURIComponent(fileId)}/view`:''}
-function openReceivedEditor(index){const item=state.received?.[index];if(!item)return;state.receivedEditingIndex=index;els.receivedEditTitle.value=normalize(item.musica||item.title);els.receivedEditArtist.value=normalize(item.artista||item.artist);els.receivedEditStyle.value=normalize(item.estilo||item.style);els.receivedEditNote.value=normalize(item.tom??item.note??item.key);els.receivedEditUser.value=normalize(item.usuario);els.receivedEditLyrics.value=sanitizeLyrics(item.letra||item.lyrics);const pdfUrl=getReceivedPdf(item);els.receivedEditPdfStatus.textContent=pdfUrl?'📄 PDF anexado':'Nenhum PDF anexado';els.receivedEditPdfBtn.textContent=pdfUrl?'Alterar PDF':'Adicionar PDF';els.receivedEditViewPdf.classList.toggle('hidden',!pdfUrl);els.receivedEditViewPdf.onclick=()=>viewPdf(pdfUrl);els.receivedEditPdfBtn.onclick=()=>{els.receivedPdfInput.value='';els.receivedPdfInput.click()};els.receivedEditModal.classList.add('active')}
+function openReceivedEditor(index){const item=state.received?.[index];if(!item)return;state.receivedEditingIndex=index;pendingReceivedPdf=null;els.receivedEditTitle.value=normalize(item.musica||item.title);els.receivedEditArtist.value=normalize(item.artista||item.artist);els.receivedEditStyle.value=normalize(item.estilo||item.style);els.receivedEditNote.value=normalize(item.tom??item.note??item.key);els.receivedEditUser.value=normalize(item.usuario);els.receivedEditLyrics.value=sanitizeLyrics(item.letra||item.lyrics);const pdfUrl=getReceivedPdf(item);els.receivedEditPdfStatus.textContent=pdfUrl?'📄 PDF anexado':'Nenhum PDF anexado';els.receivedEditPdfBtn.textContent=pdfUrl?'Alterar PDF':'Adicionar PDF';els.receivedEditViewPdf.classList.toggle('hidden',!pdfUrl);els.receivedEditViewPdf.onclick=()=>viewPdf(pdfUrl);els.receivedEditPdfBtn.onclick=()=>{els.receivedPdfInput.value='';els.receivedPdfInput.click()};els.receivedEditModal.classList.add('active')}
 function closeReceivedEditor(){els.receivedEditModal.classList.remove('active');state.receivedEditingIndex=null}
-async function saveReceivedEditor(){const index=state.receivedEditingIndex;const item=state.received?.[index];if(!item)return;const musica=normalize(els.receivedEditTitle.value),artista=normalize(els.receivedEditArtist.value),estilo=normalize(els.receivedEditStyle.value),note=normalize(els.receivedEditNote.value),usuario=normalize(els.receivedEditUser.value),letra=sanitizeLyrics(els.receivedEditLyrics.value);const pdfUrl=String(item.cadastroCompleto?.pdfUrl||item.pdfUrl||'');const pdfDriveFileId=String(item.cadastroCompleto?.pdfDriveFileId||item.pdfDriveFileId||'');if(!musica||!artista||!usuario||(!letra&&!pdfUrl&&!pdfDriveFileId)){showToast('Preencha música, artista, usuário e letra ou PDF.','error');return}if(!APPS_SCRIPT_URL){showToast('URL do Apps Script não configurada.','error');return}try{const completo={...(item.cadastroCompleto||item),id:String(item.id||''),title:musica,artist:artista,style:estilo,note,tom:note,lyrics:letra,usuario,pdfDriveFileId,pdfFileId:pdfDriveFileId,pdfFileName:String(item.cadastroCompleto?.pdfFileName||item.pdfFileName||''),pdfUrl};const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'updateCadastro',id:String(item.id||''),musica,artista,estilo,usuario,letra,dataCadastro:String(item.dataCadastro||item.data||''),cadastroCompleto:completo,pdfDriveFileId,pdfFileName:completo.pdfFileName,pdfUrl,note,tom:note})},20000);if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível salvar o cadastro.');state.received[index]={...item,musica,artista,estilo,note,tom:note,usuario,letra,pdfDriveFileId,pdfUrl,cadastroCompleto:completo};closeReceivedEditor();renderReceived();showToast('Cadastro atualizado.','success')}catch(error){showToast('Erro ao salvar cadastro: '+error.message,'error')}}
+async function saveReceivedEditor(){const index=state.receivedEditingIndex;const item=state.received?.[index];if(!item)return;const musica=normalize(els.receivedEditTitle.value),artista=normalize(els.receivedEditArtist.value),estilo=normalize(els.receivedEditStyle.value),note=normalize(els.receivedEditNote.value),usuario=normalize(els.receivedEditUser.value),letra=sanitizeLyrics(els.receivedEditLyrics.value);const pdfUrl=String(item.cadastroCompleto?.pdfUrl||item.pdfUrl||'');const pdfDriveFileId=String(item.cadastroCompleto?.pdfDriveFileId||item.pdfDriveFileId||'');if(!musica||!artista||!usuario||(!letra&&!pdfUrl&&!pdfDriveFileId)){showToast('Preencha música, artista, usuário e letra ou PDF.','error');return}if(!APPS_SCRIPT_URL){showToast('URL do Apps Script não configurada.','error');return}try{const completo={...(item.cadastroCompleto||item),id:String(item.id||''),title:musica,artist:artista,style:estilo,note,tom:note,lyrics:letra,usuario,pdfDriveFileId,pdfFileId:pdfDriveFileId,pdfFileName:String(item.cadastroCompleto?.pdfFileName||item.pdfFileName||''),pdfUrl};const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'updateCadastro',id:String(item.id||''),musica,artista,estilo,usuario,letra,dataCadastro:String(item.dataCadastro||item.data||''),cadastroCompleto:completo,pdfDriveFileId,pdfFileName:completo.pdfFileName,pdfUrl,note,tom:note})},20000);if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível salvar o cadastro.');
+    state.received[index]={...item,musica,artista,estilo,note,tom:note,usuario,letra,pdfDriveFileId,pdfUrl,cadastroCompleto:completo};
+    if(pendingReceivedPdf && pendingReceivedPdf.index===index){
+      const processed=pendingReceivedPdf.file;
+      const pdfData=await fileToDataUrl(processed);
+      const pdfResponse=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({
+        action:'saveReceivedPdf',
+        id:String(item.id||''),
+        musica,
+        pdfData,
+        pdfFileName:processed.name
+      })},30000);
+      if(!pdfResponse?.sucesso)throw new Error(pdfResponse?.mensagem||'Não foi possível enviar o PDF ao Apps Script.');
+      const updated=state.received[index]||item;
+      const updatedComplete={...(updated.cadastroCompleto||updated),
+        pdfFileId:pdfResponse.pdfFileId||'',
+        pdfDriveFileId:pdfResponse.pdfDriveFileId||pdfResponse.pdfFileId||'',
+        pdfFileName:pdfResponse.pdfFileName||processed.name,
+        pdfMimeType:'application/pdf',
+        pdfUrl:pdfResponse.pdfUrl||'',
+        pdfWatermarkApplied:true
+      };
+      state.received[index]={...updated,
+        pdfFileId:updatedComplete.pdfFileId,
+        pdfDriveFileId:updatedComplete.pdfDriveFileId,
+        pdfFileName:updatedComplete.pdfFileName,
+        pdfUrl:updatedComplete.pdfUrl,
+        cadastroCompleto:updatedComplete
+      };
+      pendingReceivedPdf=null;
+    }
+    closeReceivedEditor();renderReceived();showToast('Cadastro atualizado.','success')}catch(error){showToast('Erro ao salvar cadastro: '+error.message,'error')}}
 async function uploadReceivedPdf(file){
   const index=state.receivedEditingIndex;const item=state.received?.[index];if(!item||!file)return;
   if(file.type!=='application/pdf'&&!/\.pdf$/i.test(file.name||'')){showToast('Selecione um arquivo PDF.','error');return}
   if(state.pdfProcessing)return;state.pdfProcessing=true;
   try{
     const processed=await processPdfFileToFile(file);
-    const pdfData=await fileToDataUrl(processed);
-    const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveReceivedPdf',id:String(item.id||''),musica:String(item.musica||item.title||''),pdfData,pdfFileName:processed.name})},30000);
-    if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível anexar o PDF.');
-    const current=state.received[index]||item;const completo={...(current.cadastroCompleto||current),pdfFileId:data.pdfFileId||'',pdfDriveFileId:data.pdfDriveFileId||data.pdfFileId||'',pdfFileName:data.pdfFileName||processed.name,pdfMimeType:'application/pdf',pdfUrl:data.pdfUrl||'',pdfWatermarkApplied:true};
-    state.received[index]={...current,pdfFileId:completo.pdfFileId,pdfDriveFileId:completo.pdfDriveFileId,pdfFileName:completo.pdfFileName,pdfUrl:completo.pdfUrl,cadastroCompleto:completo};
-    els.receivedEditPdfStatus.textContent=(processed.detectedWatermarks||0)?'📄 PDF com marca Palco Pro':'📄 PDF anexado';els.receivedEditPdfBtn.textContent='Alterar PDF';els.receivedEditViewPdf.classList.remove('hidden');els.receivedEditViewPdf.onclick=()=>viewPdf(getReceivedPdf(state.received[index]));renderReceived();showToast((processed.detectedWatermarks||0)?'PDF preparado e anexado com a marca Palco Pro.':'PDF anexado.','success');
-  }catch(error){showToast('Erro ao anexar PDF: '+error.message,'error')}finally{state.pdfProcessing=false;if(els.receivedPdfInput)els.receivedPdfInput.value=''}
+    pendingReceivedPdf={file:processed,name:processed.name,detectedWatermarks:processed.detectedWatermarks||0,index};
+    const count=processed.detectedWatermarks||0;
+    els.receivedEditPdfStatus.textContent=count
+      ? `📄 PDF processado. Marca Palco Pro aplicada em ${count} página(s).`
+      : '📄 PDF processado e pronto para envio.';
+    els.receivedEditPdfBtn.textContent='Alterar PDF';
+    els.receivedEditViewPdf.classList.remove('hidden');
+    els.receivedEditViewPdf.onclick=()=>openProcessedPdfPreview(pendingReceivedPdf?.file,'Pré-visualização do PDF processado');
+    showToast(count?'PDF processado com a marca Palco Pro.':'PDF processado. Revise antes de enviar.','success');
+    await openProcessedPdfPreview(processed,'Pré-visualização do PDF processado');
+  }catch(error){showToast('Erro ao preparar PDF: '+error.message,'error')}finally{state.pdfProcessing=false;if(els.receivedPdfInput)els.receivedPdfInput.value=''}
 }
 
 
@@ -799,7 +929,7 @@ function initCatalogSwipe(){
   els.catalogList.addEventListener('click',e=>{const row=e.target.closest('.song-row[data-song-swipe]');if(moved){moved=false;return}if(e.target.closest('.song-actions'))return;if(row?.classList.contains('revealed')){row.classList.remove('revealed','is-revealing');setVisual(row,0,true);e.preventDefault();e.stopPropagation()}},true);
   document.addEventListener('click',e=>{if(e.target.closest('.song-row[data-song-swipe]'))return;els.catalogList.querySelectorAll('.song-row.revealed,.song-row.is-revealing').forEach(row=>{row.classList.remove('revealed','is-revealing');setVisual(row,0,true)})});
 }
-  els.pdfViewerScreen?.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;state.pdfSwipeStartX=e.clientX;state.pdfSwipeStartY=e.clientY;state.pdfSwipeTracking=true;try{els.pdfViewerScreen.setPointerCapture?.(e.pointerId)}catch(_){}});els.pdfViewerScreen?.addEventListener('pointerup',e=>{if(!state.pdfSwipeTracking)return;state.pdfSwipeTracking=false;const dx=e.clientX-state.pdfSwipeStartX,dy=e.clientY-state.pdfSwipeStartY;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.15)changeAdminPdfPage(dx<0?1:-1)});els.pdfViewerScreen?.addEventListener('pointercancel',()=>{state.pdfSwipeTracking=false});window.addEventListener('resize',()=>{if(state.pdfDoc&&els.pdfViewerScreen?.classList.contains('open'))renderAdminPdfPage(state.pdfPage).catch(()=>{})});
+  els.pdfViewerScreen?.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;state.pdfSwipeStartX=e.clientX;state.pdfSwipeStartY=e.clientY;state.pdfSwipeTracking=true;try{els.pdfViewerScreen.setPointerCapture?.(e.pointerId)}catch(_){}});els.pdfViewerScreen?.addEventListener('pointerup',e=>{if(!state.pdfSwipeTracking)return;state.pdfSwipeTracking=false;const dx=e.clientX-state.pdfSwipeStartX,dy=e.clientY-state.pdfSwipeStartY;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.15)changeAdminPdfPage(dx<0?1:-1)});els.pdfViewerScreen?.addEventListener('pointercancel',()=>{state.pdfSwipeTracking=false});els.pdfViewerClose?.addEventListener('click',closePdfViewer);els.pdfViewerPrev?.addEventListener('click',()=>changeAdminPdfPage(-1));els.pdfViewerNext?.addEventListener('click',()=>changeAdminPdfPage(1));window.addEventListener('resize',()=>{if(state.pdfDoc&&els.pdfViewerScreen?.classList.contains('open'))renderAdminPdfPage(state.pdfPage).catch(()=>{})});
 function initReceivedSwipe(){let activeRow=null,startX=0,startY=0,startOffset=0,currentDx=0,pointerId=null,moved=false,dragging=false;const getWidth=row=>Number.parseFloat(getComputedStyle(row).getPropertyValue('--received-swipe-width'))||400;const closeOthers=row=>els.receivedList.querySelectorAll('.received-row.revealed,.received-row.is-revealing,.received-row.is-swiping').forEach(other=>{if(other!==row){other.classList.remove('revealed','is-revealing','is-swiping');other.querySelector('.received-card')?.style.removeProperty('transform')}});const setVisual=(row,offset,animate=false)=>{const card=row?.querySelector('.received-card');if(!card)return;card.style.transition=animate?'transform .22s ease':'none';card.style.transform=`translateX(${offset}px)`};const reset=()=>{activeRow=null;pointerId=null;currentDx=0;startOffset=0;dragging=false};const finish=()=>{if(!activeRow)return;const row=activeRow,width=getWidth(row),threshold=Math.max(48,Math.min(110,width*.18));const finalOffset=startOffset+currentDx;const open=finalOffset<-threshold||(startOffset<0&&finalOffset<-width*.38);row.classList.remove('is-swiping');if(open){closeOthers(row);row.classList.remove('is-revealing');row.classList.add('revealed');setVisual(row,-width,true)}else{row.classList.remove('revealed','is-revealing');setVisual(row,0,true)}reset()};els.receivedList.addEventListener('pointerdown',e=>{const row=e.target.closest('.received-row[data-received-swipe]');if(!row)return;if(e.target.closest('button,input'))return;activeRow=row;pointerId=e.pointerId;startX=e.clientX;startY=e.clientY;currentDx=0;moved=false;dragging=false;const width=getWidth(row);startOffset=row.classList.contains('revealed')?-width:0;row.classList.add('is-swiping');setVisual(row,startOffset,false)});els.receivedList.addEventListener('pointermove',e=>{if(!activeRow||e.pointerId!==pointerId)return;const dx=e.clientX-startX,dy=e.clientY-startY;if(Math.abs(dx)>8||Math.abs(dy)>8)moved=true;if(Math.abs(dx)<=8||Math.abs(dx)<=Math.abs(dy))return;if(!dragging){dragging=true;try{activeRow.setPointerCapture(e.pointerId)}catch(_){}}const width=getWidth(activeRow);currentDx=dx;let offset=startOffset+dx;offset=Math.max(-width,Math.min(8,offset));activeRow.classList.toggle('is-revealing',startOffset===0&&offset<-6);setVisual(activeRow,offset,false);e.preventDefault()});els.receivedList.addEventListener('pointerup',e=>{if(e.pointerId===pointerId)finish()});els.receivedList.addEventListener('pointercancel',()=>{if(activeRow){activeRow.classList.remove('is-swiping','is-revealing');setVisual(activeRow,startOffset,false)}reset()});els.receivedList.addEventListener('click',e=>{if(moved){moved=false;return}const row=e.target.closest('.received-row[data-received-swipe]');if(!row)return;if(e.target.closest('.received-actions'))return;if(row.classList.contains('revealed')){row.classList.remove('revealed','is-revealing');setVisual(row,0,true);e.preventDefault();e.stopPropagation()}},true);document.addEventListener('click',e=>{if(e.target.closest('.received-row[data-received-swipe]'))return;els.receivedList.querySelectorAll('.received-row.revealed,.received-row.is-revealing').forEach(row=>{row.classList.remove('revealed','is-revealing');setVisual(row,0,true)})})}
 
 function init(){
@@ -823,7 +953,7 @@ function init(){
  els.catalogList.addEventListener('click',e=>{const select=e.target.closest('[data-select]');if(select){toggleSelected(select.dataset.select,select.checked);return;}const edit=e.target.closest('[data-edit]');const view=e.target.closest('[data-view]');const pdf=e.target.closest('[data-pdf]');const toggle=e.target.closest('[data-toggle]');const del=e.target.closest('[data-delete]');if(edit){beginEdit(edit.dataset.edit);document.querySelector('.tab-btn[data-tab="editor"]').click();}else if(view)showLyrics(view.dataset.view);else if(pdf)askPdfForSong(pdf.dataset.pdf);else if(toggle)toggleActive(toggle.dataset.toggle);else if(del)askDelete(del.dataset.delete)});
   els.receivedList.addEventListener('click',e=>{const select=e.target.closest('[data-received-select]');if(select){const index=Number(select.dataset.receivedSelect);if(select.checked)state.receivedSelected.add(index);else state.receivedSelected.delete(index);renderReceived();return}const detail=e.target.closest('[data-detail]');if(detail){detail.closest('.received-row').classList.toggle('open');return}const pdfView=e.target.closest('[data-view-pdf]');if(pdfView){const item=state.received?.[Number(pdfView.dataset.viewPdf)];const url=getReceivedPdf(item);if(url)viewPdf(url);else showToast('PDF não disponível para visualização.','error');return}const del=e.target.closest('[data-delete-received]');if(del){deleteReceivedCadastro(Number(del.dataset.deleteReceived));return}const approve=e.target.closest('[data-approve]');if(approve){authorizeReceivedCadastro(Number(approve.dataset.approve));return}const edit=e.target.closest('[data-edit-received]');if(edit){openReceivedEditor(Number(edit.dataset.editReceived));return}});
   document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{const target=btn.dataset.tab;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));document.querySelectorAll('.tab-panel').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===target));if(target==='catalog')loadLocal();if(target==='received')loadReceived();}));
- els.pdfViewerScreen?.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;state.pdfSwipeStartX=e.clientX;state.pdfSwipeStartY=e.clientY;state.pdfSwipeTracking=true;try{els.pdfViewerScreen.setPointerCapture?.(e.pointerId)}catch(_){}});els.pdfViewerScreen?.addEventListener('pointerup',e=>{if(!state.pdfSwipeTracking)return;state.pdfSwipeTracking=false;const dx=e.clientX-state.pdfSwipeStartX,dy=e.clientY-state.pdfSwipeStartY;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.15)changeAdminPdfPage(dx<0?1:-1)});els.pdfViewerScreen?.addEventListener('pointercancel',()=>{state.pdfSwipeTracking=false});window.addEventListener('resize',()=>{if(state.pdfDoc&&els.pdfViewerScreen?.classList.contains('open'))renderAdminPdfPage(state.pdfPage).catch(()=>{})});els.detailModal.querySelectorAll('[data-close-detail]').forEach(b=>b.addEventListener('click',closeDetail));els.confirmModal.querySelectorAll('[data-close-confirm]').forEach(b=>b.addEventListener('click',closeConfirm));els.confirmBtn.addEventListener('click',()=>state.confirmAction?.());
+ els.detailModal.querySelectorAll('[data-close-detail]').forEach(b=>b.addEventListener('click',closeDetail));els.confirmModal.querySelectorAll('[data-close-confirm]').forEach(b=>b.addEventListener('click',closeConfirm));els.confirmBtn.addEventListener('click',()=>state.confirmAction?.());
  document.addEventListener('keydown',e=>{if(els.pdfViewerScreen?.classList.contains('open')){if(e.key==='Escape')closePdfViewer();else if(e.key==='ArrowLeft')changeAdminPdfPage(-1);else if(e.key==='ArrowRight')changeAdminPdfPage(1);return}if(e.key==='Escape'){closeDetail();closeConfirm();closeStyleModal();closeReceivedEditor()}});
  if(sessionStorage.getItem(SESSION_KEY)==='1'){els.authCard.classList.add('hidden');els.adminPanel.classList.remove('hidden');loadLocal()}else{els.loginInput.focus()}
 }
