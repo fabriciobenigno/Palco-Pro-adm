@@ -880,19 +880,53 @@ async function searchMusicOnline(){
     els.searchMusicBtn.disabled=false;els.searchMusicBtn.textContent='🔎 Buscar música';
   }
 }
-function selectMusicSearchResult(index){
+async function fetchLyricsForSelectedSong(title,artist,album=''){
+  const params=new URLSearchParams({track_name:title,artist_name:artist});
+  if(album)params.set('album_name',album);
+  const response=await fetch('https://lrclib.net/api/search?'+params.toString(),{method:'GET',mode:'cors',cache:'no-store',headers:{Accept:'application/json'}});
+  if(!response.ok)throw new Error('A fonte de letras respondeu com HTTP '+response.status+'.');
+  const data=await response.json();
+  const rows=Array.isArray(data)?data:[];
+  const norm=v=>normalizeMusicSearchText(v||'');
+  const exact=rows.find(x=>norm(x.trackName)===norm(title)&&norm(x.artistName)===norm(artist)&&(x.plainLyrics||x.syncedLyrics));
+  const candidate=exact||rows.find(x=>(x.plainLyrics||x.syncedLyrics));
+  if(!candidate)return '';
+  if(candidate.plainLyrics)return sanitizeLyrics(candidate.plainLyrics);
+  if(candidate.syncedLyrics){
+    return sanitizeLyrics(candidate.syncedLyrics.replace(/\[(?:\d{1,2}:)?\d{1,2}:\d{2}(?:\.\d+)?\]/g,'').replace(/\[[^\]]+\]/g,'').replace(/\n{3,}/g,'\n\n'));
+  }
+  return '';
+}
+async function selectMusicSearchResult(index){
   const item=state.musicSearchResults?.[Number(index)];
   if(!item)return;
-  const title=normalize(item.trackName),artist=normalize(item.artistName),style=normalize(item.primaryGenreName);
+  const title=normalize(item.trackName),artist=normalize(item.artistName),style=normalize(item.primaryGenreName),album=normalize(item.collectionName);
   els.songTitle.value=title;els.songArtist.value=artist;
   if(style)els.songStyle.value=style;
   if(els.musicSearchSelected){
-    els.musicSearchSelected.textContent=`✅ Selecionada: ${title} — ${artist}${style?' • Estilo preenchido: '+style:''}. Confira os campos e depois salve manualmente.`;
+    els.musicSearchSelected.textContent=`✅ Selecionada: ${title} — ${artist}${style?' • Estilo preenchido: '+style:''}. Buscando a letra automaticamente...`;
     els.musicSearchSelected.classList.remove('hidden');
   }
-  els.musicSearchStatus.textContent='Dados da música selecionada foram aplicados ao cadastro. Nada foi salvo automaticamente.';
-  els.musicSearchStatus.className='music-search-status status-success';
+  els.musicSearchStatus.textContent='Buscando a letra da música selecionada...';
+  els.musicSearchStatus.className='music-search-status';
   els.musicSearchResults.innerHTML='';
+  try{
+    const lyrics=await fetchLyricsForSelectedSong(title,artist,album);
+    if(lyrics){
+      els.songLyrics.value=lyrics;
+      els.musicSearchStatus.textContent='✅ Nome, artista, estilo e letra preenchidos. Nada foi salvo automaticamente; confira e salve manualmente.';
+      els.musicSearchStatus.className='music-search-status status-success';
+      if(els.musicSearchSelected)els.musicSearchSelected.textContent=`✅ Selecionada: ${title} — ${artist}${style?' • Estilo: '+style:''} • Letra preenchida automaticamente.`;
+    }else{
+      els.musicSearchStatus.textContent='✅ Nome, artista e estilo preenchidos. A letra não foi encontrada automaticamente; preencha a letra manualmente antes de salvar.';
+      els.musicSearchStatus.className='music-search-status status-warn';
+      if(els.musicSearchSelected)els.musicSearchSelected.textContent=`✅ Selecionada: ${title} — ${artist}${style?' • Estilo: '+style:''}. A letra precisará ser preenchida manualmente.`;
+    }
+  }catch(error){
+    els.musicSearchStatus.textContent='✅ Dados da música preenchidos, mas não foi possível buscar a letra automaticamente agora: '+(error?.message||'erro desconhecido')+' Caso necessário, preencha manualmente.';
+    els.musicSearchStatus.className='music-search-status status-warn';
+    if(els.musicSearchSelected)els.musicSearchSelected.textContent=`✅ Selecionada: ${title} — ${artist}${style?' • Estilo: '+style:''}. A busca da letra falhou, então ela pode ser preenchida manualmente.`;
+  }
 }
 function clearForm(){selectedFormPdf=null;pendingReceivedPdf=null;els.catalogPdfInput.value='';delete els.catalogPdfInput.dataset.formMode;state.editingId=null;els.formTitle.textContent='Cadastrar música';els.formSubtitle.textContent='A música será incluída no catálogo que o Palco Pro principal lê.';els.editingBadge.textContent='Nova música';els.editingBadge.className='badge';els.saveSong.textContent='Salvar música';els.cancelEdit.classList.add('hidden');els.songTitle.value='';els.songArtist.value='';els.songStyle.value='';if(els.songNote)els.songNote.value='';els.songLyrics.value='';els.formStatus.textContent='';clearMusicSearchUI();updateFormPdfUI(null)}
 function beginEdit(id){const s=state.songs.find(x=>x.id===id);if(!s)return;state.editingId=id;els.formTitle.textContent='Editar música';els.formSubtitle.textContent='Atualize os dados e salve. A alteração ficará pronta para o próximo catalogo.json.';els.editingBadge.textContent='Edição';els.editingBadge.className='badge';els.saveSong.textContent='Salvar alterações';els.cancelEdit.classList.remove('hidden');els.songTitle.value=s.title;els.songArtist.value=s.artist;els.songStyle.value=s.style;if(els.songNote)els.songNote.value=normalize(s.note);els.songLyrics.value=s.lyrics;selectedFormPdf=null;pendingReceivedPdf=null;updateFormPdfUI(s);els.formStatus.textContent='Você está editando esta música.';clearMusicSearchUI();els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})}
