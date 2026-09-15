@@ -612,54 +612,61 @@ return {r:R/pts.length/255,g:G/pts.length/255,b:B/pts.length/255};
     }
 
     async function processAttachedPdfWithWatermark(file) {
-if (!window.pdfjsLib) throw new Error('O leitor de PDF ainda não está disponível.');
-if (pdfjsLib.GlobalWorkerOptions) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-}
-const pdfLib = await loadExternalScriptOnce(PDF_LIB_URL, 'PDFLib');
-const originalBytes = new Uint8Array(await file.arrayBuffer());
-const detectDoc = await pdfjsLib.getDocument({ data: originalBytes.slice() }).promise;
-const outDoc = await pdfLib.PDFDocument.load(originalBytes);
-const logo = await outDoc.embedPng(await loadWatermarkLogoBytes());
-let detectedCount = 0;
-for (let idx=0; idx<detectDoc.numPages; idx++) {
-  const pdfJsPage=await detectDoc.getPage(idx+1), base=pdfJsPage.getViewport({scale:1});
-  const scale=Math.max(.8,Math.min(1.5,1200/Math.max(1,base.width))), viewport=pdfJsPage.getViewport({scale});
-  const canvas=document.createElement('canvas'); canvas.width=Math.ceil(viewport.width); canvas.height=Math.ceil(viewport.height);
-  const ctx=canvas.getContext('2d',{alpha:false,willReadFrequently:true}); if(!ctx) continue;
-  ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
-  await pdfJsPage.render({canvasContext:ctx,viewport}).promise;
-  let box=detectWatermarkBoxFromCanvas(canvas);
-  // Em computadores, alguns PDFs/combinações de renderização não permitem
-  // que a marca amarela seja detectada com a mesma tolerância do celular.
-  // Nesses casos usamos apenas no desktop a posição padrão do cabeçalho
-  // superior direito onde a marca original fica no modelo de partitura.
-  if(!box && window.matchMedia && window.matchMedia('(pointer:fine)').matches){
-    const fw=canvas.width, fh=canvas.height;
-    box={
-      x:Math.floor(fw*0.72),
-      y:Math.floor(fh*0.018),
-      width:Math.max(1,Math.floor(fw*0.24)),
-      height:Math.max(1,Math.floor(fh*0.075))
-    };
+  if (!window.pdfjsLib) throw new Error('O leitor de PDF ainda não está disponível.');
+  if (pdfjsLib.GlobalWorkerOptions) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   }
-  if(!box) continue;
-  const page=outDoc.getPage(idx), pw=page.getWidth(), ph=page.getHeight();
-  const x=box.x/scale, y=ph-(box.y+box.height)/scale, w=box.width/scale, h=box.height/scale, bg=sampleBackgroundColor(canvas,box);
-  page.drawRectangle({x,y,width:w,height:h,color:pdfLib.rgb(bg.r,bg.g,bg.b)});
-  const aspect=logo.width/logo.height, maxW=w*.96, maxH=h*.8;
-  let dw=maxW, dh=dw/aspect; if(dh>maxH){dh=maxH;dw=dh*aspect;}
-  page.drawImage(logo,{x:x+(w-dw)/2,y:y+(h-dh)/2,width:dw,height:dh}); detectedCount++;
-}
-try{detectDoc.destroy();}catch(_){ }
-const output=await outDoc.save({useObjectStreams:true});
-return {dataUrl:uint8ArrayToPdfDataUrl(output),detectedCount,pageCount:outDoc.getPageCount()};
+  const pdfLib = await loadExternalScriptOnce(PDF_LIB_URL, 'PDFLib');
+  const originalBytes = new Uint8Array(await file.arrayBuffer());
+  const detectDoc = await pdfjsLib.getDocument({ data: originalBytes.slice() }).promise;
+  const outDoc = await pdfLib.PDFDocument.load(originalBytes);
+  const logo = await outDoc.embedPng(await loadWatermarkLogoBytes());
+  let detectedCount = 0;
+  for (let idx=0; idx<detectDoc.numPages; idx++) {
+    const pdfJsPage=await detectDoc.getPage(idx+1), base=pdfJsPage.getViewport({scale:1});
+    const scale=Math.max(.8,Math.min(1.5,1200/Math.max(1,base.width))), viewport=pdfJsPage.getViewport({scale});
+    const canvas=document.createElement('canvas'); canvas.width=Math.ceil(viewport.width); canvas.height=Math.ceil(viewport.height);
+    const ctx=canvas.getContext('2d',{alpha:false,willReadFrequently:true}); if(!ctx) continue;
+    ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    await pdfJsPage.render({canvasContext:ctx,viewport}).promise;
+    let box=detectWatermarkBoxFromCanvas(canvas);
+    // Em computadores, alguns PDFs/combinações de renderização não permitem
+    // que a marca amarela seja detectada com a mesma tolerância do celular.
+    // Nesses casos usamos apenas no desktop a posição padrão do cabeçalho
+    // superior direito onde a marca original fica no modelo de partitura.
+    if(!box && window.matchMedia && window.matchMedia('(pointer:fine)').matches){
+      const fw=canvas.width, fh=canvas.height;
+      box={
+        x:Math.floor(fw*0.72),
+        y:Math.floor(fh*0.018),
+        width:Math.max(1,Math.floor(fw*0.24)),
+        height:Math.max(1,Math.floor(fh*0.075))
+      };
     }
+    if(!box) continue;
+    const page=outDoc.getPage(idx), pw=page.getWidth(), ph=page.getHeight();
+    const x=box.x/scale, y=ph-(box.y+box.height)/scale, w=box.width/scale, h=box.height/scale, bg=sampleBackgroundColor(canvas,box);
+    page.drawRectangle({x,y,width:w,height:h,color:pdfLib.rgb(bg.r,bg.g,bg.b)});
+    const aspect=logo.width/logo.height, maxW=w*.96, maxH=h*.8;
+    let dw=maxW, dh=dw/aspect; if(dh>maxH){dh=maxH;dw=dh*aspect;}
+    page.drawImage(logo,{x:x+(w-dw)/2,y:y+(h-dh)/2,width:dw,height:dh}); detectedCount++;
+  }
+  try{detectDoc.destroy();}catch(_){ }
+  const output=await outDoc.save({useObjectStreams:true});
+  return {dataUrl:uint8ArrayToPdfDataUrl(output),detectedCount,pageCount:outDoc.getPageCount()};
+}
 
 async function processPdfFileToFile(file){
- if(!file)return null; if(file.type!=='application/pdf'&&!/\.pdf$/i.test(file.name||''))throw new Error('Selecione um arquivo PDF.');
- const result=await processAttachedPdfWithWatermark(file);const base64=result.dataUrl.split(',')[1]||'',binary=atob(base64),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
- const processed=new File([bytes],file.name||'palco-pro.pdf',{type:'application/pdf',lastModified:Date.now()});processed.detectedWatermarks=result.detectedCount;processed.pageCount=result.pageCount;processed.__palcoProcessed=true;return processed;
+  if(!file)return null;
+  if(file.type!=='application/pdf'&&!/\.pdf$/i.test(file.name||''))throw new Error('Selecione um arquivo PDF.');
+  const result=await processAttachedPdfWithWatermark(file);
+  const base64=result.dataUrl.split(',')[1]||'',binary=atob(base64),bytes=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+  const processed=new File([bytes],file.name||'palco-pro.pdf',{type:'application/pdf',lastModified:Date.now()});
+  processed.detectedWatermarks=result.detectedCount;
+  processed.pageCount=result.pageCount;
+  processed.__palcoProcessed=true;
+  return processed;
 }
 
 function showToast(message,type='success'){els.toast.textContent=message;els.toast.className=`toast show ${type}`;clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>els.toast.classList.remove('show'),2200)}
