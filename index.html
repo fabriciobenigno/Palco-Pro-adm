@@ -634,7 +634,7 @@ return {r:R/pts.length/255,g:G/pts.length/255,b:B/pts.length/255};
     // que a marca amarela seja detectada com a mesma tolerância do celular.
     // Nesses casos usamos apenas no desktop a posição padrão do cabeçalho
     // superior direito onde a marca original fica no modelo de partitura.
-    if(!box && window.matchMedia && window.matchMedia('(pointer:fine)').matches){
+    if(!box && idx === 0 && window.matchMedia && window.matchMedia('(pointer:fine)').matches){
       const fw=canvas.width, fh=canvas.height;
       box={
         x:Math.floor(fw*0.72),
