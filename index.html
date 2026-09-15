@@ -49,7 +49,7 @@
 .modal{position:fixed;inset:0;z-index:90;display:none;padding:max(12px,calc(var(--safe-top) + 6px)) max(10px,calc(var(--safe-right) + 8px)) max(12px,calc(var(--safe-bottom) + 8px)) max(10px,calc(var(--safe-left) + 8px));background:rgba(1,3,8,.72);backdrop-filter:blur(16px)}.modal.active{display:block}.modal-card{height:100%;border-radius:30px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(11,17,30,.96),rgba(7,11,19,.98)),var(--glass);box-shadow:var(--shadow-xl),inset 0 1px 0 rgba(255,255,255,.05);display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}.modal-head{padding:16px 14px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;gap:10px}.modal-head h3{margin:0;font-size:18px;letter-spacing:-.02em}.modal-body{overflow:auto;padding:14px;display:grid;gap:12px;align-content:start}.modal-foot{padding:14px;border-top:1px solid rgba(255,255,255,.08);display:grid;gap:8px}.icon-btn{width:42px;min-width:42px;height:42px;border-radius:15px;background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04)),rgba(10,17,29,.82);color:#fff;border:1px solid rgba(255,255,255,.10);cursor:pointer;font-size:18px;box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,.05)}.detail-block{padding:15px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:grid;gap:8px}.detail-block label{color:var(--soft);font-size:12px;font-weight:700;letter-spacing:.02em;text-transform:uppercase}.detail-block div{color:#fff;line-height:1.7;white-space:pre-wrap;word-break:break-word}.confirm-text{font-size:13px;line-height:1.6;color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:max(20px,calc(var(--safe-bottom) + 20px));transform:translate(-50%,20px);z-index:120;opacity:0;pointer-events:none;min-width:min(90vw,360px);padding:12px 14px;border-radius:16px;background:rgba(7,12,20,.94);border:1px solid rgba(133,208,255,.20);box-shadow:var(--shadow-lg);color:#fff;font-size:12px;line-height:1.4;text-align:center;transition:opacity .2s ease,transform .2s ease}.toast.show{opacity:1;transform:translate(-50%,0)}.toast.success{border-color:rgba(72,214,138,.30)}.toast.error{border-color:rgba(255,111,111,.30)}
 
-.pdf-viewer-close{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;z-index:60;width:42px;height:42px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.16);border-radius:50%;background:rgba(5,9,17,.76);color:#fff;font-size:21px;line-height:1;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.30);backdrop-filter:blur(10px)}.pdf-viewer-close:active{transform:scale(.96)}@media(max-width:680px){.pdf-viewer-close{top:calc(env(safe-area-inset-top,0px) + 10px);right:10px;width:40px;height:40px;font-size:20px}}
+.pdf-viewer-close{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:12px;z-index:60;width:42px;height:42px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.16);border-radius:50%;background:#d71920;color:#fff;font-size:21px;line-height:1;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.30);backdrop-filter:blur(10px)}.pdf-viewer-close:active{transform:scale(.96)}@media(max-width:680px){.pdf-viewer-close{top:calc(env(safe-area-inset-top,0px) + 10px);right:10px;width:40px;height:40px;font-size:20px}}
 .tabs{display:flex;gap:8px;overflow:visible;padding:2px 2px 0;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab-btn{min-height:42px;flex:0 0 auto;padding:9px 14px;border-radius:14px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.10);color:var(--muted);font-size:12px;font-weight:800;cursor:pointer;transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease}.tab-btn:hover{transform:translateY(-1px)}.tab-btn.active{background:linear-gradient(180deg,rgba(116,200,255,.18),rgba(74,137,255,.10));border-color:rgba(133,208,255,.30);color:#fff}.tab-panel{display:none}.tab-panel.active{display:grid;gap:12px}.received-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.received-toolbar .btn{flex:0 0 auto}.received-list{display:grid;gap:8px}.received-row{display:grid;gap:10px;padding:12px 13px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02)),rgba(15,21,34,.94);border:1px solid rgba(255,255,255,.06)}.received-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:start}.received-title{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.received-meta{color:var(--muted);font-size:11px;line-height:1.45}.received-status{font-size:10px;font-weight:800;padding:4px 8px;border-radius:999px;white-space:nowrap}.received-status.exists{background:rgba(255,204,104,.10);border:1px solid rgba(255,204,104,.18);color:#ffdf94}.received-status.new{background:rgba(72,214,138,.10);border:1px solid rgba(72,214,138,.18);color:#a9f3c9}.received-actions{display:flex;gap:6px;flex-wrap:wrap}.received-actions .btn{flex:1 1 140px}.received-note{padding:11px 12px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);color:var(--muted);font-size:11px;line-height:1.55}.received-detail{margin-top:2px;padding:12px;border-radius:16px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);white-space:pre-wrap;word-break:break-word;color:#eef5ff;font-size:12px;line-height:1.55;display:none}.received-row.open .received-detail{display:block}.project-context{font-size:12px;line-height:1.7}.project-context p{margin:0 0 10px}.project-context p:last-child{margin-bottom:0}.project-context code{color:#bfeaff;background:rgba(116,200,255,.08);padding:2px 5px;border-radius:6px}
 @media(max-width:680px){.two-col,.actions-grid,.stats-grid{grid-template-columns:1fr}.bulk-actions .btn{width:100%}.bulk-count{width:100%;margin-right:0}.admin-topbar{align-items:flex-start}.top-actions{flex-direction:column}.song-row{grid-template-columns:minmax(0,1fr)}.song-actions{justify-content:flex-start}.catalog-list{max-height:52dvh}.card{padding:14px}.admin-shell{max-width:620px}}
 /* === POLIMENTO VISUAL / EXPERIÊNCIA ADMINISTRATIVA === */
@@ -374,6 +374,17 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
 }
 @media (max-width:390px){.received-row[data-received-swipe] .received-actions{gap:3px!important;padding:5px!important;}.received-row[data-received-swipe] .received-actions .received-action-btn{height:36px!important;min-height:36px!important;border-radius:9px!important}.received-row[data-received-swipe] .received-action-icon{font-size:15px!important;}}
 </style>
+
+<style>
+.pdf-native-frame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#05080d;z-index:4;}
+.pdf-native-frame.hidden{display:none;}
+.pdf-viewer-close{position:absolute!important;top:calc(env(safe-area-inset-top,0px) + 12px)!important;right:12px!important;z-index:9999!important;width:44px!important;height:44px!important;display:flex!important;align-items:center!important;justify-content:center!important;pointer-events:auto!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;}
+@media(max-width:680px){.pdf-viewer-close{top:calc(env(safe-area-inset-top,0px) + 10px)!important;right:10px!important;width:42px!important;height:42px!important;}}
+<style>
+.pdf-viewer-close{background:#d71920!important;color:#fff!important;border:2px solid rgba(255,255,255,.9)!important;box-shadow:0 8px 24px rgba(0,0,0,.4),0 0 0 2px rgba(215,25,32,.25)!important;pointer-events:auto!important;touch-action:manipulation!important;}
+.pdf-viewer-close:hover{background:#b51218!important;}
+</style>
+</style>
 </head>
 <body>
 <main class="app">
@@ -475,6 +486,7 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
   <div class="pdf-viewer-note hidden" id="pdfViewerNote" aria-hidden="true"></div>
   <div class="pdf-viewer-page-wrap" id="pdfViewerPageWrap">
     <div class="page-swipe-preview pdf" id="pdfPagePreview"><canvas id="pdfPagePreviewCanvas" aria-label="Prévia da próxima página"></canvas></div>
+    <iframe id="pdfNativeFrame" class="pdf-native-frame hidden" title="Visualização nativa do PDF" referrerpolicy="no-referrer"></iframe>
     <canvas class="pdf-viewer-canvas" id="pdfViewerCanvas" aria-label="Página do PDF da música"></canvas>
   </div>
   <div class="pdf-viewer-hint hidden" id="pdfViewerHint">Deslize para trocar de folha</div>
@@ -508,11 +520,11 @@ const PDF_LIB_URL='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.
 const CATALOG_KEY='palco-pro-admin-catalog-v4';
 const SESSION_KEY='palco-pro-admin-session-v4';
 const $=id=>document.getElementById(id);
-const state={songs:[],editingId:null,filter:'all',confirmAction:null,lastFileName:'',selectedIds:new Set(),catalogHandle:null,received:[],receivedSelected:new Set(),receivedEditingIndex:null,pdfProcessing:false,pdfDoc:null,pdfPage:1,pdfPageCount:0,pdfRenderToken:0,pdfUrl:'',pdfSwipeStartX:0,pdfSwipeStartY:0,pdfSwipeTracking:false};
+const state={songs:[],editingId:null,filter:'all',confirmAction:null,lastFileName:'',selectedIds:new Set(),catalogHandle:null,received:[],receivedSelected:new Set(),receivedEditingIndex:null,pdfProcessing:false,pdfDoc:null,pdfPage:1,pdfPageCount:0,pdfRenderToken:0,pdfUrl:'',pdfSwipeStartX:0,pdfSwipeStartY:0,pdfSwipeTracking:false,pdfNativeFrame:false};
 const els={
  authCard:$('authCard'),adminPanel:$('adminPanel'),loginInput:$('loginInput'),passwordInput:$('passwordInput'),showPassword:$('showPasswordToggle'),loginBtn:$('loginBtn'),authStatus:$('authStatus'),logoutBtn:$('logoutBtn'),refreshIndexBtn:$('refreshIndexBtn'), refreshCatalog:$('refreshCatalogBtn'),
  songTitle:$('songTitle'),songArtist:$('songArtist'),songStyle:$('songStyle'),songNote:$('songNote'),songLyrics:$('songLyrics'),selectSongPdfBtn:$('selectSongPdfBtn'),songPdfStatus:$('songPdfStatus'),viewSongPdfBtn:$('viewSongPdfBtn'),formTitle:$('formTitle'),formSubtitle:$('formSubtitle'),editingBadge:$('editingBadge'),saveSong:$('saveSongBtn'),cancelEdit:$('cancelEditBtn'),formStatus:$('formStatus'),
- importZone:$('importZone'),importFile:$('importFile'),exportBtn:$('exportBtn'),quickExport:$('quickExportBtn'),fileStatus:$('fileStatus'),catalogStatus:$('catalogStatus'),search:$('searchInput'),searchCounter:$('searchCounter'),catalogList:$('catalogList'),catalogCounter:$('catalogCounter'),statTotal:$('statTotal'),statActive:$('statActive'),statInactive:$('statInactive'),newSong:$('newSongBtn'),receivedList:$('receivedList'),receivedCounter:$('receivedCounter'),refreshReceived:$('refreshReceivedBtn'),receivedStatus:$('receivedStatus'),receivedBulk:$('receivedBulk'),receivedBulkCount:$('receivedBulkCount'),selectAllReceived:$('selectAllReceivedBtn'),clearReceivedSelection:$('clearReceivedSelectionBtn'),approveSelectedReceived:$('approveSelectedReceivedBtn'),receivedEditModal:$('receivedEditModal'),receivedEditTitle:$('receivedEditTitle'),receivedEditArtist:$('receivedEditArtist'),receivedEditStyle:$('receivedEditStyle'),receivedEditNote:$('receivedEditNote'),receivedEditUser:$('receivedEditUser'),receivedEditLyrics:$('receivedEditLyrics'),receivedEditPdfStatus:$('receivedEditPdfStatus'),receivedEditPdfBtn:$('receivedEditPdfBtn'),receivedEditViewPdf:$('receivedEditViewPdfBtn'),catalogPdfInput:$('catalogPdfInput'),receivedPdfInput:$('receivedPdfInput'),saveReceivedEdit:$('saveReceivedEditBtn'),bulkActions:$('bulkActions'),bulkCount:$('bulkCount'),selectAll:$('selectAllBtn'),clearSelection:$('clearSelectionBtn'),changeStyle:$('changeStyleBtn'),styleModal:$('styleModal'),bulkStyleInput:$('bulkStyleInput'),continueStyle:$('continueStyleBtn'),linkCatalog:$('linkCatalogBtn'),detailModal:$('detailModal'),detailTitle:$('detailTitle'),detailBody:$('detailBody'),confirmModal:$('confirmModal'),confirmTitle:$('confirmTitle'),confirmBody:$('confirmBody'),confirmBtn:$('confirmBtn'),toast:$('toast'),confirmationOverlay:$('confirmationOverlay'),confirmationSong:$('confirmationSong'),pdfViewerScreen:$('pdfViewerScreen'),pdfViewerPageWrap:$('pdfViewerPageWrap'),pdfViewerCanvas:$('pdfViewerCanvas'),pdfPagePreview:$('pdfPagePreview'),pdfPagePreviewCanvas:$('pdfPagePreviewCanvas'),pdfViewerPrev:$('pdfViewerPrev'),pdfViewerNext:$('pdfViewerNext'),pdfViewerClose:$('pdfViewerClose'),pdfViewerPageIndicator:$('pdfViewerPageIndicator'),pdfViewerHint:$('pdfViewerHint')
+ importZone:$('importZone'),importFile:$('importFile'),exportBtn:$('exportBtn'),quickExport:$('quickExportBtn'),fileStatus:$('fileStatus'),catalogStatus:$('catalogStatus'),search:$('searchInput'),searchCounter:$('searchCounter'),catalogList:$('catalogList'),catalogCounter:$('catalogCounter'),statTotal:$('statTotal'),statActive:$('statActive'),statInactive:$('statInactive'),newSong:$('newSongBtn'),receivedList:$('receivedList'),receivedCounter:$('receivedCounter'),refreshReceived:$('refreshReceivedBtn'),receivedStatus:$('receivedStatus'),receivedBulk:$('receivedBulk'),receivedBulkCount:$('receivedBulkCount'),selectAllReceived:$('selectAllReceivedBtn'),clearReceivedSelection:$('clearReceivedSelectionBtn'),approveSelectedReceived:$('approveSelectedReceivedBtn'),receivedEditModal:$('receivedEditModal'),receivedEditTitle:$('receivedEditTitle'),receivedEditArtist:$('receivedEditArtist'),receivedEditStyle:$('receivedEditStyle'),receivedEditNote:$('receivedEditNote'),receivedEditUser:$('receivedEditUser'),receivedEditLyrics:$('receivedEditLyrics'),receivedEditPdfStatus:$('receivedEditPdfStatus'),receivedEditPdfBtn:$('receivedEditPdfBtn'),receivedEditViewPdf:$('receivedEditViewPdfBtn'),catalogPdfInput:$('catalogPdfInput'),receivedPdfInput:$('receivedPdfInput'),saveReceivedEdit:$('saveReceivedEditBtn'),bulkActions:$('bulkActions'),bulkCount:$('bulkCount'),selectAll:$('selectAllBtn'),clearSelection:$('clearSelectionBtn'),changeStyle:$('changeStyleBtn'),styleModal:$('styleModal'),bulkStyleInput:$('bulkStyleInput'),continueStyle:$('continueStyleBtn'),linkCatalog:$('linkCatalogBtn'),detailModal:$('detailModal'),detailTitle:$('detailTitle'),detailBody:$('detailBody'),confirmModal:$('confirmModal'),confirmTitle:$('confirmTitle'),confirmBody:$('confirmBody'),confirmBtn:$('confirmBtn'),toast:$('toast'),confirmationOverlay:$('confirmationOverlay'),confirmationSong:$('confirmationSong'),pdfViewerScreen:$('pdfViewerScreen'),pdfViewerPageWrap:$('pdfViewerPageWrap'),pdfViewerCanvas:$('pdfViewerCanvas'),pdfPagePreview:$('pdfPagePreview'),pdfPagePreviewCanvas:$('pdfPagePreviewCanvas'),pdfViewerPrev:$('pdfViewerPrev'),pdfViewerNext:$('pdfViewerNext'),pdfViewerClose:$('pdfViewerClose'),pdfViewerPageIndicator:$('pdfViewerPageIndicator'),pdfViewerHint:$('pdfViewerHint'),pdfNativeFrame:$('pdfNativeFrame')
 };
 function normalize(v){return String(v??'').trim()}
 function sanitizeLyrics(v){return String(v??'').replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim()}
@@ -566,69 +578,88 @@ async function loadWatermarkLogoBytes() {
       throw new Error('A logo do Palco Pro não pôde ser carregada no navegador.' + (lastError?.message ? ' ' + lastError.message : ''));
     }
 function isWatermarkYellowPixel(r,g,b){const max=Math.max(r,g,b),min=Math.min(r,g,b);const saturation=max?(max-min)/max:0;return r>120&&g>120&&b<165&&saturation>0.24&&g>b*1.28;}
-function detectWatermarkBoxFromCanvas(canvas){
- const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)return null;
- const w=canvas.width,h=canvas.height,xStart=Math.floor(w*0.68),yEnd=Math.floor(h*0.25),rw=w-xStart;
- const data=ctx.getImageData(xStart,0,rw,yEnd).data,step=w>1400?2:1;let minX=w,maxX=-1,minY=h,maxY=-1,count=0;
- for(let y=4;y<yEnd;y+=step)for(let x=xStart;x<w;x+=step){const i=((y*rw)+(x-xStart))*4;if(!isWatermarkYellowPixel(data[i],data[i+1],data[i+2]))continue;count++;if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;}
- if(count<15||maxX<minX)return null;const yellowW=maxX-minX+1,yellowH=maxY-minY+1;
- if(yellowW<w*0.035||yellowW>w*0.35||yellowH<4||yellowH>h*0.10)return null;
- const topPad=Math.max(10,yellowH*0.72),sidePad=Math.max(2,yellowW*0.015),bottomPad=Math.max(2,yellowH*0.06);
- const x=Math.max(0,Math.floor(minX-sidePad)),y=Math.max(0,Math.floor(minY-topPad));const right=Math.min(w,Math.ceil(maxX+sidePad+1)),bottom=Math.min(h,Math.ceil(maxY+bottomPad+1));
- return{x,y,width:Math.max(1,right-x),height:Math.max(1,bottom-y)};
+function detectWatermarkBoxFromCanvas(canvas) {
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
+if (!ctx) return null;
+const w = canvas.width, h = canvas.height;
+const xStart = Math.floor(w * 0.68), yEnd = Math.floor(h * 0.25), rw = w - xStart;
+const data = ctx.getImageData(xStart, 0, rw, yEnd).data;
+const step = w > 1400 ? 2 : 1;
+let minX = w, maxX = -1, minY = h, maxY = -1, count = 0;
+for (let y = 4; y < yEnd; y += step) {
+  for (let x = xStart; x < w; x += step) {
+    const i = ((y * rw) + (x - xStart)) * 4;
+    if (!isWatermarkYellowPixel(data[i], data[i+1], data[i+2])) continue;
+    count++;
+    if (x < minX) minX=x; if (x > maxX) maxX=x; if (y < minY) minY=y; if (y > maxY) maxY=y;
+  }
 }
-function sampleBackgroundColor(canvas,box){const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)return{r:1,g:1,b:1};const pts=[[box.x-5,box.y+box.height*.25],[box.x+box.width+5,box.y+box.height*.25],[box.x-5,box.y+box.height*.75],[box.x+box.width+5,box.y+box.height*.75],[box.x+box.width*.5,box.y-5],[box.x+box.width*.5,box.y+box.height+5]];let R=0,G=0,B=0;pts.forEach(([xx,yy])=>{const x=Math.max(0,Math.min(canvas.width-1,Math.round(xx))),y=Math.max(0,Math.min(canvas.height-1,Math.round(yy)));const p=ctx.getImageData(x,y,1,1).data;R+=p[0];G+=p[1];B+=p[2];});return{r:R/pts.length/255,g:G/pts.length/255,b:B/pts.length/255};}
-async function processAttachedPdfWithWatermark(file) {
-      if (!window.pdfjsLib) throw new Error('O leitor de PDF ainda não está disponível.');
-      if (pdfjsLib.GlobalWorkerOptions) {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-      }
-      const pdfLib = await loadExternalScriptOnce(PDF_LIB_URL, 'PDFLib');
-      const originalBytes = new Uint8Array(await file.arrayBuffer());
-      const detectDoc = await pdfjsLib.getDocument({ data: originalBytes.slice() }).promise;
-      const outDoc = await pdfLib.PDFDocument.load(originalBytes);
-      const logo = await outDoc.embedPng(await loadWatermarkLogoBytes());
-      let detectedCount = 0;
-      for (let idx=0; idx<detectDoc.numPages; idx++) {
-        const pdfJsPage=await detectDoc.getPage(idx+1), base=pdfJsPage.getViewport({scale:1});
-        const scale=Math.max(.8,Math.min(1.5,1200/Math.max(1,base.width))), viewport=pdfJsPage.getViewport({scale});
-        const canvas=document.createElement('canvas'); canvas.width=Math.ceil(viewport.width); canvas.height=Math.ceil(viewport.height);
-        const ctx=canvas.getContext('2d',{alpha:false,willReadFrequently:true}); if(!ctx) continue;
-        ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
-        await pdfJsPage.render({canvasContext:ctx,viewport}).promise;
-        let box=detectWatermarkBoxFromCanvas(canvas);
-        // Em computadores, alguns PDFs/combinações de renderização não permitem
-        // que a marca amarela seja detectada com a mesma tolerância do celular.
-        // Nesses casos usamos apenas no desktop a posição padrão do cabeçalho
-        // superior direito onde a marca original fica no modelo de partitura.
-        // Fallback para desktop somente na primeira página.
-        // Assim preservamos a correção para PCs sem aplicar uma logo em páginas
-        // que não possuem a marca original.
-        if(!box && idx === 0 && window.matchMedia && window.matchMedia('(pointer:fine)').matches){
-          const fw=canvas.width, fh=canvas.height;
-          box={
-            x:Math.floor(fw*0.72),
-            y:Math.floor(fh*0.018),
-            width:Math.max(1,Math.floor(fw*0.24)),
-            height:Math.max(1,Math.floor(fh*0.075))
-          };
-        }
-        if(!box) continue;
-        const page=outDoc.getPage(idx), pw=page.getWidth(), ph=page.getHeight();
-        const x=box.x/scale, y=ph-(box.y+box.height)/scale, w=box.width/scale, h=box.height/scale, bg=sampleBackgroundColor(canvas,box);
-        page.drawRectangle({x,y,width:w,height:h,color:pdfLib.rgb(bg.r,bg.g,bg.b)});
-        const aspect=logo.width/logo.height, maxW=w*.96, maxH=h*.8;
-        let dw=maxW, dh=dw/aspect; if(dh>maxH){dh=maxH;dw=dh*aspect;}
-        page.drawImage(logo,{x:x+(w-dw)/2,y:y+(h-dh)/2,width:dw,height:dh}); detectedCount++;
-      }
-      try{detectDoc.destroy();}catch(_){ }
-      const output=await outDoc.save({useObjectStreams:true});
-      return {dataUrl:uint8ArrayToPdfDataUrl(output),detectedCount,pageCount:outDoc.getPageCount()};
+if (count < 15 || maxX < minX) return null;
+const yellowW=maxX-minX+1, yellowH=maxY-minY+1;
+if (yellowW < w*0.035 || yellowW > w*0.35 || yellowH < 4 || yellowH > h*0.10) return null;
+const topPad=Math.max(10,yellowH*0.72), sidePad=Math.max(2,yellowW*0.015), bottomPad=Math.max(2,yellowH*0.06);
+const x=Math.max(0,Math.floor(minX-sidePad)), y=Math.max(0,Math.floor(minY-topPad));
+const right=Math.min(w,Math.ceil(maxX+sidePad+1)), bottom=Math.min(h,Math.ceil(maxY+bottomPad+1));
+return {x,y,width:Math.max(1,right-x),height:Math.max(1,bottom-y)};
     }
+
+    function sampleBackgroundColor(canvas, box) {
+const ctx=canvas.getContext('2d',{willReadFrequently:true}); if(!ctx) return {r:1,g:1,b:1};
+const pts=[[box.x-5,box.y+box.height*.25],[box.x+box.width+5,box.y+box.height*.25],[box.x-5,box.y+box.height*.75],[box.x+box.width+5,box.y+box.height*.75],[box.x+box.width*.5,box.y-5],[box.x+box.width*.5,box.y+box.height+5]];
+let R=0,G=0,B=0;
+pts.forEach(([xx,yy])=>{const x=Math.max(0,Math.min(canvas.width-1,Math.round(xx))), y=Math.max(0,Math.min(canvas.height-1,Math.round(yy))); const p=ctx.getImageData(x,y,1,1).data; R+=p[0];G+=p[1];B+=p[2];});
+return {r:R/pts.length/255,g:G/pts.length/255,b:B/pts.length/255};
+    }
+
+    async function processAttachedPdfWithWatermark(file) {
+if (!window.pdfjsLib) throw new Error('O leitor de PDF ainda não está disponível.');
+if (pdfjsLib.GlobalWorkerOptions) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+const pdfLib = await loadExternalScriptOnce(PDF_LIB_URL, 'PDFLib');
+const originalBytes = new Uint8Array(await file.arrayBuffer());
+const detectDoc = await pdfjsLib.getDocument({ data: originalBytes.slice() }).promise;
+const outDoc = await pdfLib.PDFDocument.load(originalBytes);
+const logo = await outDoc.embedPng(await loadWatermarkLogoBytes());
+let detectedCount = 0;
+for (let idx=0; idx<detectDoc.numPages; idx++) {
+  const pdfJsPage=await detectDoc.getPage(idx+1), base=pdfJsPage.getViewport({scale:1});
+  const scale=Math.max(.8,Math.min(1.5,1200/Math.max(1,base.width))), viewport=pdfJsPage.getViewport({scale});
+  const canvas=document.createElement('canvas'); canvas.width=Math.ceil(viewport.width); canvas.height=Math.ceil(viewport.height);
+  const ctx=canvas.getContext('2d',{alpha:false,willReadFrequently:true}); if(!ctx) continue;
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  await pdfJsPage.render({canvasContext:ctx,viewport}).promise;
+  let box=detectWatermarkBoxFromCanvas(canvas);
+  // Em computadores, alguns PDFs/combinações de renderização não permitem
+  // que a marca amarela seja detectada com a mesma tolerância do celular.
+  // Nesses casos usamos apenas no desktop a posição padrão do cabeçalho
+  // superior direito onde a marca original fica no modelo de partitura.
+  if(!box && window.matchMedia && window.matchMedia('(pointer:fine)').matches){
+    const fw=canvas.width, fh=canvas.height;
+    box={
+      x:Math.floor(fw*0.72),
+      y:Math.floor(fh*0.018),
+      width:Math.max(1,Math.floor(fw*0.24)),
+      height:Math.max(1,Math.floor(fh*0.075))
+    };
+  }
+  if(!box) continue;
+  const page=outDoc.getPage(idx), pw=page.getWidth(), ph=page.getHeight();
+  const x=box.x/scale, y=ph-(box.y+box.height)/scale, w=box.width/scale, h=box.height/scale, bg=sampleBackgroundColor(canvas,box);
+  page.drawRectangle({x,y,width:w,height:h,color:pdfLib.rgb(bg.r,bg.g,bg.b)});
+  const aspect=logo.width/logo.height, maxW=w*.96, maxH=h*.8;
+  let dw=maxW, dh=dw/aspect; if(dh>maxH){dh=maxH;dw=dh*aspect;}
+  page.drawImage(logo,{x:x+(w-dw)/2,y:y+(h-dh)/2,width:dw,height:dh}); detectedCount++;
+}
+try{detectDoc.destroy();}catch(_){ }
+const output=await outDoc.save({useObjectStreams:true});
+return {dataUrl:uint8ArrayToPdfDataUrl(output),detectedCount,pageCount:outDoc.getPageCount()};
+    }
+
 async function processPdfFileToFile(file){
  if(!file)return null; if(file.type!=='application/pdf'&&!/\.pdf$/i.test(file.name||''))throw new Error('Selecione um arquivo PDF.');
  const result=await processAttachedPdfWithWatermark(file);const base64=result.dataUrl.split(',')[1]||'',binary=atob(base64),bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
- const processed=new File([bytes],file.name||'palco-pro.pdf',{type:'application/pdf',lastModified:Date.now()});processed.detectedWatermarks=result.detectedCount;processed.pageCount=result.pageCount;return processed;
+ const processed=new File([bytes],file.name||'palco-pro.pdf',{type:'application/pdf',lastModified:Date.now()});processed.detectedWatermarks=result.detectedCount;processed.pageCount=result.pageCount;processed.__palcoProcessed=true;return processed;
 }
 
 function showToast(message,type='success'){els.toast.textContent=message;els.toast.className=`toast show ${type}`;clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>els.toast.classList.remove('show'),2200)}
@@ -749,7 +780,7 @@ async function uploadCatalogPdfFile(songId,file){
   if(els.refreshCatalog){els.refreshCatalog.disabled=true;els.refreshCatalog.textContent='Preparando PDF...'}
   state.pdfProcessing=true;
   try{
-    const processed=await processPdfFileToFile(file);
+    const processed=file.__palcoProcessed?file:await processPdfFileToFile(file);
     if(els.refreshCatalog)els.refreshCatalog.textContent='Enviando PDF...';
     const pdfData=await fileToDataUrl(processed);
     const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveSongPdf',songId:song.id,title:song.title,artist:song.artist,pdfData,pdfFileName:processed.name})},30000);
@@ -762,11 +793,28 @@ async function uploadCatalogPdfFile(songId,file){
 async function uploadCatalogPdf(file){return uploadCatalogPdfFile(pendingPdfSongId,file)}
 
 function normalizePublicPdfUrl(url){const value=String(url||'').trim();const rawPrefix='https://raw.githubusercontent.com/fabriciobenigno/Palco-Pro/main/';if(value.startsWith(rawPrefix)){const path=value.slice(rawPrefix.length).split('/').map(part=>encodeURIComponent(decodeURIComponent(part))).join('/');return 'https://fabriciobenigno.github.io/Palco-Pro/'+path;}return value;}
-function closePdfViewer(){document.documentElement.style.setProperty('--page-swipe-x','0px');document.documentElement.style.setProperty('--page-preview-x','100vw');els.pdfViewerScreen?.classList.remove('open','page-swipe-active');els.pdfViewerScreen?.setAttribute('aria-hidden','true');els.pdfViewerPageIndicator?.classList.add('hidden');els.pdfViewerHint?.classList.add('hidden');els.pdfPagePreview?.classList.remove('active');state.pdfRenderToken++;try{state.pdfDoc?.destroy?.()}catch(_){}state.pdfDoc=null;state.pdfPage=1;state.pdfPageCount=0;state.pdfUrl='';state.pdfSwipeTracking=false;}
+function closePdfViewer(){
+  document.documentElement.style.setProperty('--page-swipe-x','0px');
+  document.documentElement.style.setProperty('--page-preview-x','100vw');
+  els.pdfViewerScreen?.classList.remove('open','page-swipe-active');
+  els.pdfViewerScreen?.setAttribute('aria-hidden','true');
+  els.pdfViewerPageIndicator?.classList.add('hidden');
+  els.pdfViewerHint?.classList.add('hidden');
+  els.pdfPagePreview?.classList.remove('active');
+  els.pdfNativeFrame?.classList.add('hidden');
+  if(els.pdfNativeFrame)els.pdfNativeFrame.src='about:blank';
+  state.pdfNativeFrame=false;
+  state.pdfRenderToken++;
+  try{state.pdfDoc?.destroy?.()}catch(_){}
+  state.pdfDoc=null; state.pdfPage=1; state.pdfPageCount=0; state.pdfUrl=''; state.pdfSwipeTracking=false;
+}
 async function renderAdminPdfPage(pageNumber=state.pdfPage){if(!state.pdfDoc||!els.pdfViewerCanvas||!els.pdfViewerPageWrap)return;pageNumber=Math.max(1,Math.min(Number(pageNumber)||1,state.pdfPageCount||1));state.pdfPage=pageNumber;const token=++state.pdfRenderToken;const page=await state.pdfDoc.getPage(pageNumber);if(token!==state.pdfRenderToken||!state.pdfDoc)return;const base=page.getViewport({scale:1});const maxW=Math.max(1,els.pdfViewerPageWrap.clientWidth-8);const maxH=Math.max(1,els.pdfViewerPageWrap.clientHeight-8);const scale=Math.min(maxW/base.width,maxH/base.height);const viewport=page.getViewport({scale:Math.max(.1,scale)});const dpr=Math.max(1,window.devicePixelRatio||1);els.pdfViewerCanvas.width=Math.ceil(viewport.width*dpr);els.pdfViewerCanvas.height=Math.ceil(viewport.height*dpr);els.pdfViewerCanvas.style.width=Math.ceil(viewport.width)+'px';els.pdfViewerCanvas.style.height=Math.ceil(viewport.height)+'px';const ctx=els.pdfViewerCanvas.getContext('2d',{alpha:false});if(!ctx)return;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#fff';ctx.fillRect(0,0,viewport.width,viewport.height);await page.render({canvasContext:ctx,viewport}).promise;if(token!==state.pdfRenderToken)return;if(els.pdfViewerPageIndicator){els.pdfViewerPageIndicator.textContent=`Folha ${state.pdfPage} de ${state.pdfPageCount}`;els.pdfViewerPageIndicator.classList.remove('hidden')}}
 
 async function openProcessedPdfPreview(fileOrDataUrl, title='PDF processado'){
   try{
+    els.pdfNativeFrame?.classList.add('hidden');
+    if(els.pdfNativeFrame)els.pdfNativeFrame.src='about:blank';
+    state.pdfNativeFrame=false;
     if(!window.pdfjsLib) throw new Error('O leitor de PDF ainda não está disponível.');
     pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     let bytes;
@@ -801,40 +849,40 @@ async function openProcessedPdfPreview(fileOrDataUrl, title='PDF processado'){
   }
 }
 async function renderAdminPdfPreview(pageNumber){if(!state.pdfDoc||!els.pdfPagePreviewCanvas||!els.pdfViewerPageWrap)return false;try{const page=await state.pdfDoc.getPage(pageNumber);const base=page.getViewport({scale:1});const maxW=Math.max(1,els.pdfViewerPageWrap.clientWidth-8);const maxH=Math.max(1,els.pdfViewerPageWrap.clientHeight-8);const scale=Math.min(maxW/base.width,maxH/base.height);const viewport=page.getViewport({scale:Math.max(.1,scale)});const dpr=Math.max(1,window.devicePixelRatio||1);els.pdfPagePreviewCanvas.width=Math.ceil(viewport.width*dpr);els.pdfPagePreviewCanvas.height=Math.ceil(viewport.height*dpr);els.pdfPagePreviewCanvas.style.width=Math.ceil(viewport.width)+'px';els.pdfPagePreviewCanvas.style.height=Math.ceil(viewport.height)+'px';const ctx=els.pdfPagePreviewCanvas.getContext('2d',{alpha:false});if(!ctx)return false;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#fff';ctx.fillRect(0,0,viewport.width,viewport.height);await page.render({canvasContext:ctx,viewport}).promise;return true}catch(_){return false}}
-function viewPdf(url){
-  if(typeof url==='string' && url.startsWith('data:application/pdf')){
-    return openProcessedPdfPreview(url,'PDF processado');
-  }
-  const value=normalizePublicPdfUrl(url);
-  if(!value)return;
-  const isDrive=/drive\.google\.com/i.test(value);
-  // Google Drive não permite o carregamento do PDF via pdf.js em todos os navegadores
-  // por causa de CORS/redirect. Nesse caso abrimos a visualização nativa imediatamente.
-  if(isDrive){ window.open(value,'_blank','noopener,noreferrer'); return; }
-  const popup=window.open('about:blank','_blank','noopener,noreferrer');
-  if(popup){ try{popup.document.title='Palco Pro — PDF';popup.document.body.innerHTML='<p style="font-family:system-ui;padding:24px">Abrindo PDF…</p>'; }catch(_){} }
-  (async()=>{
+async function viewPdf(url){
+  const raw=String(url||'').trim();
+  if(!raw){showToast('PDF não disponível para visualização.','error');return;}
+  if(raw.startsWith('data:application/pdf')){await openProcessedPdfPreview(raw,'PDF processado');return;}
+  const value=normalizePublicPdfUrl(raw);
+  closePdfViewer();
+  try{
+    if(!window.pdfjsLib)throw new Error('O leitor de PDF ainda não está disponível.');
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    state.pdfUrl=value;
+    state.pdfDoc=await pdfjsLib.getDocument({url:value}).promise;
+    state.pdfPageCount=state.pdfDoc.numPages||1;
+    state.pdfPage=1;
+    els.pdfViewerScreen?.classList.add('open');
+    els.pdfViewerScreen?.setAttribute('aria-hidden','false');
+    els.pdfViewerHint?.classList.remove('hidden');
+    await renderAdminPdfPage(1);
+    clearTimeout(viewPdf.hintTimer);
+    viewPdf.hintTimer=setTimeout(()=>els.pdfViewerHint?.classList.add('hidden'),2800);
+  }catch(error){
+    console.warn('Falha no leitor interno; usando visualização nativa dentro do ADM.',error);
+    closePdfViewer();
     try{
-      if(!window.pdfjsLib)throw new Error('O leitor de PDF ainda não está disponível.');
-      pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      els.pdfNativeFrame.src=value;
+      els.pdfNativeFrame.classList.remove('hidden');
+      els.pdfViewerScreen?.classList.add('open');
+      els.pdfViewerScreen?.setAttribute('aria-hidden','false');
+      state.pdfUrl=value; state.pdfNativeFrame=true;
+    }catch(fallbackError){
+      console.error('Falha ao abrir a visualização nativa do PDF.',fallbackError);
       closePdfViewer();
-      state.pdfUrl=value;
-      state.pdfDoc=await pdfjsLib.getDocument({url:value}).promise;
-      state.pdfPageCount=state.pdfDoc.numPages||1;
-      state.pdfPage=1;
-      els.pdfViewerScreen.classList.add('open');
-      els.pdfViewerScreen.setAttribute('aria-hidden','false');
-      els.pdfViewerHint?.classList.remove('hidden');
-      clearTimeout(viewPdf.hintTimer);
-      viewPdf.hintTimer=setTimeout(()=>els.pdfViewerHint?.classList.add('hidden'),2800);
-      await renderAdminPdfPage(1);
-      if(popup && !popup.closed)popup.close();
-    }catch(error){
-      console.warn('Falha ao abrir PDF no visualizador interno.',error);
-      closePdfViewer();
-      if(popup && !popup.closed)popup.location.href=value; else window.open(value,'_blank','noopener,noreferrer');
+      showToast('Não foi possível visualizar este PDF neste dispositivo.','error');
     }
-  })();
+  }
 }
 async function changeAdminPdfPage(delta){
   if(!state.pdfDoc)return;
@@ -1132,7 +1180,43 @@ function initCatalogSwipe(){
   els.catalogList.addEventListener('click',e=>{const row=e.target.closest('.song-row[data-song-swipe]');if(moved){moved=false;return}if(e.target.closest('.song-actions'))return;if(row?.classList.contains('revealed')){row.classList.remove('revealed','is-revealing');setVisual(row,0,true);e.preventDefault();e.stopPropagation()}},true);
   document.addEventListener('click',e=>{if(e.target.closest('.song-row[data-song-swipe]'))return;els.catalogList.querySelectorAll('.song-row.revealed,.song-row.is-revealing').forEach(row=>{row.classList.remove('revealed','is-revealing');setVisual(row,0,true)})});
 }
-  els.pdfViewerScreen?.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;state.pdfSwipeStartX=e.clientX;state.pdfSwipeStartY=e.clientY;state.pdfSwipeTracking=true;try{els.pdfViewerScreen.setPointerCapture?.(e.pointerId)}catch(_){}});els.pdfViewerScreen?.addEventListener('pointerup',e=>{if(!state.pdfSwipeTracking)return;state.pdfSwipeTracking=false;const dx=e.clientX-state.pdfSwipeStartX,dy=e.clientY-state.pdfSwipeStartY;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.15)changeAdminPdfPage(dx<0?1:-1)});els.pdfViewerScreen?.addEventListener('pointercancel',()=>{state.pdfSwipeTracking=false});els.pdfViewerClose?.addEventListener('click',closePdfViewer);els.pdfViewerPrev?.addEventListener('click',()=>changeAdminPdfPage(-1));els.pdfViewerNext?.addEventListener('click',()=>changeAdminPdfPage(1));window.addEventListener('resize',()=>{if(state.pdfDoc&&els.pdfViewerScreen?.classList.contains('open'))renderAdminPdfPage(state.pdfPage).catch(()=>{})});
+  let pdfGesturePointerId=null,pdfGestureStartX=0,pdfGestureStartY=0,pdfGestureMoved=false;
+  els.pdfViewerScreen?.addEventListener('pointerdown',e=>{
+    if(e.target.closest?.('#pdfViewerClose'))return;
+    if(e.pointerType==='mouse'&&e.button!==0)return;
+    pdfGesturePointerId=e.pointerId; pdfGestureStartX=e.clientX; pdfGestureStartY=e.clientY; pdfGestureMoved=false; state.pdfSwipeTracking=true;
+  },{passive:true});
+  els.pdfViewerScreen?.addEventListener('pointermove',e=>{
+    if(!state.pdfSwipeTracking||e.pointerId!==pdfGesturePointerId)return;
+    const dx=e.clientX-pdfGestureStartX,dy=e.clientY-pdfGestureStartY;
+    if(Math.abs(dx)>8||Math.abs(dy)>8)pdfGestureMoved=true;
+  },{passive:true});
+  els.pdfViewerScreen?.addEventListener('pointerup',e=>{
+    if(e.pointerId!==pdfGesturePointerId)return;
+    state.pdfSwipeTracking=false; pdfGesturePointerId=null;
+    if(e.target.closest?.('#pdfViewerClose'))return;
+    const dx=e.clientX-pdfGestureStartX,dy=e.clientY-pdfGestureStartY;
+    if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.15&&!state.pdfNativeFrame)changeAdminPdfPage(dx<0?1:-1);
+  });
+  els.pdfViewerScreen?.addEventListener('pointercancel',()=>{state.pdfSwipeTracking=false;pdfGesturePointerId=null;});
+  function handlePdfViewerCloseEvent(e){
+    e.preventDefault();
+    e.stopPropagation();
+    closePdfViewer();
+    if(state.editingId){
+      requestAnimationFrame(()=>{
+        const target=document.querySelector('#catalogTab .card')||document.querySelector('#catalogTab')||document.querySelector('.form-card');
+        target?.scrollIntoView?.({behavior:'smooth',block:'start'});
+      });
+    }
+  }
+  els.pdfViewerClose?.addEventListener('pointerdown',handlePdfViewerCloseEvent,{passive:false});
+  els.pdfViewerClose?.addEventListener('pointerup',handlePdfViewerCloseEvent,{passive:false});
+  els.pdfViewerClose?.addEventListener('touchend',handlePdfViewerCloseEvent,{passive:false});
+  els.pdfViewerClose?.addEventListener('click',handlePdfViewerCloseEvent,{passive:false});
+  els.pdfViewerPrev?.addEventListener('click',()=>changeAdminPdfPage(-1));
+  els.pdfViewerNext?.addEventListener('click',()=>changeAdminPdfPage(1));
+  window.addEventListener('resize',()=>{if(state.pdfDoc&&els.pdfViewerScreen?.classList.contains('open'))renderAdminPdfPage(state.pdfPage).catch(()=>{})});
 function initReceivedSwipe(){
   let activeRow=null,pointerId=null,startX=0,startY=0,startOffset=0,currentDx=0,moved=false,suppressNextClick=false;
   const getWidth=row=>Math.max(1,row.clientWidth);
