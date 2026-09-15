@@ -582,7 +582,6 @@ function getSongPdfReference(song){
   return '';
 }
 function songHasPdf(song){return Boolean(getSongPdfReference(song)||song?.pdfData||song?.pdfFileName||song?.pdf?.fileName||song?.arquivoPdf?.fileName)}
-function songHasLyrics(song){return Boolean(normalize(song?.lyrics||song?.letra))}
 function getCatalogPdfUrl(song){return getSongPdfReference(song)}
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
 async function fetchJson(url,options={},timeoutMs=15000){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeoutMs);try{const response=await fetch(url,{...options,signal:controller.signal,cache:'no-store'});const text=await response.text();let data=null;try{data=JSON.parse(text)}catch(_){throw new Error('Resposta inválida do servidor.')}if(!response.ok)throw new Error('HTTP '+response.status);return data}finally{clearTimeout(timer)}}
@@ -748,7 +747,7 @@ function renderCatalog(){
     const row=document.createElement('article');
     row.className=`song-row ${state.selectedIds.has(song.id)?'selected':''}`;
     row.dataset.songSwipe='1';
-    row.innerHTML=`<div class="song-actions"><span class="badge ${song.active?'':'inactive'}">${song.active?'Ativa':'Inativa'}</span><button class="btn btn-secondary btn-small" type="button" data-view="${escapeHtml(song.id)}">Ver</button><button class="btn btn-secondary btn-small" type="button" data-edit="${escapeHtml(song.id)}">Editar</button>${(songHasPdf(song)||state.localPdfPreviewSongId===song.id)?`<button class="btn btn-secondary btn-small" type="button" data-view-pdf="${escapeHtml(song.id)}">👁 PDF</button>`:''}<button class="btn btn-secondary btn-small" type="button" data-pdf="${escapeHtml(song.id)}">${songHasPdf(song)?'Alterar PDF':'Adicionar PDF'}</button><button class="btn ${song.active?'btn-amber':'btn-success'} btn-small" type="button" data-toggle="${escapeHtml(song.id)}">${song.active?'Desativar':'Ativar'}</button><button class="btn btn-danger btn-small" type="button" data-delete="${escapeHtml(song.id)}">Excluir</button></div><div class="song-card"><input class="song-select" type="checkbox" data-select="${escapeHtml(song.id)}" aria-label="Selecionar música" ${state.selectedIds.has(song.id)?'checked':''}><div class="song-main"><div class="song-title-line"><div class="song-title">${escapeHtml(song.title)}</div>${songHasPdf(song)?'<span class="song-pdf-indicator" aria-label="PDF anexado" title="PDF anexado">📄</span>':''}<button class="song-lyrics-search-btn" type="button" data-search-lyrics="${escapeHtml(song.id)}" aria-label="Buscar letra na internet" title="Buscar letra na internet">🔎</button>${(!songHasPdf(song)&&songHasLyrics(song))?`<button class="song-lyrics-search-btn song-generate-pdf-btn" type="button" data-generate-pdf="${escapeHtml(song.id)}" aria-label="Gerar PDF com a letra cadastrada" title="Gerar PDF com a letra cadastrada">🖨️</button>`:''}</div><div class="song-meta">${escapeHtml(song.artist||'Sem artista')}${song.style?' • '+escapeHtml(song.style):''}${song.note?' • Tom: '+escapeHtml(song.note):''}</div></div></div>`;
+    row.innerHTML=`<div class="song-actions"><span class="badge ${song.active?'':'inactive'}">${song.active?'Ativa':'Inativa'}</span><button class="btn btn-secondary btn-small" type="button" data-view="${escapeHtml(song.id)}">Ver</button><button class="btn btn-secondary btn-small" type="button" data-edit="${escapeHtml(song.id)}">Editar</button>${(songHasPdf(song)||state.localPdfPreviewSongId===song.id)?`<button class="btn btn-secondary btn-small" type="button" data-view-pdf="${escapeHtml(song.id)}">👁 PDF</button>`:''}${(!songHasPdf(song)&&normalize(song.lyrics))?`<button class="btn btn-secondary btn-small" type="button" data-generate-pdf="${escapeHtml(song.id)}" title="Gerar PDF usando a letra já cadastrada">🖨️ PDF</button>`:''}<button class="btn btn-secondary btn-small" type="button" data-pdf="${escapeHtml(song.id)}">${songHasPdf(song)?'Alterar PDF':'Adicionar PDF'}</button><button class="btn ${song.active?'btn-amber':'btn-success'} btn-small" type="button" data-toggle="${escapeHtml(song.id)}">${song.active?'Desativar':'Ativar'}</button><button class="btn btn-danger btn-small" type="button" data-delete="${escapeHtml(song.id)}">Excluir</button></div><div class="song-card"><input class="song-select" type="checkbox" data-select="${escapeHtml(song.id)}" aria-label="Selecionar música" ${state.selectedIds.has(song.id)?'checked':''}><div class="song-main"><div class="song-title-line"><div class="song-title">${escapeHtml(song.title)}</div>${songHasPdf(song)?'<span class="song-pdf-indicator" aria-label="PDF anexado" title="PDF anexado">📄</span>':''}<button class="song-lyrics-search-btn" type="button" data-search-lyrics="${escapeHtml(song.id)}" aria-label="Buscar letra na internet" title="Buscar letra na internet">🔎</button></div><div class="song-meta">${escapeHtml(song.artist||'Sem artista')}${song.style?' • '+escapeHtml(song.style):''}${song.note?' • Tom: '+escapeHtml(song.note):''}</div></div></div>`;
     els.catalogList.appendChild(row);
   }
   updateBulkUI();
@@ -955,49 +954,82 @@ async function generateAutomaticLyricsPdf(title,artist,lyrics){
   const regular=await doc.embedFont(pdfLib.StandardFonts.Helvetica);
   const bold=await doc.embedFont(pdfLib.StandardFonts.HelveticaBold);
   const pageW=595.28,pageH=841.89;
-  const marginX=40, bottom=38, gap=22, colW=(pageW-(marginX*2)-gap)/2;
-  const bodySize=24, leading=28.5;
-  const titleSize=36, artistSize=29;
-  const logoBytes=await loadWatermarkLogoBytes();
+  const marginX=40,bottom=38,gap=22,colW=(pageW-(marginX*2)-gap)/2;
+  const bodySize=24,leading=28.5;
+  const titleSize=36,artistSize=29;
+  const black=pdfLib.rgb(0,0,0);
   let logo=null;
-  try{logo=await doc.embedPng(logoBytes)}catch(_){logo=null}
+  try{logo=await doc.embedPng(await loadWatermarkLogoBytes())}catch(_){logo=null}
 
-  const contentTopFirst=688;
-  const contentTopOther=pageH-46;
-  const usableFirst=contentTopFirst-bottom;
-  const usableOther=contentTopOther-bottom;
-  const linesFirst=Math.max(1,Math.floor(usableFirst/leading));
-  const linesOther=Math.max(1,Math.floor(usableOther/leading));
+  const safeTitle=safePdfText(title).trim()||'Sem título';
+  const safeArtist=safePdfText(artist).trim()||'Sem artista';
+  const titleLines=wrapPdfLine(safeTitle,bold,titleSize,colW);
+  const artistLines=wrapPdfLine(safeArtist,bold,artistSize,colW);
+  const titleLeading=titleSize*1.08;
+  const artistLeading=artistSize*1.08;
+  const headerTop=pageH-52;
+  const titleFirstBaseline=headerTop-titleSize;
+  const titleBlockHeight=titleLines.length*titleLeading;
+  const artistTop=headerTop-titleBlockHeight-10;
+  const artistFirstBaseline=artistTop-artistSize;
+  const artistBlockHeight=artistLines.length*artistLeading;
+  const headerGap=20;
+  const textHeaderBottom=artistTop-artistBlockHeight;
+  const logoBox={width:130,height:60,x:pageW-marginX-130,y:pageH-42-60};
+
+  // O corpo da letra começa abaixo do cabeçalho real. O valor é calculado a
+  // partir da altura das linhas, portanto título/artista longos nunca colidem.
+  // Na segunda coluna da primeira página reservamos também a área da logo.
+  const firstColumnTop=Math.min(
+    textHeaderBottom-headerGap,
+    logoBox.y-headerGap,
+    pageH-175
+  );
+  const subsequentTop=pageH-46;
+  const firstCapacity=Math.max(1,Math.floor((firstColumnTop-bottom)/leading));
+  const subsequentCapacity=Math.max(1,Math.floor((subsequentTop-bottom)/leading));
   const allLines=buildPdfColumnLines(lyrics,regular,bodySize,colW);
 
-  let cursor=0;
-  let pageNumber=1;
+  let cursor=0,pageNumber=1;
   while(cursor<allLines.length){
     const page=doc.addPage([pageW,pageH]);
-    const firstLines=pageNumber===1?linesFirst:linesOther;
-    const secondLines=pageNumber===1?linesFirst:linesOther;
+    const top=pageNumber===1?firstColumnTop:subsequentTop;
+    const capacity=pageNumber===1?firstCapacity:subsequentCapacity;
+
     if(pageNumber===1){
-      page.drawText(safePdfText(title),{x:marginX,y:pageH-62,size:titleSize,font:bold,color:pdfLib.rgb(0,0,0),maxWidth:colW});
-      page.drawText(safePdfText(artist),{x:marginX,y:pageH-95,size:artistSize,font:bold,color:pdfLib.rgb(0,0,0),maxWidth:colW});
+      let y=titleFirstBaseline;
+      for(const line of titleLines){
+        page.drawText(safePdfText(line),{x:marginX,y,size:titleSize,font:bold,color:black});
+        y-=titleLeading;
+      }
+      y=artistFirstBaseline;
+      for(const line of artistLines){
+        page.drawText(safePdfText(line),{x:marginX,y,size:artistSize,font:bold,color:black});
+        y-=artistLeading;
+      }
       if(logo){
         const aspect=logo.width/logo.height;
-        const maxW=118,maxH=48;
-        let w=maxW,h=w/aspect;
-        if(h>maxH){h=maxH;w=h*aspect;}
-        page.drawImage(logo,{x:pageW-marginX-w,y:pageH-42-h,width:w,height:h});
+        let w=logoBox.width,h=w/aspect;
+        if(h>logoBox.height){h=logoBox.height;w=h*aspect;}
+        page.drawImage(logo,{x:logoBox.x+(logoBox.width-w)/2,y:logoBox.y+(logoBox.height-h)/2,width:w,height:h});
       }
     }
-    const ranges=[];
-    const first=allLines.slice(cursor,cursor+firstLines); cursor+=first.length; ranges.push({lines:first,x:marginX,top:pageNumber===1?contentTopFirst:contentTopOther});
-    const second=allLines.slice(cursor,cursor+secondLines); cursor+=second.length; ranges.push({lines:second,x:marginX+colW+gap,top:pageNumber===1?contentTopFirst:contentTopOther});
 
-    // Never leave blank lines at the beginning of a new column.
+    const first=allLines.slice(cursor,cursor+capacity); cursor+=first.length;
+    const second=allLines.slice(cursor,cursor+capacity); cursor+=second.length;
+    const ranges=[
+      {lines:first,x:marginX},
+      {lines:second,x:marginX+colW+gap}
+    ];
+
+    // Cada coluna começa no mesmo topo nas páginas 2+. Linhas vazias no
+    // início de uma nova coluna são removidas; as internas são preservadas.
     for(const range of ranges){
       while(range.lines.length&&range.lines[0]==='')range.lines.shift();
-      let y=range.top;
+      let y=top;
       for(const line of range.lines){
         if(y<bottom)break;
-        if(line)page.drawText(safePdfText(line),{x:range.x,y,size:bodySize,font:regular,color:pdfLib.rgb(0,0,0)});
+        if(line)page.drawText(safePdfText(line),{x:range.x,y,size:bodySize,font:regular,color:black});
         y-=leading;
       }
     }
@@ -1005,7 +1037,7 @@ async function generateAutomaticLyricsPdf(title,artist,lyrics){
   }
 
   const bytes=await doc.save({useObjectStreams:true});
-  const filename=`${safePdfText(title).replace(/[\\/:*?"<>|]/g,'-')} - ${safePdfText(artist).replace(/[\\/:*?"<>|]/g,'-')} (Palco Pro).pdf`.slice(0,180);
+  const filename=`${safeTitle.replace(/[\\/:*?"<>|]/g,'-')} - ${safeArtist.replace(/[\\/:*?"<>|]/g,'-')} (Palco Pro).pdf`.slice(0,180);
   const file=new File([bytes],filename,{type:'application/pdf',lastModified:Date.now()});
   file.pageCount=doc.getPageCount();
   file.detectedWatermarks=0;
@@ -1110,12 +1142,13 @@ async function uploadCatalogPdfFile(songId,file){
 async function generatePdfForCatalogSong(songId){
   const song=state.songs.find(s=>s.id===songId);
   if(!song)return false;
-  if(songHasPdf(song)){showToast('Esta música já possui PDF.','error');return false}
-  const lyrics=normalize(song.lyrics||song.letra);
-  if(!lyrics){showToast('Esta música não possui letra cadastrada.','error');return false}
+  if(songHasPdf(song)){showToast('Esta música já possui PDF.','error');return false;}
+  const lyrics=sanitizeLyrics(song.lyrics||song.letra);
+  if(!lyrics){showToast('Esta música não possui letra cadastrada.','error');return false;}
   state.pdfProcessing=true;
-  const button=els.catalogList?.querySelector(`[data-generate-pdf=\"${CSS.escape(String(songId))}\"]`);
-  if(button){button.disabled=true;button.textContent='⏳'}
+  const button=els.catalogList?.querySelector(`[data-generate-pdf="${CSS.escape(String(songId))}"]`);
+  const oldText=button?.textContent||'🖨️ PDF';
+  if(button){button.disabled=true;button.textContent='⏳';}
   try{
     const generated=await generateAutomaticLyricsPdf(song.title,song.artist,lyrics);
     const pdfDataUrl=await fileToDataUrl(generated);
@@ -1136,6 +1169,7 @@ async function generatePdfForCatalogSong(songId){
     return false;
   }finally{
     state.pdfProcessing=false;
+    if(button){button.disabled=false;button.textContent=oldText;}
   }
 }
 
