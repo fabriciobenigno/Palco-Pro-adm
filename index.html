@@ -909,15 +909,97 @@ async function generateLyricsPdfPreview(title,artist,lyrics){
   const doc=await pdfLib.PDFDocument.create();
   const bold=await doc.embedFont(pdfLib.StandardFonts.HelveticaBold);
   const regular=await doc.embedFont(pdfLib.StandardFonts.Helvetica);
-  let logo=null;try{logo=await doc.embedPng(await loadWatermarkLogoBytes());}catch(_){logo=null;}
-  const PAGE_W=595.28,PAGE_H=841.89,marginLeft=42,marginRight=42,gutter=26,top=58,bottom=42;
-  const colW=(PAGE_W-marginLeft-marginRight-gutter)/2,titleSize=22,artistSize=15,lyricSize=11.2,lineGap=3.1,paragraphGap=8;
+  let logo=null;
+  try{logo=await doc.embedPng(await loadWatermarkLogoBytes());}catch(_){logo=null;}
+
+  // Padrão visual baseado no PDF de referência enviado:
+  // A4, margens estreitas, duas colunas e corpo grande (aprox. 24 pt).
+  const PAGE_W=594.96, PAGE_H=841.92;
+  const marginLeft=46.5, marginRight=46.5, gutter=27.4;
+  const colW=(PAGE_W-marginLeft-marginRight-gutter)/2;
+  const titleSize=36, artistSize=29;
+  const lyricSize=24, lineGap=4.5, paragraphGap=29;
+  const bodyTopFirst=698, bodyTopNext=792;
+  const bottom=31;
+  const titleColor=pdfLib.rgb(0,0,0);
+  const lyricColor=pdfLib.rgb(.10,.10,.10);
   let page=null,col=0,y=0;
-  const addPage=()=>{page=doc.addPage([PAGE_W,PAGE_H]);col=0;y=PAGE_H-118;if(logo){const maxW=122,maxH=46,aspect=logo.width/logo.height;let w=maxW,h=w/aspect;if(h>maxH){h=maxH;w=h*aspect;}page.drawImage(logo,{x:PAGE_W-marginRight-w,y:PAGE_H-48-h,width:w,height:h});}page.drawText(cleanTitle.toUpperCase(),{x:marginLeft,y:PAGE_H-58,size:titleSize,font:bold,color:pdfLib.rgb(0,0,0),maxWidth:colW});page.drawText(cleanArtist,{x:marginLeft,y:PAGE_H-82,size:artistSize,font:bold,color:pdfLib.rgb(0,0,0),maxWidth:colW});};
-  const wrap=(text)=>{const words=String(text||'').trim().split(/\s+/).filter(Boolean);if(!words.length)return [''];const lines=[];let line='';for(const word of words){const test=line?line+' '+word:word;if(regular.widthOfTextAtSize(test,lyricSize)<=colW){line=test;continue;}if(line){lines.push(line);line='';}if(regular.widthOfTextAtSize(word,lyricSize)<=colW){line=word;continue;}let part='';for(const ch of word){const t=part+ch;if(regular.widthOfTextAtSize(t,lyricSize)<=colW)part=t;else{if(part)lines.push(part);part=ch;}}line=part;}if(line)lines.push(line);return lines;};
-  const drawLine=(text)=>{if(y<bottom+lyricSize+lineGap){if(col===0){col=1;y=PAGE_H-58-60;}else{addPage();}}const x=marginLeft+col*(colW+gutter);page.drawText(text,{x,y,size:lyricSize,font:regular,color:pdfLib.rgb(.08,.08,.08),maxWidth:colW});y-=lyricSize+lineGap;};
-  addPage();
-  for(const para of cleanLyrics.split(/\n\s*\n/)){for(const line of wrap(para))drawLine(line);y-=paragraphGap;}
+
+  const drawHeader=()=>{
+    page.drawText(cleanTitle,{x:marginLeft,y:783,size:titleSize,font:bold,color:titleColor,maxWidth:colW});
+    page.drawText(cleanArtist,{x:marginLeft,y:752,size:artistSize,font:bold,color:titleColor,maxWidth:colW});
+    if(logo){
+      const maxW=100,maxH=42;
+      const aspect=(logo.width&&logo.height)?logo.width/logo.height:2.4;
+      let w=maxW,h=w/aspect;
+      if(h>maxH){h=maxH;w=h*aspect;}
+      page.drawImage(logo,{x:PAGE_W-marginRight-w,y:PAGE_H-30-h,width:w,height:h});
+    }
+  };
+
+  const addPage=(first=false)=>{
+    page=doc.addPage([PAGE_W,PAGE_H]);
+    col=0;
+    y=first?bodyTopFirst:bodyTopNext;
+    if(first)drawHeader();
+  };
+
+  const wrap=(text)=>{
+    const words=String(text||'').trim().split(/\s+/).filter(Boolean);
+    if(!words.length)return [];
+    const lines=[];let line='';
+    const pushLongWord=(word)=>{
+      let part='';
+      for(const ch of word){
+        const test=part+ch;
+        if(regular.widthOfTextAtSize(test,lyricSize)<=colW)part=test;
+        else{if(part)lines.push(part);part=ch;}
+      }
+      if(part)lines.push(part);
+    };
+    for(const word of words){
+      const test=line?line+' '+word:word;
+      if(regular.widthOfTextAtSize(test,lyricSize)<=colW){line=test;continue;}
+      if(line){lines.push(line);line='';}
+      if(regular.widthOfTextAtSize(word,lyricSize)<=colW)line=word;
+      else pushLongWord(word);
+    }
+    if(line)lines.push(line);
+    return lines;
+  };
+
+  const ensureSpace=()=>{
+    if(y-(lyricSize+lineGap)<bottom){
+      if(col===0){col=1;y=bodyTopNext;}
+      else{addPage(false);}
+    }
+  };
+
+  const drawLine=(text)=>{
+    ensureSpace();
+    const x=marginLeft+col*(colW+gutter);
+    page.drawText(text,{x,y,size:lyricSize,font:regular,color:lyricColor,maxWidth:colW});
+    y-=lyricSize+lineGap;
+  };
+
+  addPage(true);
+  const paragraphs=cleanLyrics.split(/\n\s*\n/);
+  for(let pIndex=0;pIndex<paragraphs.length;pIndex++){
+    const paragraph=paragraphs[pIndex].trim();
+    if(paragraph){
+      for(const line of wrap(paragraph))drawLine(line);
+    }
+    if(pIndex<paragraphs.length-1){
+      // Mantém o espaçamento visual entre versos/blocos do modelo.
+      if(y-(paragraphGap)<bottom){
+        if(col===0){col=1;y=bodyTopNext;}
+        else{addPage(false);}
+      }else{
+        y-=paragraphGap;
+      }
+    }
+  }
+
   return uint8ArrayToPdfDataUrl(await doc.save({useObjectStreams:true}));
 }
 async function regenerateFormLyricsPdf(){
