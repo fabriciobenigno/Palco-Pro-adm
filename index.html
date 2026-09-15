@@ -963,8 +963,13 @@ async function generateAutomaticLyricsPdf(title,artist,lyrics){
 
   const safeTitle=safePdfText(title).trim()||'Sem título';
   const safeArtist=safePdfText(artist).trim()||'Sem artista';
-  const titleLines=wrapPdfLine(safeTitle,bold,titleSize,colW);
-  const artistLines=wrapPdfLine(safeArtist,bold,artistSize,colW);
+  const logoBox={width:130,height:60,x:pageW-marginX-130,y:pageH-42-60};
+  // Cabeçalho próprio, em uma única coluna à esquerda da logotipo.
+  // A letra continua usando as duas colunas independentes abaixo.
+  const headerGap=18;
+  const headerW=Math.max(220,logoBox.x-marginX-headerGap);
+  const titleLines=wrapPdfLine(safeTitle,bold,titleSize,headerW);
+  const artistLines=wrapPdfLine(safeArtist,bold,artistSize,headerW);
   const titleLeading=titleSize*1.08;
   const artistLeading=artistSize*1.08;
   const headerTop=pageH-52;
@@ -973,9 +978,7 @@ async function generateAutomaticLyricsPdf(title,artist,lyrics){
   const artistTop=headerTop-titleBlockHeight-10;
   const artistFirstBaseline=artistTop-artistSize;
   const artistBlockHeight=artistLines.length*artistLeading;
-  const headerGap=20;
   const textHeaderBottom=artistTop-artistBlockHeight;
-  const logoBox={width:130,height:60,x:pageW-marginX-130,y:pageH-42-60};
 
   // O corpo da letra começa abaixo do cabeçalho real. O valor é calculado a
   // partir da altura das linhas, portanto título/artista longos nunca colidem.
