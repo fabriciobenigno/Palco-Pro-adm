@@ -546,11 +546,12 @@ const LOGIN='fabricio', PASSWORD='fabricio';
 const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbweGCvcOlO76O2CRVQTQUp5Unu2yOB5cKKvs1iFFf8RQpRI1jObEvfh4D4y-8gW2Ibr/exec';
 const MAIN_CATALOG_URL='https://fabriciobenigno.github.io/Palco-Pro/catalogo.json';
 const WATERMARK_LOGO_URL='./marca-dagua-palco-pro.png';
+const INLINE_PRINT_LOGO_DATA_URL='data:image/png;base64,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';
 const PDF_LIB_URL='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js';
 const CATALOG_KEY='palco-pro-admin-catalog-v4';
 const SESSION_KEY='palco-pro-admin-session-v4';
 const $=id=>document.getElementById(id);
-const state={songs:[],editingId:null,filter:'all',confirmAction:null,lastFileName:'',selectedIds:new Set(),catalogHandle:null,received:[],receivedSelected:new Set(),receivedEditingIndex:null,musicSearchResults:[],musicSearchController:null,pdfProcessing:false,pdfDoc:null,pdfPage:1,pdfPageCount:0,pdfRenderToken:0,pdfUrl:'',pdfSwipeStartX:0,pdfSwipeStartY:0,pdfSwipeTracking:false,pdfNativeFrame:false,localPdfPreviewSongId:'',localPdfPreviewDataUrl:'',generatedFormPdfDataUrl:'',generatedFormPdfFile:null,generatedFormPdfTitle:''};
+const state={songs:[],editingId:null,filter:'all',confirmAction:null,lastFileName:'',selectedIds:new Set(),catalogHandle:null,received:[],receivedSelected:new Set(),receivedEditingIndex:null,musicSearchResults:[],musicSearchController:null,pdfProcessing:false,pdfDoc:null,pdfPage:1,pdfPageCount:0,pdfRenderToken:0,pdfUrl:'',pdfSwipeStartX:0,pdfSwipeStartY:0,pdfSwipeTracking:false,pdfNativeFrame:false,localPdfPreviewSongId:'',localPdfPreviewDataUrl:''};
 const els={
  authCard:$('authCard'),adminPanel:$('adminPanel'),loginInput:$('loginInput'),passwordInput:$('passwordInput'),showPassword:$('showPasswordToggle'),loginBtn:$('loginBtn'),authStatus:$('authStatus'),logoutBtn:$('logoutBtn'),refreshIndexBtn:$('refreshIndexBtn'), refreshCatalog:$('refreshCatalogBtn'),
  songTitle:$('songTitle'),songArtist:$('songArtist'),songStyle:$('songStyle'),searchMusicBtn:$('searchMusicBtn'),musicSearchStatus:$('musicSearchStatus'),musicSearchResults:$('musicSearchResults'),musicSearchSelected:$('musicSearchSelected'),songNote:$('songNote'),songLyrics:$('songLyrics'),selectSongPdfBtn:$('selectSongPdfBtn'),songPdfStatus:$('songPdfStatus'),viewSongPdfBtn:$('viewSongPdfBtn'),formTitle:$('formTitle'),formSubtitle:$('formSubtitle'),editingBadge:$('editingBadge'),saveSong:$('saveSongBtn'),cancelEdit:$('cancelEditBtn'),formStatus:$('formStatus'),
@@ -769,13 +770,15 @@ let pendingReceivedPdf=null;
 function updateFormPdfUI(song=null){
   if(!els.songPdfStatus)return;
   const hasExisting=!!song?.pdfUrl;
-  const hasGenerated=!!state.generatedFormPdfDataUrl;
   if(selectedFormPdf){
-    const count=selectedFormPdf.detectedWatermarks||0;
-    els.songPdfStatus.textContent=count?`PDF processado. Marca Palco Pro aplicada em ${count} página(s).`:'PDF anexado e pronto para visualização.';
-    els.viewSongPdfBtn?.classList.remove('hidden');
-  }else if(hasGenerated){
-    els.songPdfStatus.textContent='✅ PDF gerado automaticamente e pronto para visualização.';
+    if(selectedFormPdf.__palcoGeneratedLyrics){
+      els.songPdfStatus.textContent=`PDF da letra gerado automaticamente (${selectedFormPdf.pageCount||1} página${(selectedFormPdf.pageCount||1)===1?'':'s'}).`;
+    }else{
+      const count=selectedFormPdf.detectedWatermarks||0;
+      els.songPdfStatus.textContent=count
+        ? `PDF processado. Marca Palco Pro aplicada em ${count} página(s).`
+        : 'PDF processado e pronto para visualização.';
+    }
     els.viewSongPdfBtn?.classList.remove('hidden');
   }else if(hasExisting){
     els.songPdfStatus.textContent='PDF atual: '+(song.pdfFileName||'arquivo.pdf');
@@ -785,7 +788,6 @@ function updateFormPdfUI(song=null){
     els.viewSongPdfBtn?.classList.add('hidden');
   }
 }
-
 function selectFormPdf(){els.catalogPdfInput.value='';els.catalogPdfInput.dataset.formMode='1';els.catalogPdfInput.click()}
 async function handleFormPdfSelection(file){
   if(!file)return;
@@ -894,126 +896,6 @@ async function searchMusicOnline(){
     els.searchMusicBtn.disabled=false;els.searchMusicBtn.textContent='🔎 Buscar música';
   }
 }
-function dataUrlToFile(dataUrl,name='letra-musica.pdf'){
-  const parts=String(dataUrl||'').split(',');
-  if(parts.length<2)throw new Error('PDF gerado inválido.');
-  const mime=(parts[0].match(/data:([^;]+)/i)||[])[1]||'application/pdf';
-  const binary=atob(parts[1]); const bytes=new Uint8Array(binary.length);
-  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
-  return new File([bytes],name,{type:mime});
-}
-async function generateLyricsPdfPreview(title,artist,lyrics){
-  const cleanTitle=normalize(title), cleanArtist=normalize(artist), cleanLyrics=sanitizeLyrics(lyrics);
-  if(!cleanTitle||!cleanLyrics)throw new Error('Não há letra suficiente para gerar o PDF.');
-  const pdfLib=await loadExternalScriptOnce(PDF_LIB_URL,'PDFLib');
-  const doc=await pdfLib.PDFDocument.create();
-  const bold=await doc.embedFont(pdfLib.StandardFonts.HelveticaBold);
-  const regular=await doc.embedFont(pdfLib.StandardFonts.Helvetica);
-  let logo=null;
-  try{logo=await doc.embedPng(await loadWatermarkLogoBytes());}catch(_){logo=null;}
-
-  // Padrão visual baseado no PDF de referência enviado:
-  // A4, margens estreitas, duas colunas e corpo grande (aprox. 24 pt).
-  const PAGE_W=594.96, PAGE_H=841.92;
-  const marginLeft=46.5, marginRight=46.5, gutter=27.4;
-  const colW=(PAGE_W-marginLeft-marginRight-gutter)/2;
-  const titleSize=36, artistSize=29;
-  const lyricSize=24, lineGap=4.5, paragraphGap=29;
-  const bodyTopFirst=698, bodyTopNext=792;
-  const bottom=31;
-  const titleColor=pdfLib.rgb(0,0,0);
-  const lyricColor=pdfLib.rgb(.10,.10,.10);
-  let page=null,col=0,y=0;
-
-  const drawHeader=()=>{
-    page.drawText(cleanTitle,{x:marginLeft,y:783,size:titleSize,font:bold,color:titleColor,maxWidth:colW});
-    page.drawText(cleanArtist,{x:marginLeft,y:752,size:artistSize,font:bold,color:titleColor,maxWidth:colW});
-    if(logo){
-      const maxW=100,maxH=42;
-      const aspect=(logo.width&&logo.height)?logo.width/logo.height:2.4;
-      let w=maxW,h=w/aspect;
-      if(h>maxH){h=maxH;w=h*aspect;}
-      page.drawImage(logo,{x:PAGE_W-marginRight-w,y:PAGE_H-30-h,width:w,height:h});
-    }
-  };
-
-  const addPage=(first=false)=>{
-    page=doc.addPage([PAGE_W,PAGE_H]);
-    col=0;
-    y=first?bodyTopFirst:bodyTopNext;
-    if(first)drawHeader();
-  };
-
-  const wrap=(text)=>{
-    const words=String(text||'').trim().split(/\s+/).filter(Boolean);
-    if(!words.length)return [];
-    const lines=[];let line='';
-    const pushLongWord=(word)=>{
-      let part='';
-      for(const ch of word){
-        const test=part+ch;
-        if(regular.widthOfTextAtSize(test,lyricSize)<=colW)part=test;
-        else{if(part)lines.push(part);part=ch;}
-      }
-      if(part)lines.push(part);
-    };
-    for(const word of words){
-      const test=line?line+' '+word:word;
-      if(regular.widthOfTextAtSize(test,lyricSize)<=colW){line=test;continue;}
-      if(line){lines.push(line);line='';}
-      if(regular.widthOfTextAtSize(word,lyricSize)<=colW)line=word;
-      else pushLongWord(word);
-    }
-    if(line)lines.push(line);
-    return lines;
-  };
-
-  const ensureSpace=()=>{
-    if(y-(lyricSize+lineGap)<bottom){
-      if(col===0){col=1;y=bodyTopNext;}
-      else{addPage(false);}
-    }
-  };
-
-  const drawLine=(text)=>{
-    ensureSpace();
-    const x=marginLeft+col*(colW+gutter);
-    page.drawText(text,{x,y,size:lyricSize,font:regular,color:lyricColor,maxWidth:colW});
-    y-=lyricSize+lineGap;
-  };
-
-  addPage(true);
-  const paragraphs=cleanLyrics.split(/\n\s*\n/);
-  for(let pIndex=0;pIndex<paragraphs.length;pIndex++){
-    const paragraph=paragraphs[pIndex].trim();
-    if(paragraph){
-      for(const line of wrap(paragraph))drawLine(line);
-    }
-    if(pIndex<paragraphs.length-1){
-      // Mantém o espaçamento visual entre versos/blocos do modelo.
-      if(y-(paragraphGap)<bottom){
-        if(col===0){col=1;y=bodyTopNext;}
-        else{addPage(false);}
-      }else{
-        y-=paragraphGap;
-      }
-    }
-  }
-
-  return uint8ArrayToPdfDataUrl(await doc.save({useObjectStreams:true}));
-}
-async function regenerateFormLyricsPdf(){
-  const title=normalize(els.songTitle?.value),artist=normalize(els.songArtist?.value),lyrics=sanitizeLyrics(els.songLyrics?.value);
-  if(!title||!lyrics){state.generatedFormPdfDataUrl='';state.generatedFormPdfFile=null;state.generatedFormPdfTitle='';updateFormPdfUI(null);return false;}
-  try{
-    els.viewSongPdfBtn?.classList.remove('hidden'); if(els.viewSongPdfBtn){els.viewSongPdfBtn.disabled=true;els.viewSongPdfBtn.textContent='Gerando PDF...';}
-    const dataUrl=await generateLyricsPdfPreview(title,artist,lyrics);
-    state.generatedFormPdfDataUrl=dataUrl;state.generatedFormPdfTitle=title+' — '+artist;state.generatedFormPdfFile=dataUrlToFile(dataUrl,(title+' - '+artist).replace(/[\\/:*?"<>|]/g,'_')+'.pdf');
-    updateFormPdfUI(null);if(els.viewSongPdfBtn)els.viewSongPdfBtn.textContent='👁 Ver PDF';return true;
-  }catch(error){state.generatedFormPdfDataUrl='';state.generatedFormPdfFile=null;state.generatedFormPdfTitle='';updateFormPdfUI(null);showToast('Não foi possível gerar o PDF automaticamente: '+(error?.message||'erro desconhecido'),'error');return false;}
-  finally{if(els.viewSongPdfBtn)els.viewSongPdfBtn.disabled=false;}
-}
-
 async function fetchLyricsForSelection(title,artist){
   const trackName=normalize(title),artistName=normalize(artist);
   if(!trackName||!artistName)return '';
@@ -1028,26 +910,150 @@ async function fetchLyricsForSelection(title,artist){
   if(!synced)return '';
   return synced.split('\n').map(line=>line.replace(/^\s*\[[^\]]+\]\s*/,'').trim()).filter(Boolean).join('\n');
 }
-async function selectMusicSearchResult(index){
-  const item=state.musicSearchResults?.[Number(index)];if(!item)return;
-  const title=normalize(item.trackName),artist=normalize(item.artistName),style=normalize(item.primaryGenreName);
-  els.songTitle.value=title;els.songArtist.value=artist;if(style)els.songStyle.value=style;
-  if(els.musicSearchSelected){els.musicSearchSelected.textContent=`✅ Selecionada: ${title} — ${artist}${style?' • Estilo preenchido: '+style:''}.`;els.musicSearchSelected.classList.remove('hidden');}
-  els.musicSearchResults.innerHTML='';state.generatedFormPdfDataUrl='';state.generatedFormPdfFile=null;state.generatedFormPdfTitle='';updateFormPdfUI(null);
-  els.musicSearchStatus.textContent='Buscando a letra da música selecionada...';els.musicSearchStatus.className='music-search-status';
-  try{
-    const lyrics=await fetchLyricsForSelection(title,artist);
-    if(!lyrics){els.musicSearchStatus.textContent='✅ Dados da música preenchidos, mas a letra não foi encontrada automaticamente. O PDF será gerado assim que houver letra.';els.musicSearchStatus.className='music-search-status status-warn';return;}
-    els.songLyrics.value=lyrics;
-    els.musicSearchStatus.textContent='Gerando PDF automaticamente...';els.musicSearchStatus.className='music-search-status';
-    const generated=await regenerateFormLyricsPdf();
-    els.musicSearchStatus.textContent=generated?'✅ Nome, artista, estilo, letra e PDF preenchidos automaticamente. Confira e salve manualmente.':'✅ Nome, artista, estilo e letra preenchidos. O PDF não pôde ser gerado agora.';
-    els.musicSearchStatus.className=generated?'music-search-status status-success':'music-search-status status-warn';
-  }catch(error){els.musicSearchStatus.textContent='✅ Dados da música preenchidos. Não foi possível buscar a letra automaticamente: '+(error?.message||'erro desconhecido')+'.';els.musicSearchStatus.className='music-search-status status-warn';}
+function pdfWrapText(text,font,size,maxWidth){
+  const raw=String(text??'').replace(/\r/g,'').trimEnd();
+  if(!raw)return [''];
+  const words=raw.split(/\s+/).filter(Boolean);
+  if(!words.length)return [''];
+  const lines=[];let current='';
+  const pushCurrent=()=>{if(current){lines.push(current);current='';}};
+  for(const word of words){
+    const candidate=current?current+' '+word:word;
+    if(font.widthOfTextAtSize(candidate,size)<=maxWidth){current=candidate;continue;}
+    if(current)pushCurrent();
+    if(font.widthOfTextAtSize(word,size)<=maxWidth){current=word;continue;}
+    let piece='';
+    for(const ch of word){
+      const test=piece+ch;
+      if(piece&&font.widthOfTextAtSize(test,size)>maxWidth){lines.push(piece);piece=ch;}else piece=test;
+    }
+    current=piece;
+  }
+  pushCurrent();
+  return lines.length?lines:[''];
+}
+function lyricsToPrintLines(lyrics,font,size,maxWidth){
+  const source=sanitizeLyrics(lyrics).split('\n');
+  const out=[];
+  for(const line of source){
+    if(!line.trim()){out.push('');continue;}
+    out.push(...pdfWrapText(line,font,size,maxWidth));
+  }
+  return out.length?out:[''];
+}
+async function generateLyricsPdfFile(title,artist,lyrics){
+  const pdfLib=await loadExternalScriptOnce(PDF_LIB_URL,'PDFLib');
+  const doc=await pdfLib.PDFDocument.create();
+  const bodyFont=await doc.embedFont(pdfLib.StandardFonts.Helvetica);
+  const boldFont=await doc.embedFont(pdfLib.StandardFonts.HelveticaBold);
+  const pageWidth=594.96,pageHeight=841.92;
+  const bodySize=24;
+  const lineHeight=28.5;
+  const leftX=46.5,rightX=307.4;
+  const colWidth=241.0;
+  const bottomMargin=54.0;
+  const firstPageTop=126.8;
+  const followingPageTop=32.3;
+  const titleSize=36;
+  const artistSize=30;
+  const pages=[];
+  let currentPage=doc.addPage([pageWidth,pageHeight]);
+  pages.push(currentPage);
+  let col=0;
+  let y=pageHeight-firstPageTop-bodySize;
+  const lines=lyricsToPrintLines(lyrics,bodyFont,bodySize,colWidth);
+  let lineIndex=0;
+  let blankExtra=0;
+  const drawHeader=async(page)=>{
+    page.drawText(normalize(title)||'Sem título',{x:leftX,y:pageHeight-70,size:titleSize,font:boldFont,color:pdfLib.rgb(0,0,0),maxWidth:360});
+    page.drawText(normalize(artist)||'Artista não informado',{x:leftX,y:pageHeight-104,size:artistSize,font:boldFont,color:pdfLib.rgb(0,0,0),maxWidth:360});
+    try{
+      const logo=await doc.embedPng(await (async()=>{
+        const binary=atob(INLINE_PRINT_LOGO_DATA_URL.split(',')[1]||'');
+        const bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return bytes;
+      })());
+      const logoW=73.5,logoH=22.5,logoX=474.75,logoY=pageHeight-54;
+      page.drawImage(logo,{x:logoX,y:logoY,width:logoW,height:logoH});
+    }catch(error){
+      // Se a logo embutida estiver indisponível por algum motivo, tenta a mesma logo externa usada no painel.
+      try{const logo=await doc.embedPng(await loadWatermarkLogoBytes());const logoW=73.5,logoH=22.5,logoX=474.75,logoY=pageHeight-54;page.drawImage(logo,{x:logoX,y:logoY,width:logoW,height:logoH});}catch(_){console.warn('Logo não pôde ser incorporada ao PDF de impressão:',error)}
+    }
+  };
+  await drawHeader(currentPage);
+  const advanceColumn=()=>{
+    if(col===0){col=1;y=pageHeight-firstPageTop-bodySize;blankExtra=0;return true;}
+    currentPage=doc.addPage([pageWidth,pageHeight]);pages.push(currentPage);col=0;y=pageHeight-followingPageTop-bodySize;blankExtra=0;return true;
+  };
+  while(lineIndex<lines.length){
+    const line=lines[lineIndex];
+    const lineStep=line?lineHeight:Math.max(14,lineHeight*0.56);
+    if(y-lineStep<bottomMargin){
+      advanceColumn();
+      continue;
+    }
+    if(line){currentPage.drawText(line,{x:col===0?leftX:rightX,y,size:bodySize,font:bodyFont,color:pdfLib.rgb(0,0,0),maxWidth:colWidth});}
+    y-=lineStep;
+    lineIndex++;
+  }
+  const bytes=await doc.save({useObjectStreams:true});
+  const dataUrl=uint8ArrayToPdfDataUrl(bytes);
+  const base64=dataUrl.split(',')[1]||'';
+  const binary=atob(base64);const outBytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)outBytes[i]=binary.charCodeAt(i);
+  const safeName=(normalize(`${title||'musica'} - ${artist||'artista'} (Palco Pro).pdf`).replace(/[\\/:*?"<>|]+/g,'_'))||'musica (Palco Pro).pdf';
+  const file=new File([outBytes],safeName,{type:'application/pdf',lastModified:Date.now()});
+  file.__palcoProcessed=true;
+  file.__palcoGeneratedLyrics=true;
+  file.pageCount=pages.length;
+  file.detectedWatermarks=0;
+  file.__palcoDataUrl=dataUrl;
+  return file;
 }
 
-function clearForm(){selectedFormPdf=null;pendingReceivedPdf=null;state.generatedFormPdfDataUrl='';state.generatedFormPdfFile=null;state.generatedFormPdfTitle='';els.catalogPdfInput.value='';delete els.catalogPdfInput.dataset.formMode;state.editingId=null;els.formTitle.textContent='Cadastrar música';els.formSubtitle.textContent='A música será incluída no catálogo que o Palco Pro principal lê.';els.editingBadge.textContent='Nova música';els.editingBadge.className='badge';els.saveSong.textContent='Salvar música';els.cancelEdit.classList.add('hidden');els.songTitle.value='';els.songArtist.value='';els.songStyle.value='';if(els.songNote)els.songNote.value='';els.songLyrics.value='';els.formStatus.textContent='';clearMusicSearchUI();updateFormPdfUI(null)}
-function beginEdit(id){const s=state.songs.find(x=>x.id===id);if(!s)return;state.editingId=id;els.formTitle.textContent='Editar música';els.formSubtitle.textContent='Atualize os dados e salve. A alteração ficará pronta para o próximo catalogo.json.';els.editingBadge.textContent='Edição';els.editingBadge.className='badge';els.saveSong.textContent='Salvar alterações';els.cancelEdit.classList.remove('hidden');els.songTitle.value=s.title;els.songArtist.value=s.artist;els.songStyle.value=s.style;if(els.songNote)els.songNote.value=normalize(s.note);els.songLyrics.value=s.lyrics;selectedFormPdf=null;pendingReceivedPdf=null;state.generatedFormPdfDataUrl='';state.generatedFormPdfFile=null;state.generatedFormPdfTitle='';updateFormPdfUI(s);els.formStatus.textContent='Você está editando esta música.';clearMusicSearchUI();els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})}
+async function selectMusicSearchResult(index){
+  const item=state.musicSearchResults?.[Number(index)];
+  if(!item)return;
+  const title=normalize(item.trackName),artist=normalize(item.artistName),style=normalize(item.primaryGenreName);
+  els.songTitle.value=title;els.songArtist.value=artist;
+  if(style)els.songStyle.value=style;
+  if(els.musicSearchSelected){
+    els.musicSearchSelected.textContent=`✅ Selecionada: ${title} — ${artist}${style?' • Estilo preenchido: '+style:''}.`;
+    els.musicSearchSelected.classList.remove('hidden');
+  }
+  els.musicSearchResults.innerHTML='';
+  els.musicSearchStatus.textContent='Buscando a letra da música selecionada...';
+  els.musicSearchStatus.className='music-search-status';
+  selectedFormPdf=null;
+  updateFormPdfUI(null);
+  try{
+    const lyrics=await fetchLyricsForSelection(title,artist);
+    if(lyrics){
+      els.songLyrics.value=lyrics;
+      els.musicSearchStatus.textContent='Letra encontrada. Gerando automaticamente o PDF no padrão de impressão...';
+      els.musicSearchStatus.className='music-search-status';
+      try{
+        selectedFormPdf=await generateLyricsPdfFile(title,artist,lyrics);
+        if(els.songPdfStatus)els.songPdfStatus.textContent=`PDF da letra gerado automaticamente (${selectedFormPdf.pageCount||1} página${(selectedFormPdf.pageCount||1)===1?'':'s'}).`;
+        els.viewSongPdfBtn?.classList.remove('hidden');
+        els.musicSearchStatus.textContent='✅ Nome, artista, estilo, letra e PDF preenchidos. Nada foi salvo automaticamente; confira e salve manualmente.';
+        els.musicSearchStatus.className='music-search-status status-success';
+      }catch(pdfError){
+        selectedFormPdf=null;
+        updateFormPdfUI(null);
+        els.musicSearchStatus.textContent='✅ Nome, artista, estilo e letra preenchidos, mas o PDF não pôde ser gerado automaticamente: '+(pdfError?.message||'erro desconhecido')+'.';
+        els.musicSearchStatus.className='music-search-status status-warn';
+      }
+    }else{
+      els.songLyrics.value='';
+      els.musicSearchStatus.textContent='✅ Dados da música preenchidos, mas a letra não foi encontrada automaticamente. O PDF também não foi gerado.';
+      els.musicSearchStatus.className='music-search-status status-warn';
+    }
+  }catch(error){
+    els.musicSearchStatus.textContent='✅ Dados da música preenchidos. Não foi possível buscar a letra automaticamente: '+(error?.message||'erro desconhecido')+'.';
+    els.musicSearchStatus.className='music-search-status status-warn';
+  }
+}
+function clearForm(){selectedFormPdf=null;pendingReceivedPdf=null;els.catalogPdfInput.value='';delete els.catalogPdfInput.dataset.formMode;state.editingId=null;els.formTitle.textContent='Cadastrar música';els.formSubtitle.textContent='A música será incluída no catálogo que o Palco Pro principal lê.';els.editingBadge.textContent='Nova música';els.editingBadge.className='badge';els.saveSong.textContent='Salvar música';els.cancelEdit.classList.add('hidden');els.songTitle.value='';els.songArtist.value='';els.songStyle.value='';if(els.songNote)els.songNote.value='';els.songLyrics.value='';els.formStatus.textContent='';clearMusicSearchUI();updateFormPdfUI(null)}
+function beginEdit(id){const s=state.songs.find(x=>x.id===id);if(!s)return;state.editingId=id;els.formTitle.textContent='Editar música';els.formSubtitle.textContent='Atualize os dados e salve. A alteração ficará pronta para o próximo catalogo.json.';els.editingBadge.textContent='Edição';els.editingBadge.className='badge';els.saveSong.textContent='Salvar alterações';els.cancelEdit.classList.remove('hidden');els.songTitle.value=s.title;els.songArtist.value=s.artist;els.songStyle.value=s.style;if(els.songNote)els.songNote.value=normalize(s.note);els.songLyrics.value=s.lyrics;selectedFormPdf=null;pendingReceivedPdf=null;updateFormPdfUI(s);els.formStatus.textContent='Você está editando esta música.';clearMusicSearchUI();els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})}
 async function saveSong(){
  if(saveSong.busy)return;
  const title=normalize(els.songTitle.value),artist=normalize(els.songArtist.value),style=normalize(els.songStyle.value),note=normalize(els.songNote?.value),lyrics=sanitizeLyrics(els.songLyrics.value);
@@ -1066,10 +1072,9 @@ async function saveSong(){
   const publicado=await publishCatalogToServer();
   if(!publicado.sucesso){setStatus('Foi salvo neste dispositivo, mas não foi sincronizado com o catálogo principal: '+publicado.mensagem,'error');showToast('Falha na sincronização.','error');return}
   const savedSong=editing?state.songs.find(s=>s.id===state.editingId):state.songs[0];
-  const pdfToUpload=selectedFormPdf||state.generatedFormPdfFile;
-  if(pdfToUpload && savedSong){
+  if(selectedFormPdf && savedSong){
     setStatus('Catálogo sincronizado. Enviando PDF...');
-    const pdfOk=await uploadCatalogPdfFile(savedSong.id,pdfToUpload);
+    const pdfOk=await uploadCatalogPdfFile(savedSong.id,selectedFormPdf);
     if(!pdfOk){setStatus('⚠ Música salva no catálogo, mas o PDF não foi enviado. Você pode anexá-lo pela lista da música.','error')}
   }
   clearForm();setStatus(editing?'✅ Música atualizada no catálogo principal.':'✅ Música adicionada ao catálogo principal.','success');showToast(editing?'Música atualizada.':'Música adicionada.','success');if(!editing)showConfirmationAnimation(title);
@@ -1601,7 +1606,7 @@ function init(){
   document.addEventListener('pointerleave', clearTap, {passive:true});
  initCatalogSwipe();
  initReceivedSwipe();
- els.catalogPdfInput?.addEventListener('change',e=>{const file=e.target.files?.[0];if(!file)return;if(e.target.dataset.formMode==='1'){delete e.target.dataset.formMode;handleFormPdfSelection(file)}else uploadCatalogPdf(file)});els.selectSongPdfBtn?.addEventListener('click',selectFormPdf);els.viewSongPdfBtn?.addEventListener('click',()=>{const song=state.songs.find(s=>s.id===state.editingId);if(selectedFormPdf)openProcessedPdfPreview(selectedFormPdf,'Pré-visualização do PDF anexado');else if(state.generatedFormPdfDataUrl)openProcessedPdfPreview(state.generatedFormPdfDataUrl,'Pré-visualização do PDF gerado');else if(song?.pdfUrl)viewPdf(song.pdfUrl)});els.receivedPdfInput?.addEventListener('change',e=>{const file=e.target.files?.[0];if(file)uploadReceivedPdf(file)});els.showPassword.addEventListener('change',()=>els.passwordInput.type=els.showPassword.checked?'text':'password');els.loginBtn.addEventListener('click',handleLogin);[els.loginInput,els.passwordInput].forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin()}));els.logoutBtn.addEventListener('click',logout);els.refreshIndexBtn?.addEventListener('click',()=>{window.location.reload()});els.refreshCatalog?.addEventListener('click',refreshMainCatalog);els.refreshReceived.addEventListener('click',loadReceived);els.selectAllReceived.addEventListener('click',()=>{const all=state.received.length>0&&state.received.every((_,i)=>state.receivedSelected.has(i));state.receivedSelected=all?new Set():new Set(state.received.map((_,i)=>i));renderReceived()});els.clearReceivedSelection.addEventListener('click',()=>{state.receivedSelected.clear();renderReceived()});els.approveSelectedReceived.addEventListener('click',authorizeSelectedReceived);els.saveReceivedEdit.addEventListener('click',saveReceivedEditor);els.receivedEditModal.querySelectorAll('[data-close-received-edit]').forEach(b=>b.addEventListener('click',closeReceivedEditor));
+ els.catalogPdfInput?.addEventListener('change',e=>{const file=e.target.files?.[0];if(!file)return;if(e.target.dataset.formMode==='1'){delete e.target.dataset.formMode;handleFormPdfSelection(file)}else uploadCatalogPdf(file)});els.selectSongPdfBtn?.addEventListener('click',selectFormPdf);els.viewSongPdfBtn?.addEventListener('click',async()=>{if(selectedFormPdf){await openProcessedPdfPreview(selectedFormPdf,selectedFormPdf.__palcoGeneratedLyrics?'Pré-visualização da letra':'Pré-visualização do PDF processado');return;}const song=state.songs.find(s=>s.id===state.editingId);if(song?.pdfUrl)await viewPdf(song.pdfUrl)});els.receivedPdfInput?.addEventListener('change',e=>{const file=e.target.files?.[0];if(file)uploadReceivedPdf(file)});els.showPassword.addEventListener('change',()=>els.passwordInput.type=els.showPassword.checked?'text':'password');els.loginBtn.addEventListener('click',handleLogin);[els.loginInput,els.passwordInput].forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin()}));els.logoutBtn.addEventListener('click',logout);els.refreshIndexBtn?.addEventListener('click',()=>{window.location.reload()});els.refreshCatalog?.addEventListener('click',refreshMainCatalog);els.refreshReceived.addEventListener('click',loadReceived);els.selectAllReceived.addEventListener('click',()=>{const all=state.received.length>0&&state.received.every((_,i)=>state.receivedSelected.has(i));state.receivedSelected=all?new Set():new Set(state.received.map((_,i)=>i));renderReceived()});els.clearReceivedSelection.addEventListener('click',()=>{state.receivedSelected.clear();renderReceived()});els.approveSelectedReceived.addEventListener('click',authorizeSelectedReceived);els.saveReceivedEdit.addEventListener('click',saveReceivedEditor);els.receivedEditModal.querySelectorAll('[data-close-received-edit]').forEach(b=>b.addEventListener('click',closeReceivedEditor));
  els.searchMusicBtn?.addEventListener('click',searchMusicOnline);els.musicSearchResults?.addEventListener('click',e=>{const result=e.target.closest('[data-music-search-index]');if(result)selectMusicSearchResult(result.dataset.musicSearchIndex)});els.songTitle?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!state.editingId&&els.songTitle.value.trim()){e.preventDefault();searchMusicOnline()}});els.saveSong.addEventListener('click',saveSong);els.cancelEdit.addEventListener('click',clearForm);els.newSong.addEventListener('click',()=>{document.querySelector('.tab-btn[data-tab="editor"]').click();clearForm();els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})});els.exportBtn?.addEventListener('click',exportCatalog);els.quickExport?.addEventListener('click',exportCatalog);els.selectAll.addEventListener('click',toggleAllVisible);els.clearSelection.addEventListener('click',clearSelection);els.changeStyle.addEventListener('click',openStyleModal);els.continueStyle.addEventListener('click',continueStyleChange);els.styleModal.querySelectorAll('[data-close-style]').forEach(b=>b.addEventListener('click',closeStyleModal));els.linkCatalog?.addEventListener('click',linkCatalog);els.search.addEventListener('input',renderCatalog);document.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click',()=>setFilter(b.dataset.filter)));
  els.catalogList.addEventListener('click',e=>{const lyricsSearch=e.target.closest('[data-search-lyrics]');if(lyricsSearch){const song=state.songs.find(x=>x.id===lyricsSearch.dataset.searchLyrics);if(song)openLyricsSearch(song.title);return;}const select=e.target.closest('[data-select]');if(select){toggleSelected(select.dataset.select,select.checked);return;}const edit=e.target.closest('[data-edit]');const view=e.target.closest('[data-view]');const viewPdfBtn=e.target.closest('[data-view-pdf]');const pdf=e.target.closest('[data-pdf]');const toggle=e.target.closest('[data-toggle]');const del=e.target.closest('[data-delete]');if(edit){beginEdit(edit.dataset.edit);document.querySelector('.tab-btn[data-tab="editor"]').click();}else if(view)showLyrics(view.dataset.view);else if(viewPdfBtn){const song=state.songs.find(x=>x.id===viewPdfBtn.dataset.viewPdf);const localPreview=song&&state.localPdfPreviewSongId===song.id?state.localPdfPreviewDataUrl:'';const catalogPdf=getCatalogPdfUrl(song);if(localPreview)openProcessedPdfPreview(localPreview,'PDF processado recentemente');else if(catalogPdf)viewPdf(catalogPdf);else showToast('PDF não disponível para visualização.','error');}else if(pdf)askPdfForSong(pdf.dataset.pdf);else if(toggle)toggleActive(toggle.dataset.toggle);else if(del)askDelete(del.dataset.delete)});
   els.receivedList.addEventListener('click',e=>{const receivedLyricsSearch=e.target.closest('[data-search-received-lyrics]');if(receivedLyricsSearch){const item=state.received?.[Number(receivedLyricsSearch.dataset.searchReceivedLyrics)];const title=item?.musica||item?.title||item?.cadastroCompleto?.title||'';if(title)openLyricsSearch(title);return}const select=e.target.closest('[data-received-select]');if(select){const index=Number(select.dataset.receivedSelect);if(select.checked)state.receivedSelected.add(index);else state.receivedSelected.delete(index);renderReceived();return}const detail=e.target.closest('[data-detail]');if(detail){viewReceivedCadastro(Number(detail.dataset.detail));return}const pdfView=e.target.closest('[data-view-pdf]');if(pdfView){const item=state.received?.[Number(pdfView.dataset.viewPdf)];const url=getReceivedPdf(item);if(url)viewPdf(url);else showToast('PDF não disponível para visualização.','error');return}const del=e.target.closest('[data-delete-received]');if(del){deleteReceivedCadastro(Number(del.dataset.deleteReceived));return}const approve=e.target.closest('[data-approve]');if(approve){authorizeReceivedCadastro(Number(approve.dataset.approve));return}const edit=e.target.closest('[data-edit-received]');if(edit){openReceivedEditor(Number(edit.dataset.editReceived));return}});
