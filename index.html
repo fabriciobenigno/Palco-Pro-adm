@@ -983,8 +983,13 @@ async function generateAutomaticLyricsPdf(title,artist,lyrics){
   // O corpo da letra começa abaixo do cabeçalho real. O valor é calculado a
   // partir da altura das linhas, portanto título/artista longos nunca colidem.
   // Na segunda coluna da primeira página reservamos também a área da logo.
+  // Quando título/artista ocupam mais de uma linha, acrescentamos uma folga
+  // proporcional antes da letra. O tamanho das fontes permanece fixo; apenas
+  // o início do corpo é deslocado para baixo para manter o cabeçalho arejado.
+  const headerLinesTotal=titleLines.length+artistLines.length;
+  const extraBodyGap=headerLinesTotal>2?Math.min(28,(headerLinesTotal-2)*8):0;
   const firstColumnTop=Math.min(
-    textHeaderBottom-headerGap,
+    textHeaderBottom-headerGap-extraBodyGap,
     logoBox.y-headerGap,
     pageH-175
   );
