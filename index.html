@@ -952,15 +952,22 @@ async function generateLyricsPdfFile(title,artist,lyrics){
   const leftX=46.5,rightX=307.4;
   const colWidth=241.0;
   const bottomMargin=54.0;
-  const firstPageTop=126.8;
-  const followingPageTop=32.3;
+  // Primeira coluna da primeira página: fica abaixo do cabeçalho/título.
+  const firstPageLeftTop=126.8;
+  // Segunda coluna da primeira página: começa logo abaixo da área reservada à logo.
+  const firstPageRightTop=66.0;
+  // Todas as páginas seguintes não têm logotipo: as duas colunas usam exatamente
+  // o mesmo topo, garantindo alinhamento visual entre elas.
+  const followingPageTop=42.0;
   const titleSize=36;
   const artistSize=30;
   const pages=[];
   let currentPage=doc.addPage([pageWidth,pageHeight]);
   pages.push(currentPage);
   let col=0;
-  let y=pageHeight-firstPageTop-bodySize;
+  // O eixo Y inicial de cada coluna é explícito. Isso evita que uma coluna
+  // herde qualquer posição residual da coluna anterior.
+  let y=pageHeight-firstPageLeftTop-bodySize;
   const lines=lyricsToPrintLines(lyrics,bodyFont,bodySize,colWidth);
   let lineIndex=0;
   let blankExtra=0;
@@ -978,8 +985,21 @@ async function generateLyricsPdfFile(title,artist,lyrics){
   };
   await drawHeader(currentPage);
   const advanceColumn=()=>{
-    if(col===0){col=1;y=pageHeight-firstPageTop-bodySize;blankExtra=0;return true;}
-    currentPage=doc.addPage([pageWidth,pageHeight]);pages.push(currentPage);col=0;y=pageHeight-followingPageTop-bodySize;blankExtra=0;return true;
+    if(col===0){
+      col=1;
+      // Primeira página, segunda coluna: deixa a letra começar abaixo da logo,
+      // com uma pequena folga, sem empurrar o restante das páginas.
+      y=pageHeight-firstPageRightTop-bodySize;
+      blankExtra=0;
+      return true;
+    }
+    currentPage=doc.addPage([pageWidth,pageHeight]);
+    pages.push(currentPage);
+    col=0;
+    // Páginas 2+: as duas colunas começam exatamente no mesmo ponto.
+    y=pageHeight-followingPageTop-bodySize;
+    blankExtra=0;
+    return true;
   };
   while(lineIndex<lines.length){
     const line=lines[lineIndex];
