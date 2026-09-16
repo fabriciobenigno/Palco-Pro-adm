@@ -856,35 +856,38 @@ async function searchMusicOnline(){
     const data=await response.json();
     const requestedTitle=normalizeMusicSearchText(titleQuery);
     const requestedArtist=normalizeMusicSearchText(artistQuery);
-    const results=(Array.isArray(data?.results)?data.results:[])
+    const baseResults=(Array.isArray(data?.results)?data.results:[])
       .filter(item=>normalize(item.trackName))
       .map(item=>({
-        trackName:item.trackName||'',
-        artistName:item.artistName||'',
-        primaryGenreName:item.primaryGenreName||'',
-        collectionName:item.collectionName||'',
-        releaseDate:item.releaseDate||'',
-        trackId:item.trackId||'',
-        collectionId:item.collectionId||'',
-        trackViewUrl:item.trackViewUrl||'',
-        previewUrl:item.previewUrl||''
-      }))
-      .filter(item=>{
+        trackName:item.trackName||'',artistName:item.artistName||'',primaryGenreName:item.primaryGenreName||'',
+        collectionName:item.collectionName||'',releaseDate:item.releaseDate||'',trackId:item.trackId||'',
+        collectionId:item.collectionId||'',trackViewUrl:item.trackViewUrl||'',previewUrl:item.previewUrl||''
+      }));
+    const matches=(item,strict=false)=>{
+      const resultTitle=normalizeMusicSearchText(item.trackName||'');
+      const resultArtist=normalizeMusicSearchText(item.artistName||'');
+      const titleMatch=strict ? resultTitle===requestedTitle : (resultTitle===requestedTitle || resultTitle.includes(requestedTitle) || requestedTitle.includes(resultTitle));
+      const artistMatch=!requestedArtist || resultArtist===requestedArtist || resultArtist.includes(requestedArtist) || requestedArtist.includes(resultArtist);
+      return titleMatch && artistMatch;
+    };
+    let results=baseResults.filter(item=>matches(item,true));
+    if(!results.length) results=baseResults.filter(item=>matches(item,false));
+    if(!results.length && requestedArtist){
+      results=baseResults.filter(item=>{
         const resultTitle=normalizeMusicSearchText(item.trackName||'');
-        const resultArtist=normalizeMusicSearchText(item.artistName||'');
-        // Mostrar somente a música solicitada. O artista, quando informado,
-        // também precisa corresponder ao artista pesquisado.
-        const titleMatches=resultTitle===requestedTitle;
-        const artistMatches=!requestedArtist || resultArtist===requestedArtist || resultArtist.includes(requestedArtist);
-        return titleMatches && artistMatches;
-      })
-      .sort((a,b)=>{
-        const aArtist=normalizeMusicSearchText(a.artistName||''),bArtist=normalizeMusicSearchText(b.artistName||'');
-        const aExact=requestedArtist&&aArtist===requestedArtist?1:0;
-        const bExact=requestedArtist&&bArtist===requestedArtist?1:0;
-        if(aExact!==bExact)return bExact-aExact;
-        return (aArtist||'').localeCompare(bArtist||'', 'pt-BR');
+        return resultTitle===requestedTitle || resultTitle.includes(requestedTitle) || requestedTitle.includes(resultTitle);
       });
+    }
+    results.sort((a,b)=>{
+      const score=(item)=>{
+        const t=normalizeMusicSearchText(item.trackName||''),a=normalizeMusicSearchText(item.artistName||'');
+        let n=0;
+        if(t===requestedTitle)n+=100;else if(t.includes(requestedTitle)||requestedTitle.includes(t))n+=70;
+        if(requestedArtist){if(a===requestedArtist)n+=60;else if(a.includes(requestedArtist)||requestedArtist.includes(a))n+=35;}
+        return n;
+      };
+      return score(b)-score(a);
+    });
     state.musicSearchResults=results.slice(0,8);
     if(!state.musicSearchResults.length){
       els.musicSearchStatus.textContent='Nenhuma correspondência encontrada. Tente outro nome ou informe também o artista no campo ao lado.';
