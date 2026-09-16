@@ -994,8 +994,16 @@ async function generateAutomaticLyricsPdf(title,artist,lyrics){
     textHeaderBottom-30-extraBodyGap,
     pageH-165
   );
+  const normalFirstPageTop=pageH-46;
+  // A segunda coluna só desce quando o cabeçalho realmente invade sua área.
+  // Para títulos/artistas curtos, ela permanece no topo normal da página.
+  const secondColumnTop=Math.min(
+    normalFirstPageTop,
+    textHeaderBottom-30-extraBodyGap
+  );
   const subsequentTop=pageH-46;
   const firstCapacity=Math.max(1,Math.floor((firstColumnTop-bottom)/leading));
+  const firstPageSecondCapacity=Math.max(1,Math.floor((secondColumnTop-bottom)/leading));
   const subsequentCapacity=Math.max(1,Math.floor((subsequentTop-bottom)/leading));
   const allLines=buildPdfColumnLines(lyrics,regular,bodySize,colW);
 
@@ -1025,17 +1033,18 @@ async function generateAutomaticLyricsPdf(title,artist,lyrics){
     }
 
     const first=allLines.slice(cursor,cursor+capacity); cursor+=first.length;
-    const second=allLines.slice(cursor,cursor+capacity); cursor+=second.length;
+    const secondCapacity=pageNumber===1?firstPageSecondCapacity:subsequentCapacity;
+    const second=allLines.slice(cursor,cursor+secondCapacity); cursor+=second.length;
     const ranges=[
-      {lines:first,x:marginX},
-      {lines:second,x:marginX+colW+gap}
+      {lines:first,x:marginX,yTop:pageNumber===1?firstColumnTop:subsequentTop},
+      {lines:second,x:marginX+colW+gap,yTop:pageNumber===1?secondColumnTop:subsequentTop}
     ];
 
     // Cada coluna começa no mesmo topo nas páginas 2+. Linhas vazias no
     // início de uma nova coluna são removidas; as internas são preservadas.
     for(const range of ranges){
       while(range.lines.length&&range.lines[0]==='')range.lines.shift();
-      let y=top;
+      let y=range.yTop;
       for(const line of range.lines){
         if(y<bottom)break;
         if(line)page.drawText(safePdfText(line),{x:range.x,y,size:bodySize,font:regular,color:black});
