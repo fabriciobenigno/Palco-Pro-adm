@@ -987,11 +987,12 @@ async function generateAutomaticLyricsPdf(title,artist,lyrics){
   // proporcional antes da letra. O tamanho das fontes permanece fixo; apenas
   // o início do corpo é deslocado para baixo para manter o cabeçalho arejado.
   const headerLinesTotal=titleLines.length+artistLines.length;
-  const extraBodyGap=headerLinesTotal>2?Math.min(28,(headerLinesTotal-2)*8):0;
+  // Folga estética dedicada entre o fim do artista e o primeiro verso.
+  // Em cabeçalhos altos, a folga cresce um pouco mais, sem alterar as fontes.
+  const extraBodyGap=headerLinesTotal>2?Math.min(36,(headerLinesTotal-2)*10):0;
   const firstColumnTop=Math.min(
-    textHeaderBottom-headerGap-extraBodyGap,
-    logoBox.y-headerGap,
-    pageH-175
+    textHeaderBottom-30-extraBodyGap,
+    pageH-165
   );
   const subsequentTop=pageH-46;
   const firstCapacity=Math.max(1,Math.floor((firstColumnTop-bottom)/leading));
