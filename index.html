@@ -849,7 +849,10 @@ async function searchMusicOnline(){
   els.musicSearchStatus.className='music-search-status';
   els.musicSearchResults.innerHTML='';els.musicSearchSelected?.classList.add('hidden');
   try{
-    const query=artistQuery?`${titleQuery} ${artistQuery}`:titleQuery;
+    // A consulta principal usa somente o nome digitado. O artista informado
+    // serve para ordenar/priorizar as correspondências, sem eliminar resultados
+    // que possam ter pequenas variações de escrita no título ou nos créditos.
+    const query=titleQuery;
     const url='https://itunes.apple.com/search?term='+encodeURIComponent(query)+'&media=music&entity=song&limit=25&country=BR';
     const response=await fetch(url,{method:'GET',mode:'cors',cache:'no-store',signal:controller.signal,headers:{Accept:'application/json'}});
     if(!response.ok)throw new Error('A fonte de pesquisa respondeu com HTTP '+response.status+'.');
@@ -868,18 +871,18 @@ async function searchMusicOnline(){
         previewUrl:item.previewUrl||''
       }))
       .sort((a,b)=>{
-        const aTitle=normalizeMusicSearchText(a.trackName||''),bTitle=normalizeMusicSearchText(b.trackName||'');
-        const aArtist=normalizeMusicSearchText(a.artistName||''),bArtist=normalizeMusicSearchText(b.artistName||'');
         const aq=normalizeMusicSearchText(artistQuery);
-        const aArtistScore=artistQuery?(aArtist===aq?1000:(aArtist.includes(aq)?500:0)):0;
-        const bArtistScore=artistQuery?(bArtist===aq?1000:(bArtist.includes(aq)?500:0)):0;
+        const aArtist=normalizeMusicSearchText(a.artistName||''), bArtist=normalizeMusicSearchText(b.artistName||'');
+        const aArtistScore=aq?(aArtist===aq?1000:(aArtist.includes(aq)?500:0)):0;
+        const bArtistScore=aq?(bArtist===aq?1000:(bArtist.includes(aq)?500:0)):0;
         const baseA=rankMusicSearchResult(a,titleQuery),baseB=rankMusicSearchResult(b,titleQuery);
-        if(baseA!==baseB)return (bArtistScore+baseB)-(aArtistScore+baseA);
-        return bArtistScore-aArtistScore;
+        if(aArtistScore!==bArtistScore)return bArtistScore-aArtistScore;
+        if(baseA!==baseB)return baseB-baseA;
+        return (a.trackName||'').localeCompare(b.trackName||'','pt-BR',{sensitivity:'base'});
       });
     state.musicSearchResults=results.slice(0,8);
     if(!state.musicSearchResults.length){
-      els.musicSearchStatus.textContent='Nenhuma correspondência encontrada. Tente outro nome ou informe também o artista no campo ao lado.';
+      els.musicSearchStatus.textContent='Nenhuma correspondência encontrada. Tente outro nome.';
       els.musicSearchStatus.className='music-search-status status-error';
       return;
     }
@@ -903,12 +906,13 @@ async function fetchLyricsForSelection(title,artist){
   if(response.status===404)return '';
   if(!response.ok)throw new Error('A fonte de letras respondeu com HTTP '+response.status+'.');
   const data=await response.json();
-  const plain=normalize(data?.plainLyrics);
+  const plain=sanitizeLyrics(data?.plainLyrics);
   if(plain)return plain;
   const synced=normalize(data?.syncedLyrics);
   if(!synced)return '';
-  return synced.split('\n').map(line=>line.replace(/^\s*\[[^\]]+\]\s*/,'').trim()).filter(Boolean).join('\n');
+  return sanitizeLyrics(synced.split('\n').map(line=>line.replace(/^\s*\[[^\]]+\]\s*/,'').trim()).filter(Boolean).join('\n'));
 }
+
 function safePdfText(value){
   return String(value??'').replace(/\r/g,'').replace(/\u00a0/g,' ')
     .replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[–—]/g,'-').replace(/…/g,'...')
@@ -993,16 +997,10 @@ async function generateAutomaticLyricsPdf(title,artist,lyrics){
     textHeaderBottom-30-extraBodyGap,
     pageH-165
   );
-  const normalFirstPageTop=pageH-46;
-  // A segunda coluna só desce quando o cabeçalho realmente invade sua área.
-  // Para títulos/artistas curtos, ela permanece no topo normal da página.
-  const secondColumnTop=Math.min(
-    normalFirstPageTop,
-    textHeaderBottom-30-extraBodyGap
-  );
+  // A segunda coluna da primeira página precisa ficar abaixo da área da logo.
+  const firstPageSecondColumnTop=Math.min(firstColumnTop,logoBox.y-headerGap);
   const subsequentTop=pageH-46;
   const firstCapacity=Math.max(1,Math.floor((firstColumnTop-bottom)/leading));
-  const firstPageSecondCapacity=Math.max(1,Math.floor((secondColumnTop-bottom)/leading));
   const subsequentCapacity=Math.max(1,Math.floor((subsequentTop-bottom)/leading));
   const allLines=buildPdfColumnLines(lyrics,regular,bodySize,colW);
 
@@ -1032,18 +1030,17 @@ async function generateAutomaticLyricsPdf(title,artist,lyrics){
     }
 
     const first=allLines.slice(cursor,cursor+capacity); cursor+=first.length;
-    const secondCapacity=pageNumber===1?firstPageSecondCapacity:subsequentCapacity;
-    const second=allLines.slice(cursor,cursor+secondCapacity); cursor+=second.length;
+    const second=allLines.slice(cursor,cursor+capacity); cursor+=second.length;
     const ranges=[
-      {lines:first,x:marginX,yTop:pageNumber===1?firstColumnTop:subsequentTop},
-      {lines:second,x:marginX+colW+gap,yTop:pageNumber===1?secondColumnTop:subsequentTop}
+      {lines:first,x:marginX},
+      {lines:second,x:marginX+colW+gap}
     ];
 
     // Cada coluna começa no mesmo topo nas páginas 2+. Linhas vazias no
     // início de uma nova coluna são removidas; as internas são preservadas.
     for(const range of ranges){
       while(range.lines.length&&range.lines[0]==='')range.lines.shift();
-      let y=range.yTop;
+      let y=top;
       for(const line of range.lines){
         if(y<bottom)break;
         if(line)page.drawText(safePdfText(line),{x:range.x,y,size:bodySize,font:regular,color:black});
