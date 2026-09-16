@@ -898,6 +898,43 @@ async function searchMusicOnline(){
     els.searchMusicBtn.disabled=false;els.searchMusicBtn.textContent='🔎 Buscar música';
   }
 }
+async function fetchRhythmForSelection(item,title,artist){
+  const fallback=normalize(item?.primaryGenreName||'');
+  const cleanTitle=normalize(title),cleanArtist=normalize(artist);
+  if(!cleanTitle||!cleanArtist)return fallback;
+  const rhythmMap=[
+    ['axé','Axé'],['axe','Axé'],['samba-enredo','Samba-enredo'],['samba','Samba'],['pagode','Pagode'],
+    ['forró','Forró'],['forro','Forró'],['arrocha','Arrocha'],['brega','Brega'],['frevo','Frevo'],['maracatu','Maracatu'],
+    ['coco','Coco'],['carimbó','Carimbó'],['carimbo','Carimbó'],['sertanejo','Sertanejo'],['modão','Modão'],['modao','Modão'],
+    ['reggae','Reggae'],['ska','Ska'],['rock','Rock'],['pop','Pop'],['funk','Funk'],['rap','Rap'],['hip hop','Hip Hop'],
+    ['trap','Trap'],['r&b','R&B'],['soul','Soul'],['blues','Blues'],['jazz','Jazz'],['bossa nova','Bossa Nova'],
+    ['bolero','Bolero'],['salsa','Salsa'],['merengue','Merengue'],['bachata','Bachata'],['cumbia','Cumbia'],
+    ['gospel','Gospel'],['house','House'],['techno','Techno'],['eletrônica','Eletrônica'],['electronica','Eletrônica']
+  ];
+  const pickRhythm=(tags)=>{
+    const names=(tags||[]).map(t=>String(t?.name||t||'').toLowerCase().trim()).filter(Boolean);
+    for(const [needle,label] of rhythmMap){if(names.some(n=>n===needle||n.includes(needle)))return label;}
+    return '';
+  };
+  try{
+    const query='recording:"'+cleanTitle.replace(/\"/g,'')+'" AND artist:"'+cleanArtist.replace(/\"/g,'')+'"';
+    const endpoint='https://musicbrainz.org/ws/2/recording/?query='+encodeURIComponent(query)+'&fmt=json&limit=5';
+    const response=await fetch(endpoint,{method:'GET',mode:'cors',cache:'no-store',headers:{Accept:'application/json'}});
+    if(response.ok){
+      const data=await response.json();
+      const recordings=Array.isArray(data?.recordings)?data.recordings:[];
+      const best=recordings[0];
+      const genres=best?.genres||[];
+      const tags=best?.tags||[];
+      const rhythm=pickRhythm([...genres,...tags]);
+      if(rhythm)return rhythm;
+    }
+  }catch(_){/* usa fallback abaixo */}
+  const fallbackLower=fallback.toLowerCase();
+  const mapped=pickRhythm([{name:fallbackLower}]);
+  return mapped||fallback;
+}
+
 async function fetchLyricsForSelection(title,artist){
   const trackName=normalize(title),artistName=normalize(artist);
   if(!trackName||!artistName)return '';
@@ -1064,8 +1101,12 @@ async function generateAutomaticLyricsPdf(title,artist,lyrics){
 async function selectMusicSearchResult(index){
   const item=state.musicSearchResults?.[Number(index)];
   if(!item)return;
-  const title=normalize(item.trackName),artist=normalize(item.artistName),style=normalize(item.primaryGenreName);
+  const title=normalize(item.trackName),artist=normalize(item.artistName);
   els.songTitle.value=title;els.songArtist.value=artist;
+  els.musicSearchStatus.textContent='Identificando o ritmo da música...';
+  els.musicSearchStatus.className='music-search-status';
+  let style=normalize(item.primaryGenreName);
+  try{style=await fetchRhythmForSelection(item,title,artist)||style;}catch(_){ }
   if(style)els.songStyle.value=style;
   if(els.musicSearchSelected){
     els.musicSearchSelected.textContent=`✅ Selecionada: ${title} — ${artist}${style?' • Estilo preenchido: '+style:''}.`;
