@@ -975,7 +975,8 @@ async function generateAutomaticLyricsPdf(title,artist,lyrics){
   const artistLines=wrapPdfLine(safeArtist,bold,artistSize,headerW);
   const titleLeading=titleSize*1.08;
   const artistLeading=artistSize*1.08;
-  const headerTop=pageH-52;
+  // Sobe levemente o cabeçalho, preservando os tamanhos aprovados.
+  const headerTop=pageH-42;
   const titleFirstBaseline=headerTop-titleSize;
   const titleBlockHeight=titleLines.length*titleLeading;
   const artistTop=headerTop-titleBlockHeight-10;
@@ -994,8 +995,8 @@ async function generateAutomaticLyricsPdf(title,artist,lyrics){
   // Em cabeçalhos altos, a folga cresce um pouco mais, sem alterar as fontes.
   const extraBodyGap=headerLinesTotal>2?Math.min(36,(headerLinesTotal-2)*10):0;
   const firstColumnTop=Math.min(
-    textHeaderBottom-30-extraBodyGap,
-    pageH-165
+    textHeaderBottom-50-extraBodyGap,
+    pageH-155
   );
   // A segunda coluna da primeira página precisa ficar abaixo da área da logo.
   const firstPageSecondColumnTop=Math.min(firstColumnTop,logoBox.y-headerGap);
