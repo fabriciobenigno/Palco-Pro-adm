@@ -854,40 +854,29 @@ async function searchMusicOnline(){
     const response=await fetch(url,{method:'GET',mode:'cors',cache:'no-store',signal:controller.signal,headers:{Accept:'application/json'}});
     if(!response.ok)throw new Error('A fonte de pesquisa respondeu com HTTP '+response.status+'.');
     const data=await response.json();
-    const requestedTitle=normalizeMusicSearchText(titleQuery);
-    const requestedArtist=normalizeMusicSearchText(artistQuery);
-    const baseResults=(Array.isArray(data?.results)?data.results:[])
+    const results=(Array.isArray(data?.results)?data.results:[])
       .filter(item=>normalize(item.trackName))
       .map(item=>({
-        trackName:item.trackName||'',artistName:item.artistName||'',primaryGenreName:item.primaryGenreName||'',
-        collectionName:item.collectionName||'',releaseDate:item.releaseDate||'',trackId:item.trackId||'',
-        collectionId:item.collectionId||'',trackViewUrl:item.trackViewUrl||'',previewUrl:item.previewUrl||''
-      }));
-    const matches=(item,strict=false)=>{
-      const resultTitle=normalizeMusicSearchText(item.trackName||'');
-      const resultArtist=normalizeMusicSearchText(item.artistName||'');
-      const titleMatch=strict ? resultTitle===requestedTitle : (resultTitle===requestedTitle || resultTitle.includes(requestedTitle) || requestedTitle.includes(resultTitle));
-      const artistMatch=!requestedArtist || resultArtist===requestedArtist || resultArtist.includes(requestedArtist) || requestedArtist.includes(resultArtist);
-      return titleMatch && artistMatch;
-    };
-    let results=baseResults.filter(item=>matches(item,true));
-    if(!results.length) results=baseResults.filter(item=>matches(item,false));
-    if(!results.length && requestedArtist){
-      results=baseResults.filter(item=>{
-        const resultTitle=normalizeMusicSearchText(item.trackName||'');
-        return resultTitle===requestedTitle || resultTitle.includes(requestedTitle) || requestedTitle.includes(resultTitle);
+        trackName:item.trackName||'',
+        artistName:item.artistName||'',
+        primaryGenreName:item.primaryGenreName||'',
+        collectionName:item.collectionName||'',
+        releaseDate:item.releaseDate||'',
+        trackId:item.trackId||'',
+        collectionId:item.collectionId||'',
+        trackViewUrl:item.trackViewUrl||'',
+        previewUrl:item.previewUrl||''
+      }))
+      .sort((a,b)=>{
+        const aTitle=normalizeMusicSearchText(a.trackName||''),bTitle=normalizeMusicSearchText(b.trackName||'');
+        const aArtist=normalizeMusicSearchText(a.artistName||''),bArtist=normalizeMusicSearchText(b.artistName||'');
+        const aq=normalizeMusicSearchText(artistQuery);
+        const aArtistScore=artistQuery?(aArtist===aq?1000:(aArtist.includes(aq)?500:0)):0;
+        const bArtistScore=artistQuery?(bArtist===aq?1000:(bArtist.includes(aq)?500:0)):0;
+        const baseA=rankMusicSearchResult(a,titleQuery),baseB=rankMusicSearchResult(b,titleQuery);
+        if(baseA!==baseB)return (bArtistScore+baseB)-(aArtistScore+baseA);
+        return bArtistScore-aArtistScore;
       });
-    }
-    results.sort((a,b)=>{
-      const score=(item)=>{
-        const t=normalizeMusicSearchText(item.trackName||''),a=normalizeMusicSearchText(item.artistName||'');
-        let n=0;
-        if(t===requestedTitle)n+=100;else if(t.includes(requestedTitle)||requestedTitle.includes(t))n+=70;
-        if(requestedArtist){if(a===requestedArtist)n+=60;else if(a.includes(requestedArtist)||requestedArtist.includes(a))n+=35;}
-        return n;
-      };
-      return score(b)-score(a);
-    });
     state.musicSearchResults=results.slice(0,8);
     if(!state.musicSearchResults.length){
       els.musicSearchStatus.textContent='Nenhuma correspondência encontrada. Tente outro nome ou informe também o artista no campo ao lado.';
@@ -914,13 +903,12 @@ async function fetchLyricsForSelection(title,artist){
   if(response.status===404)return '';
   if(!response.ok)throw new Error('A fonte de letras respondeu com HTTP '+response.status+'.');
   const data=await response.json();
-  const plain=sanitizeLyrics(data?.plainLyrics);
+  const plain=normalize(data?.plainLyrics);
   if(plain)return plain;
   const synced=normalize(data?.syncedLyrics);
   if(!synced)return '';
-  return sanitizeLyrics(synced.split('\n').map(line=>line.replace(/^\s*\[[^\]]+\]\s*/,'').trim()).filter(Boolean).join('\n'));
+  return synced.split('\n').map(line=>line.replace(/^\s*\[[^\]]+\]\s*/,'').trim()).filter(Boolean).join('\n');
 }
-
 function safePdfText(value){
   return String(value??'').replace(/\r/g,'').replace(/\u00a0/g,' ')
     .replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[–—]/g,'-').replace(/…/g,'...')
