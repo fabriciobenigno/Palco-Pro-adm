@@ -270,14 +270,9 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
 .music-search-result .music-search-title{min-width:0;flex:1 1 auto;font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .music-search-result .music-search-artist{min-width:0;flex:0 1 46%;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .music-search-result .music-search-chevron{flex:0 0 auto;color:#9fd0ff;font-size:14px}
-.music-search-result .music-search-style{grid-column:1/-1;color:#bfeaff;font-size:10px;font-weight:700}
-.music-search-result .music-search-lyrics{grid-column:1/-1;color:var(--soft);font-size:10px;line-height:1.45;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;white-space:pre-line}
-.received-options-toggle{flex:0 0 auto;width:38px;height:38px;min-width:38px;border-radius:11px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:18px;line-height:1;cursor:pointer}
-.received-options-toggle:active{transform:scale(.96)}
-.received-close-actions{flex:0 0 auto;width:38px!important;min-width:38px!important;height:36px!important;padding:0!important}
-@media(max-width:680px){.received-options-toggle{width:36px;height:36px;min-width:36px}.received-close-actions{width:36px!important;min-width:36px!important}}
 .music-search-selected{padding:10px 12px;border-radius:14px;background:rgba(72,214,138,.06);border:1px solid rgba(72,214,138,.15);color:#baf7d2;font-size:11px;line-height:1.5}
-@media(max-width:680px){.music-search-actions{display:grid;grid-template-columns:1fr}.music-search-actions .btn{width:100%}.music-search-result{display:grid;grid-template-columns:minmax(0,1fr) auto}.music-search-result .music-search-artist{max-width:none;width:100%;grid-column:1/2}.music-search-result .music-search-chevron{grid-column:2;grid-row:1/3;align-self:center}}
+@media(max-width:680px){.music-search-actions{display:grid;grid-template-columns:1fr}.music-search-actions .btn{width:100%}.music-search-result{display:grid;grid-template-columns:minmax(0,1fr) auto}.music-search-result .music-search-artist{max-width:none;width:100%;grid-column:1/2}.music-search-result .music-search-chevron{grid-column:2;grid-row:1/4;align-self:center}}
+.music-search-result-main{min-width:0;display:grid;gap:3px}.music-search-result-title{font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.music-search-result-artist,.music-search-result-style{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.music-search-result-lyrics{font-size:10px;line-height:1.35;color:var(--soft);white-space:normal;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}.music-search-result .music-search-chevron{align-self:center}
 
 /* === PDF INDIVIDUAL — somente adição funcional === */
 .pdf-status{color:#bfeaff;font-size:12px;line-height:1.5}
@@ -402,6 +397,10 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
   .received-row[data-received-swipe] .received-action-icon{display:flex!important;width:100%!important;height:100%!important;align-items:center!important;justify-content:center!important;font-size:17px!important;line-height:1!important;}
 }
 @media (max-width:390px){.received-row[data-received-swipe] .received-actions{gap:3px!important;padding:5px!important;}.received-row[data-received-swipe] .received-actions .received-action-btn{height:36px!important;min-height:36px!important;border-radius:9px!important}.received-row[data-received-swipe] .received-action-icon{font-size:15px!important;}}
+.received-options-toggle{flex:0 0 34px!important;width:34px!important;height:34px!important;min-width:34px!important;padding:0!important;border-radius:10px!important;background:rgba(116,200,255,.10)!important;border:1px solid rgba(124,176,255,.22)!important;color:#bfe7ff!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:20px!important;line-height:1!important;cursor:pointer!important}
+.received-options-toggle:hover{background:rgba(116,200,255,.18)!important;border-color:rgba(133,208,255,.35)!important}
+.received-close-swipe{order:-1!important}
+@media(max-width:680px){.received-options-toggle{width:32px!important;min-width:32px!important;height:32px!important;border-radius:9px!important;font-size:18px!important}.received-actions .received-close-swipe{font-size:0!important}.received-actions .received-close-swipe .received-action-icon{font-size:16px!important}}
 </style>
 
 <style>
@@ -465,16 +464,15 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
         <section class="card">
           <div class="card-head"><div><h2 id="formTitle">Cadastrar música</h2><p id="formSubtitle">Cadastre uma música para aparecer no catálogo de sugestões.</p></div><span id="editingBadge" class="badge">Nova música</span></div>
           <div class="form-grid">
-            <div class="two-col">
-              <div class="field"><label for="songTitle">Nome da música</label><input id="songTitle" type="text" autocomplete="off" placeholder="Ex.: Evidências" /></div>
-              <div class="field"><label for="songArtist">Artista</label><input id="songArtist" type="text" autocomplete="off" placeholder="Ex.: Chitãozinho & Xororó" /></div>
-            </div>
             <div class="music-search-box">
-              <div style="font-size:12px;font-weight:800">🔎 Buscar música na internet</div>
-              <div style="color:var(--muted);font-size:11px;line-height:1.45">Digite apenas o nome da música e escolha a correspondência correta. A seleção preenche os dados do cadastro, mas nunca salva automaticamente.</div>
+              <div class="field"><label for="musicSearchQuery">Buscar música</label><input id="musicSearchQuery" type="text" autocomplete="off" placeholder="Ex.: Flor de Liz Djavan" /></div>
               <div class="music-search-actions"><button id="searchMusicBtn" type="button" class="btn btn-secondary btn-small">🔎 Buscar música</button><span id="musicSearchStatus" class="music-search-status"></span></div>
               <div id="musicSearchResults" class="music-search-results"></div>
               <div id="musicSearchSelected" class="music-search-selected hidden"></div>
+            </div>
+            <div class="two-col">
+              <div class="field"><label for="songTitle">Nome da música</label><input id="songTitle" type="text" autocomplete="off" placeholder="Ex.: Evidências" /></div>
+              <div class="field"><label for="songArtist">Artista</label><input id="songArtist" type="text" autocomplete="off" placeholder="Ex.: Chitãozinho & Xororó" /></div>
             </div>
             <div class="two-col"><div class="field"><label for="songStyle">Estilo</label><input id="songStyle" type="text" autocomplete="off" placeholder="Ex.: Sertanejo" /></div><div class="field"><label for="songNote">Tom</label><input id="songNote" type="text" autocomplete="off" placeholder="Ex.: G, Am, C, D7" maxlength="20" /></div></div>
             <div class="field"><label for="songLyrics">Letra completa</label><textarea id="songLyrics" placeholder="Cole a letra completa aqui..."></textarea></div>
@@ -559,7 +557,7 @@ const $=id=>document.getElementById(id);
 const state={songs:[],editingId:null,filter:'all',confirmAction:null,lastFileName:'',selectedIds:new Set(),catalogHandle:null,received:[],receivedSelected:new Set(),receivedEditingIndex:null,musicSearchResults:[],musicSearchController:null,pdfProcessing:false,pdfDoc:null,pdfPage:1,pdfPageCount:0,pdfRenderToken:0,pdfUrl:'',pdfSwipeStartX:0,pdfSwipeStartY:0,pdfSwipeTracking:false,pdfNativeFrame:false,localPdfPreviewSongId:'',localPdfPreviewDataUrl:'',autoPdfGenerating:false};
 const els={
  authCard:$('authCard'),adminPanel:$('adminPanel'),loginInput:$('loginInput'),passwordInput:$('passwordInput'),showPassword:$('showPasswordToggle'),loginBtn:$('loginBtn'),authStatus:$('authStatus'),logoutBtn:$('logoutBtn'),refreshIndexBtn:$('refreshIndexBtn'), refreshCatalog:$('refreshCatalogBtn'),
- songTitle:$('songTitle'),songArtist:$('songArtist'),songStyle:$('songStyle'),searchMusicBtn:$('searchMusicBtn'),musicSearchStatus:$('musicSearchStatus'),musicSearchResults:$('musicSearchResults'),musicSearchSelected:$('musicSearchSelected'),songNote:$('songNote'),songLyrics:$('songLyrics'),selectSongPdfBtn:$('selectSongPdfBtn'),songPdfStatus:$('songPdfStatus'),viewSongPdfBtn:$('viewSongPdfBtn'),formTitle:$('formTitle'),formSubtitle:$('formSubtitle'),editingBadge:$('editingBadge'),saveSong:$('saveSongBtn'),cancelEdit:$('cancelEditBtn'),formStatus:$('formStatus'),
+ songTitle:$('songTitle'),songArtist:$('songArtist'),songStyle:$('songStyle'),musicSearchQuery:$('musicSearchQuery'),searchMusicBtn:$('searchMusicBtn'),musicSearchStatus:$('musicSearchStatus'),musicSearchResults:$('musicSearchResults'),musicSearchSelected:$('musicSearchSelected'),songNote:$('songNote'),songLyrics:$('songLyrics'),selectSongPdfBtn:$('selectSongPdfBtn'),songPdfStatus:$('songPdfStatus'),viewSongPdfBtn:$('viewSongPdfBtn'),formTitle:$('formTitle'),formSubtitle:$('formSubtitle'),editingBadge:$('editingBadge'),saveSong:$('saveSongBtn'),cancelEdit:$('cancelEditBtn'),formStatus:$('formStatus'),
  importZone:$('importZone'),importFile:$('importFile'),exportBtn:$('exportBtn'),quickExport:$('quickExportBtn'),fileStatus:$('fileStatus'),catalogStatus:$('catalogStatus'),search:$('searchInput'),searchCounter:$('searchCounter'),catalogList:$('catalogList'),catalogCounter:$('catalogCounter'),statTotal:$('statTotal'),statActive:$('statActive'),statInactive:$('statInactive'),newSong:$('newSongBtn'),receivedList:$('receivedList'),receivedCounter:$('receivedCounter'),refreshReceived:$('refreshReceivedBtn'),receivedStatus:$('receivedStatus'),receivedBulk:$('receivedBulk'),receivedBulkCount:$('receivedBulkCount'),selectAllReceived:$('selectAllReceivedBtn'),clearReceivedSelection:$('clearReceivedSelectionBtn'),approveSelectedReceived:$('approveSelectedReceivedBtn'),receivedEditModal:$('receivedEditModal'),receivedEditTitle:$('receivedEditTitle'),receivedEditArtist:$('receivedEditArtist'),receivedEditStyle:$('receivedEditStyle'),receivedEditNote:$('receivedEditNote'),receivedEditUser:$('receivedEditUser'),receivedEditLyrics:$('receivedEditLyrics'),receivedEditPdfStatus:$('receivedEditPdfStatus'),receivedEditPdfBtn:$('receivedEditPdfBtn'),receivedEditViewPdf:$('receivedEditViewPdfBtn'),catalogPdfInput:$('catalogPdfInput'),receivedPdfInput:$('receivedPdfInput'),saveReceivedEdit:$('saveReceivedEditBtn'),bulkActions:$('bulkActions'),bulkCount:$('bulkCount'),selectAll:$('selectAllBtn'),clearSelection:$('clearSelectionBtn'),changeStyle:$('changeStyleBtn'),styleModal:$('styleModal'),bulkStyleInput:$('bulkStyleInput'),continueStyle:$('continueStyleBtn'),linkCatalog:$('linkCatalogBtn'),detailModal:$('detailModal'),detailTitle:$('detailTitle'),detailBody:$('detailBody'),confirmModal:$('confirmModal'),confirmTitle:$('confirmTitle'),confirmBody:$('confirmBody'),confirmBtn:$('confirmBtn'),toast:$('toast'),confirmationOverlay:$('confirmationOverlay'),confirmationSong:$('confirmationSong'),pdfViewerScreen:$('pdfViewerScreen'),pdfViewerPageWrap:$('pdfViewerPageWrap'),pdfViewerCanvas:$('pdfViewerCanvas'),pdfPagePreview:$('pdfPagePreview'),pdfPagePreviewCanvas:$('pdfPagePreviewCanvas'),pdfViewerPrev:$('pdfViewerPrev'),pdfViewerNext:$('pdfViewerNext'),pdfViewerClose:$('pdfViewerClose'),pdfViewerPageIndicator:$('pdfViewerPageIndicator'),pdfViewerHint:$('pdfViewerHint'),pdfNativeFrame:$('pdfNativeFrame')
 };
 function normalize(v){return String(v??'').trim()}
@@ -814,59 +812,86 @@ async function handleFormPdfSelection(file){
 function clearMusicSearchUI(){
   state.musicSearchResults=[];
   if(state.musicSearchController){try{state.musicSearchController.abort()}catch(_){}state.musicSearchController=null;}
-  if(els.musicSearchStatus){els.musicSearchStatus.textContent='';}
+  if(els.musicSearchStatus){els.musicSearchStatus.textContent='';els.musicSearchStatus.className='music-search-status';}
   if(els.musicSearchResults){els.musicSearchResults.innerHTML='';}
   if(els.musicSearchSelected){els.musicSearchSelected.textContent='';els.musicSearchSelected.classList.add('hidden');}
+  if(els.musicSearchQuery)els.musicSearchQuery.value='';
 }
 function normalizeMusicSearchText(v){return normalizeSearch(v).replace(/[^a-z0-9\s&']/g,' ').replace(/\s+/g,' ').trim()}
 function rankMusicSearchResult(item,query){
-  const q=normalizeMusicSearchText(query), title=normalizeMusicSearchText(item.trackName||item.name||''), artist=normalizeMusicSearchText(item.artistName||item.artist||'');
+  const q=normalizeMusicSearchText(query);
+  const title=normalizeMusicSearchText(item.trackName||item.name||'');
+  const artist=normalizeMusicSearchText(item.artistName||item.artist||'');
+  const tokens=q.split(' ').filter(Boolean);
   let score=0;
-  if(title===q)score+=100;
-  else if(title.startsWith(q))score+=65;
-  else if(title.includes(q))score+=35;
-  if(artist&&q&&title!==q&&artist.includes(q))score+=5;
+  if(title===q)score+=140;
+  else if(title.startsWith(q))score+=105;
+  else if(title.includes(q))score+=70;
+  if(artist&&q&&artist===q)score+=120;
+  if(artist&&q&&artist.includes(q))score+=55;
+  for(const token of tokens){
+    if(title===token)score+=22;
+    else if(title.includes(token))score+=10;
+    if(artist.includes(token))score+=9;
+  }
   return score;
+}
+function shortLyricsPreview(lyrics){
+  const clean=sanitizeLyrics(lyrics).replace(/\s+/g,' ').trim();
+  if(clean.length<=180)return clean;
+  return clean.slice(0,180).trimEnd()+'…';
 }
 function renderMusicSearchResults(){
   if(!els.musicSearchResults)return;
   els.musicSearchResults.innerHTML='';
   const items=state.musicSearchResults||[];
-  if(!items.length)return;
   for(let i=0;i<items.length;i++){
     const item=items[i];
     const btn=document.createElement('button');
     btn.type='button';
     btn.className='music-search-result';
     btn.dataset.musicSearchIndex=String(i);
-    const title=escapeHtml(item.trackName||'');
-    const artist=escapeHtml(item.artistName||'');
-    const style=escapeHtml(item.primaryGenreName||'');
-    const lyrics=escapeHtml(sanitizeLyrics(item.lyrics||''));
-    btn.innerHTML=`<span class="music-search-title">🎵 ${title}</span><span class="music-search-artist">👤 ${artist}</span><span class="music-search-chevron">›</span><span class="music-search-style">🎼 ${style}</span><span class="music-search-lyrics">${lyrics}</span>`;
+    const title=escapeHtml(item.trackName||item.name||'');
+    const artist=escapeHtml(item.artistName||item.artist||'');
+    const style=escapeHtml(item.style||item.primaryGenreName||'');
+    const lyrics=escapeHtml(shortLyricsPreview(item.lyrics||''));
+    btn.innerHTML=`<div class="music-search-result-main"><div class="music-search-result-title">🎵 ${title}</div><div class="music-search-result-artist">👤 ${artist}</div><div class="music-search-result-style">🎼 ${style}</div><div class="music-search-result-lyrics">📝 ${lyrics}</div></div><span class="music-search-chevron">›</span>`;
     els.musicSearchResults.appendChild(btn);
   }
 }
-
+async function enrichMusicSearchCandidate(item,query){
+  const title=normalize(item.trackName||item.name);
+  const artist=normalize(item.artistName||item.artist);
+  if(!title||!artist)return null;
+  let style=normalize(item.primaryGenreName||'');
+  try{style=await fetchRhythmForSelection(item,title,artist)||style;}catch(_){}
+  if(!style)return null;
+  let lyrics='';
+  try{lyrics=await fetchLyricsForSelection(title,artist);}catch(_){}
+  if(!lyrics)return null;
+  return {...item,style,lyrics,searchQuery:query};
+}
 async function searchMusicOnline(){
-  const titleQuery=normalize(els.songTitle?.value);
-  const artistQuery=normalize(els.songArtist?.value);
-  if(!titleQuery){showToast('Digite o nome da música para pesquisar.','error');els.songTitle?.focus();return;}
+  const query=normalize(els.musicSearchQuery?.value);
+  if(!query){showToast('Digite o nome da música e, se quiser, o artista para pesquisar.','error');els.musicSearchQuery?.focus();return;}
   if(!els.searchMusicBtn)return;
   if(state.musicSearchController){try{state.musicSearchController.abort()}catch(_){} }
-  const controller=new AbortController();state.musicSearchController=controller;
-  els.searchMusicBtn.disabled=true;els.searchMusicBtn.textContent='Buscando...';
-  els.musicSearchStatus.textContent='Consultando catálogo musical...';
+  const controller=new AbortController();
+  state.musicSearchController=controller;
+  state.musicSearchResults=[];
+  els.searchMusicBtn.disabled=true;
+  els.searchMusicBtn.textContent='Buscando...';
+  els.musicSearchStatus.textContent='Buscando músicas com título, artista, estilo e letra completos...';
   els.musicSearchStatus.className='music-search-status';
-  els.musicSearchResults.innerHTML='';state.musicSearchResults=[];els.musicSearchSelected?.classList.add('hidden');
+  els.musicSearchResults.innerHTML='';
+  els.musicSearchSelected?.classList.add('hidden');
   try{
-    const query=titleQuery;
     const url='https://itunes.apple.com/search?term='+encodeURIComponent(query)+'&media=music&entity=song&limit=50&country=BR';
     const response=await fetch(url,{method:'GET',mode:'cors',cache:'no-store',signal:controller.signal,headers:{Accept:'application/json'}});
     if(!response.ok)throw new Error('A fonte de pesquisa respondeu com HTTP '+response.status+'.');
     const data=await response.json();
-    const sourceResults=(Array.isArray(data?.results)?data.results:[])
-      .filter(item=>normalize(item.trackName)&&normalize(item.artistName)&&normalize(item.primaryGenreName))
+    const candidates=(Array.isArray(data?.results)?data.results:[])
+      .filter(item=>normalize(item.trackName)&&normalize(item.artistName))
       .map(item=>({
         trackName:item.trackName||'',
         artistName:item.artistName||'',
@@ -879,68 +904,70 @@ async function searchMusicOnline(){
         previewUrl:item.previewUrl||''
       }))
       .sort((a,b)=>{
-        const aq=normalizeMusicSearchText(artistQuery);
-        const aArtist=normalizeMusicSearchText(a.artistName||''), bArtist=normalizeMusicSearchText(b.artistName||'');
-        const aArtistScore=aq?(aArtist===aq?1000:(aArtist.includes(aq)?500:0)):0;
-        const bArtistScore=aq?(bArtist===aq?1000:(bArtist.includes(aq)?500:0)):0;
-        const baseA=rankMusicSearchResult(a,titleQuery),baseB=rankMusicSearchResult(b,titleQuery);
-        if(aArtistScore!==bArtistScore)return bArtistScore-aArtistScore;
-        if(baseA!==baseB)return baseB-baseA;
+        const scoreDiff=rankMusicSearchResult(b,query)-rankMusicSearchResult(a,query);
+        if(scoreDiff!==0)return scoreDiff;
         return (a.trackName||'').localeCompare(b.trackName||'','pt-BR',{sensitivity:'base'});
       });
-
-    if(!sourceResults.length){
+    if(!candidates.length){
       els.musicSearchStatus.textContent='Nenhuma correspondência encontrada. Tente outro nome.';
       els.musicSearchStatus.className='music-search-status status-error';
       return;
     }
-
-    let nextIndex=0, validCount=0, activeWorkers=0;
-    const seen=new Set();
-    const worker=async()=>{
-      while(nextIndex<sourceResults.length&&validCount<30&&!controller.signal.aborted){
-        const item=sourceResults[nextIndex++];
-        const key=normalizeSearch((item.trackName||'')+' '+(item.artistName||''));
-        if(seen.has(key))continue;
-        seen.add(key);
-        try{
-          const lyrics=await fetchLyricsForSelection(item.trackName,item.artistName);
-          if(controller.signal.aborted)return;
-          const title=normalize(item.trackName),artist=normalize(item.artistName),style=normalize(item.primaryGenreName),cleanLyrics=sanitizeLyrics(lyrics);
-          // Só entra na lista quando TODOS os dados exigidos existirem.
-          if(validCount>=30||!title||!artist||!style||!cleanLyrics)continue;
-          state.musicSearchResults.push({...item,lyrics:cleanLyrics});
-          validCount++;
-          renderMusicSearchResults();
-          els.musicSearchStatus.textContent=`${validCount} resultado${validCount===1?'':'s'} válido${validCount===1?'':'s'} encontrado${validCount===1?'':'s'}.`;
-          els.musicSearchStatus.className='music-search-status';
-        }catch(error){
-          if(error?.name==='AbortError')return;
-        }
+    let nextIndex=0;
+    let running=0;
+    let completed=0;
+    let validCount=0;
+    let stopped=false;
+    const pump=()=>{
+      if(stopped)return;
+      while(running<4&&nextIndex<candidates.length&&validCount<30){
+        const candidate=candidates[nextIndex++];
+        running++;
+        enrichMusicSearchCandidate(candidate,query).then(valid=>{
+          if(stopped)return;
+          if(valid&&validCount<30){
+            state.musicSearchResults.push(valid);
+            validCount++;
+            renderMusicSearchResults();
+          }
+        }).catch(()=>{}).finally(()=>{
+          running--;
+          completed++;
+          if(state.musicSearchController!==controller)return;
+          if(validCount>=30||completed>=candidates.length){
+            stopped=true;
+            els.musicSearchStatus.textContent=validCount?`${validCount} resultado${validCount===1?'':'s'} válido${validCount===1?'':'s'} encontrado${validCount===1?'':'s'}.`:'Nenhum resultado com todos os dados necessários foi encontrado.';
+            els.musicSearchStatus.className=validCount?'music-search-status':'music-search-status status-warn';
+          }else{
+            els.musicSearchStatus.textContent=`Buscando... ${validCount} resultado${validCount===1?'':'s'} válido${validCount===1?'':'s'} encontrado${validCount===1?'':'s'}.`;
+            pump();
+          }
+        });
+      }
+      if(running===0&&nextIndex>=candidates.length&&!stopped){
+        stopped=true;
+        els.musicSearchStatus.textContent=validCount?`${validCount} resultado${validCount===1?'':'s'} válido${validCount===1?'':'s'} encontrado${validCount===1?'':'s'}.`:'Nenhum resultado com todos os dados necessários foi encontrado.';
+        els.musicSearchStatus.className=validCount?'music-search-status':'music-search-status status-warn';
       }
     };
-
-    activeWorkers=Math.min(5,sourceResults.length);
-    await Promise.all(Array.from({length:activeWorkers},worker));
-
-    if(controller.signal.aborted)return;
-    if(!validCount){
-      els.musicSearchStatus.textContent='Nenhuma música com título, artista, estilo e letra completos foi encontrada.';
-      els.musicSearchStatus.className='music-search-status status-error';
-    }else{
-      els.musicSearchStatus.textContent=`${validCount} resultado${validCount===1?'':'s'} válido${validCount===1?'':'s'} disponível${validCount===1?'':'is'} (máximo 30).`;
-      els.musicSearchStatus.className='music-search-status';
-    }
+    pump();
+    await new Promise(resolve=>{
+      const check=()=>{
+        if(state.musicSearchController!==controller||stopped){resolve();return;}
+        setTimeout(check,40);
+      };
+      check();
+    });
   }catch(error){
     if(error?.name==='AbortError')return;
     els.musicSearchStatus.textContent='Não foi possível consultar a internet agora: '+(error?.message||'erro desconhecido')+'.';
     els.musicSearchStatus.className='music-search-status status-error';
   }finally{
     if(state.musicSearchController===controller)state.musicSearchController=null;
-    els.searchMusicBtn.disabled=false;els.searchMusicBtn.textContent='🔎 Buscar música';
+    els.searchMusicBtn.disabled=false;
+    els.searchMusicBtn.textContent='🔎 Buscar música';
   }
 }
-
 async function fetchRhythmForSelection(item,title,artist){
   const fallback=normalize(item?.primaryGenreName||'');
   const cleanTitle=normalize(title),cleanArtist=normalize(artist);
@@ -1142,27 +1169,24 @@ async function generateAutomaticLyricsPdf(title,artist,lyrics){
 }
 
 async function selectMusicSearchResult(index){
-  if(state.musicSearchController){try{state.musicSearchController.abort()}catch(_){}state.musicSearchController=null;}
   const item=state.musicSearchResults?.[Number(index)];
   if(!item)return;
   const title=normalize(item.trackName),artist=normalize(item.artistName);
-  els.songTitle.value=title;els.songArtist.value=artist;
-  els.musicSearchStatus.textContent='Identificando o ritmo da música...';
-  els.musicSearchStatus.className='music-search-status';
-  let style=normalize(item.primaryGenreName);
-  try{style=await fetchRhythmForSelection(item,title,artist)||style;}catch(_){ }
+  els.songTitle.value=title;
+  els.songArtist.value=artist;
+  const style=normalize(item.style||item.primaryGenreName||'');
   if(style)els.songStyle.value=style;
   if(els.musicSearchSelected){
-    els.musicSearchSelected.textContent=`✅ Selecionada: ${title} — ${artist}${style?' • Estilo preenchido: '+style:''}.`;
+    els.musicSearchSelected.textContent=`✅ Selecionada: ${title} — ${artist}.`;
     els.musicSearchSelected.classList.remove('hidden');
   }
   els.musicSearchResults.innerHTML='';
-  els.musicSearchStatus.textContent='Buscando a letra da música selecionada...';
+  els.musicSearchStatus.textContent='Preparando o cadastro da música selecionada...';
   els.musicSearchStatus.className='music-search-status';
   selectedFormPdf=null;
   updateFormPdfUI(null);
   try{
-    const lyrics=await fetchLyricsForSelection(title,artist);
+    const lyrics=normalize(item.lyrics)||await fetchLyricsForSelection(title,artist);
     if(lyrics){
       els.songLyrics.value=lyrics;
       els.musicSearchStatus.textContent='Letra encontrada. Gerando o PDF automaticamente...';
@@ -1424,8 +1448,8 @@ function renderReceived(){
     const approveButton=match?'':action('btn-success','data-approve',index,'Aprovar','✅');
     row.innerHTML=`
       <div class="received-actions">
-        <button type="button" class="btn btn-secondary btn-small received-action-btn received-close-actions" data-received-toggle="${index}" aria-label="Fechar opções" title="Fechar opções">✕</button>
         <span class="badge ${match?'inactive':''} received-state-badge">${match?'Já no catálogo':'Novo'}</span>
+        <button type="button" class="btn btn-secondary btn-small received-action-btn received-close-swipe" data-close-received-swipe="${index}" aria-label="Fechar opções" title="Fechar opções"><span class="received-action-icon" aria-hidden="true">✕</span><span class="received-action-label">Fechar</span></button>
         ${action('btn-secondary','data-detail',index,'Visualizar','👁️')}
         ${action('btn-primary','data-edit-received',index,'Editar','✏️')}
         ${approveButton}
@@ -1434,8 +1458,8 @@ function renderReceived(){
       </div>
       <div class="received-card">
         <input class="song-select received-select" type="checkbox" data-received-select="${index}" ${state.receivedSelected.has(index)?'checked':''} aria-label="Selecionar cadastro recebido">
-        <div class="song-title received-title">${escapeHtml(title)}<button class="received-lyrics-search-btn" type="button" data-search-received-lyrics="${index}" aria-label="Buscar letra na internet" title="Buscar letra na internet">🔎</button></div>
-        <button type="button" class="received-options-toggle" data-received-toggle="${index}" aria-label="Mostrar opções" title="Mostrar opções">⋯</button>
+        <div class="song-title received-title">${escapeHtml(title)}</div>
+        <button class="received-options-toggle" type="button" data-toggle-received-swipe="${index}" aria-label="Abrir opções" title="Abrir opções">⋯</button>
       </div>`;
     els.receivedList.appendChild(row);
   });
@@ -1717,13 +1741,38 @@ function initReceivedSwipe(){
   const actionCount=row=>row?.querySelectorAll('.received-actions .received-action-btn').length||1;
   const setLayout=row=>{
     if(!row)return;
-    const width=getWidth(row); row.style.setProperty('--received-swipe-width',`${width}px`);
+    const width=getWidth(row);
+    row.style.setProperty('--received-swipe-width',`${width}px`);
     const actions=row.querySelector('.received-actions');
     if(actions){actions.style.gridTemplateColumns=`repeat(${actionCount(row)},minmax(0,1fr))`;}
   };
-  const setVisual=(row,offset,animate)=>{const card=row?.querySelector('.received-card');if(!card)return;setLayout(row);card.style.transition=animate?'transform .22s cubic-bezier(.22,.8,.26,1)':'none';card.style.transform=`translate3d(${offset}px,0,0)`;};
-  const closeRow=row=>{if(!row)return;row.classList.remove('revealed','is-revealing','is-swiping');setVisual(row,0,true);};
-  const closeOthers=row=>els.receivedList.querySelectorAll('.received-row.revealed,.received-row.is-revealing').forEach(other=>{if(other!==row)closeRow(other);});
+  const setVisual=(row,offset,animate)=>{
+    const card=row?.querySelector('.received-card');
+    if(!card)return;
+    setLayout(row);
+    card.style.transition=animate?'transform .22s cubic-bezier(.22,.8,.26,1)':'none';
+    card.style.transform=`translate3d(${offset}px,0,0)`;
+  };
+  const closeRow=row=>{
+    if(!row)return;
+    row.classList.remove('revealed','is-revealing','is-swiping');
+    setVisual(row,0,true);
+    const toggle=row.querySelector('[data-toggle-received-swipe]');
+    if(toggle){toggle.textContent='⋯';toggle.setAttribute('aria-label','Abrir opções');toggle.title='Abrir opções';}
+  };
+  const openRow=row=>{
+    if(!row)return;
+    setLayout(row);
+    closeOthers(row);
+    row.classList.remove('is-revealing','is-swiping');
+    row.classList.add('revealed');
+    setVisual(row,-getWidth(row),true);
+    const toggle=row.querySelector('[data-toggle-received-swipe]');
+    if(toggle){toggle.textContent='✕';toggle.setAttribute('aria-label','Fechar opções');toggle.title='Fechar opções';}
+  };
+  const closeOthers=row=>{
+    els.receivedList.querySelectorAll('.received-row.revealed,.received-row.is-revealing').forEach(other=>{if(other!==row)closeRow(other);});
+  };
   const reset=()=>{activeRow=null;pointerId=null;startOffset=0;currentDx=0;moved=false;};
   const finish=()=>{
     if(!activeRow)return;
@@ -1731,16 +1780,31 @@ function initReceivedSwipe(){
     const opening=startOffset===0&&finalOffset<-threshold;
     const closing=startOffset<0&&currentDx>threshold;
     row.classList.remove('is-swiping','is-revealing');
-    if(opening){closeOthers(row);row.classList.add('revealed');setVisual(row,-width,true);}
-    else if(startOffset<0&&(!opening)){closeRow(row);if(moved)suppressNextClick=true;}
-    else{closeRow(row);}
+    if(opening){
+      openRow(row);
+      suppressNextClick=true;
+    }else if(closing){
+      closeRow(row);
+      suppressNextClick=true;
+    }else if(startOffset<0){
+      row.classList.add('revealed');
+      setVisual(row,-width,true);
+    }else{
+      closeRow(row);
+      if(moved)suppressNextClick=true;
+    }
     reset();
   };
   els.receivedList.addEventListener('pointerdown',e=>{
-    const row=e.target.closest('.received-row[data-received-swipe]'); if(!row)return;
+    const row=e.target.closest('.received-row[data-received-swipe]');
+    if(!row)return;
+    if(e.target.closest('.received-actions,[data-toggle-received-swipe],.received-select,.received-lyrics-search-btn'))return;
     if(e.pointerType==='mouse'&&e.button!==0)return;
-    setLayout(row);activeRow=row;pointerId=e.pointerId;startX=e.clientX;startY=e.clientY;currentDx=0;moved=false;
-    startOffset=row.classList.contains('revealed')?-getWidth(row):0;row.classList.add('is-swiping');setVisual(row,startOffset,false);
+    setLayout(row);
+    activeRow=row;pointerId=e.pointerId;startX=e.clientX;startY=e.clientY;currentDx=0;moved=false;
+    startOffset=row.classList.contains('revealed')?-getWidth(row):0;
+    row.classList.add('is-swiping');
+    setVisual(row,startOffset,false);
     try{row.setPointerCapture(e.pointerId);}catch(_){ }
   });
   els.receivedList.addEventListener('pointermove',e=>{
@@ -1748,26 +1812,47 @@ function initReceivedSwipe(){
     const dx=e.clientX-startX,dy=e.clientY-startY;
     if(Math.abs(dx)>7||Math.abs(dy)>7)moved=true;
     if(Math.abs(dx)<8||Math.abs(dx)<=Math.abs(dy))return;
-    const width=getWidth(activeRow);currentDx=dx;let offset=startOffset+dx;offset=Math.max(-width,Math.min(0,offset));
+    const width=getWidth(activeRow);
+    currentDx=dx;
+    let offset=startOffset+dx;
+    offset=Math.max(-width,Math.min(0,offset));
     if(startOffset===0&&offset<-6)activeRow.classList.add('is-revealing');
     if(startOffset<0)activeRow.classList.add('revealed');
-    setVisual(activeRow,offset,false);e.preventDefault();
+    setVisual(activeRow,offset,false);
+    e.preventDefault();
   },{passive:false});
   els.receivedList.addEventListener('pointerup',e=>{if(e.pointerId===pointerId)finish();});
-  els.receivedList.addEventListener('pointercancel',()=>{if(activeRow){if(startOffset<0){activeRow.classList.add('revealed');setVisual(activeRow,-getWidth(activeRow),true);}else closeRow(activeRow);}reset();});
+  els.receivedList.addEventListener('pointercancel',()=>{
+    if(activeRow){
+      if(startOffset<0)openRow(activeRow);
+      else closeRow(activeRow);
+    }
+    reset();
+  });
   els.receivedList.addEventListener('click',e=>{
     if(suppressNextClick){suppressNextClick=false;e.preventDefault();e.stopPropagation();return;}
-    const row=e.target.closest('.received-row[data-received-swipe]');if(!row)return;
-    const toggle=e.target.closest('[data-received-toggle]');
-    if(toggle&&!e.target.closest('.received-actions')&&!row.classList.contains('revealed')){
-      closeOthers(row);
-      row.classList.add('revealed');
-      setVisual(row,-getWidth(row),true);
-      e.preventDefault();e.stopPropagation();return;
+    const closeButton=e.target.closest('[data-close-received-swipe]');
+    if(closeButton){const row=closeButton.closest('.received-row[data-received-swipe]');if(row){closeRow(row);e.preventDefault();e.stopPropagation();}return;}
+    const toggle=e.target.closest('[data-toggle-received-swipe]');
+    if(toggle){const row=toggle.closest('.received-row[data-received-swipe]');if(row){if(row.classList.contains('revealed'))closeRow(row);else openRow(row);e.preventDefault();e.stopPropagation();}return;}
+    const row=e.target.closest('.received-row[data-received-swipe]');
+    if(!row)return;
+    if(row.classList.contains('revealed')&&!e.target.closest('.received-actions')){
+      openRow(row);
+      e.preventDefault();
+      e.stopPropagation();
     }
-    if(row.classList.contains('revealed')&&!e.target.closest('.received-actions')){closeRow(row);e.preventDefault();e.stopPropagation();}
   },true);
-  document.addEventListener('click',e=>{if(e.target.closest('.received-row[data-received-swipe]'))return;els.receivedList.querySelectorAll('.received-row.revealed,.received-row.is-revealing').forEach(closeRow);});
+  document.addEventListener('click',e=>{
+    if(e.target.closest('.received-row[data-received-swipe]'))return;
+    els.receivedList.querySelectorAll('.received-row.revealed,.received-row.is-revealing').forEach(closeRow);
+  });
+  window.addEventListener('resize',()=>{
+    els.receivedList.querySelectorAll('.received-row[data-received-swipe]').forEach(row=>{
+      setLayout(row);
+      if(row.classList.contains('revealed'))setVisual(row,-getWidth(row),false);
+    });
+  });
 }
 
 function init(){
@@ -1787,9 +1872,9 @@ function init(){
  initCatalogSwipe();
  initReceivedSwipe();
  els.catalogPdfInput?.addEventListener('change',e=>{const file=e.target.files?.[0];if(!file)return;if(e.target.dataset.formMode==='1'){delete e.target.dataset.formMode;handleFormPdfSelection(file)}else uploadCatalogPdf(file)});els.selectSongPdfBtn?.addEventListener('click',selectFormPdf);els.viewSongPdfBtn?.addEventListener('click',async()=>{if(selectedFormPdf){await openProcessedPdfPreview(selectedFormPdf,selectedFormPdf.__palcoAutoGenerated?'Pré-visualização do PDF automático':'Pré-visualização do PDF processado');return;}const song=state.songs.find(s=>s.id===state.editingId);if(song?.pdfUrl)viewPdf(song.pdfUrl);else showToast('PDF não disponível para visualização.','error')});els.receivedPdfInput?.addEventListener('change',e=>{const file=e.target.files?.[0];if(file)uploadReceivedPdf(file)});els.showPassword.addEventListener('change',()=>els.passwordInput.type=els.showPassword.checked?'text':'password');els.loginBtn.addEventListener('click',handleLogin);[els.loginInput,els.passwordInput].forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin()}));els.logoutBtn.addEventListener('click',logout);els.refreshIndexBtn?.addEventListener('click',()=>{window.location.reload()});els.refreshCatalog?.addEventListener('click',refreshMainCatalog);els.refreshReceived.addEventListener('click',loadReceived);els.selectAllReceived.addEventListener('click',()=>{const all=state.received.length>0&&state.received.every((_,i)=>state.receivedSelected.has(i));state.receivedSelected=all?new Set():new Set(state.received.map((_,i)=>i));renderReceived()});els.clearReceivedSelection.addEventListener('click',()=>{state.receivedSelected.clear();renderReceived()});els.approveSelectedReceived.addEventListener('click',authorizeSelectedReceived);els.saveReceivedEdit.addEventListener('click',saveReceivedEditor);els.receivedEditModal.querySelectorAll('[data-close-received-edit]').forEach(b=>b.addEventListener('click',closeReceivedEditor));
- els.searchMusicBtn?.addEventListener('click',searchMusicOnline);els.musicSearchResults?.addEventListener('click',e=>{const result=e.target.closest('[data-music-search-index]');if(result)selectMusicSearchResult(result.dataset.musicSearchIndex)});els.songTitle?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!state.editingId&&els.songTitle.value.trim()){e.preventDefault();searchMusicOnline()}});els.saveSong.addEventListener('click',saveSong);els.cancelEdit.addEventListener('click',clearForm);els.newSong.addEventListener('click',()=>{document.querySelector('.tab-btn[data-tab="editor"]').click();clearForm();els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})});els.exportBtn?.addEventListener('click',exportCatalog);els.quickExport?.addEventListener('click',exportCatalog);els.selectAll.addEventListener('click',toggleAllVisible);els.clearSelection.addEventListener('click',clearSelection);els.changeStyle.addEventListener('click',openStyleModal);els.continueStyle.addEventListener('click',continueStyleChange);els.styleModal.querySelectorAll('[data-close-style]').forEach(b=>b.addEventListener('click',closeStyleModal));els.linkCatalog?.addEventListener('click',linkCatalog);els.search.addEventListener('input',renderCatalog);document.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click',()=>setFilter(b.dataset.filter)));
+ els.searchMusicBtn?.addEventListener('click',searchMusicOnline);els.musicSearchResults?.addEventListener('click',e=>{const result=e.target.closest('[data-music-search-index]');if(result)selectMusicSearchResult(result.dataset.musicSearchIndex)});els.musicSearchQuery?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!state.editingId&&els.musicSearchQuery.value.trim()){e.preventDefault();searchMusicOnline()}});els.saveSong.addEventListener('click',saveSong);els.cancelEdit.addEventListener('click',clearForm);els.newSong.addEventListener('click',()=>{document.querySelector('.tab-btn[data-tab="editor"]').click();clearForm();els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})});els.exportBtn?.addEventListener('click',exportCatalog);els.quickExport?.addEventListener('click',exportCatalog);els.selectAll.addEventListener('click',toggleAllVisible);els.clearSelection.addEventListener('click',clearSelection);els.changeStyle.addEventListener('click',openStyleModal);els.continueStyle.addEventListener('click',continueStyleChange);els.styleModal.querySelectorAll('[data-close-style]').forEach(b=>b.addEventListener('click',closeStyleModal));els.linkCatalog?.addEventListener('click',linkCatalog);els.search.addEventListener('input',renderCatalog);document.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click',()=>setFilter(b.dataset.filter)));
  els.catalogList.addEventListener('click',e=>{const generatePdf=e.target.closest('[data-generate-pdf]');if(generatePdf){generatePdfForCatalogSong(generatePdf.dataset.generatePdf);return;}const lyricsSearch=e.target.closest('[data-search-lyrics]');if(lyricsSearch){const song=state.songs.find(x=>x.id===lyricsSearch.dataset.searchLyrics);if(song)openLyricsSearch(song.title);return;}const select=e.target.closest('[data-select]');if(select){toggleSelected(select.dataset.select,select.checked);return;}const edit=e.target.closest('[data-edit]');const view=e.target.closest('[data-view]');const viewPdfBtn=e.target.closest('[data-view-pdf]');const pdf=e.target.closest('[data-pdf]');const toggle=e.target.closest('[data-toggle]');const del=e.target.closest('[data-delete]');if(edit){beginEdit(edit.dataset.edit);document.querySelector('.tab-btn[data-tab="editor"]').click();}else if(view)showLyrics(view.dataset.view);else if(viewPdfBtn){const song=state.songs.find(x=>x.id===viewPdfBtn.dataset.viewPdf);const localPreview=song&&state.localPdfPreviewSongId===song.id?state.localPdfPreviewDataUrl:'';const catalogPdf=getCatalogPdfUrl(song);if(localPreview)openProcessedPdfPreview(localPreview,'PDF processado recentemente');else if(catalogPdf)viewPdf(catalogPdf);else showToast('PDF não disponível para visualização.','error');}else if(pdf)askPdfForSong(pdf.dataset.pdf);else if(toggle)toggleActive(toggle.dataset.toggle);else if(del)askDelete(del.dataset.delete)});
-  els.receivedList.addEventListener('click',e=>{const closeOptions=e.target.closest('.received-close-actions');if(closeOptions){const row=e.target.closest('.received-row[data-received-swipe]');if(row){const card=row.querySelector('.received-card');row.classList.remove('revealed','is-revealing','is-swiping');if(card){card.style.transition='transform .22s cubic-bezier(.22,.8,.26,1)';card.style.transform='translate3d(0,0,0)';} }return}const receivedToggle=e.target.closest('.received-options-toggle');if(receivedToggle){const row=e.target.closest('.received-row[data-received-swipe]');if(row){row.classList.add('revealed');const card=row.querySelector('.received-card');if(card){card.style.transition='transform .22s cubic-bezier(.22,.8,.26,1)';card.style.transform=`translate3d(-${Math.max(1,row.clientWidth)}px,0,0)`;}}return}const receivedLyricsSearch=e.target.closest('[data-search-received-lyrics]');if(receivedLyricsSearch){const item=state.received?.[Number(receivedLyricsSearch.dataset.searchReceivedLyrics)];const title=item?.musica||item?.title||item?.cadastroCompleto?.title||'';if(title)openLyricsSearch(title);return}const select=e.target.closest('[data-received-select]');if(select){const index=Number(select.dataset.receivedSelect);if(select.checked)state.receivedSelected.add(index);else state.receivedSelected.delete(index);renderReceived();return}const detail=e.target.closest('[data-detail]');if(detail){viewReceivedCadastro(Number(detail.dataset.detail));return}const pdfView=e.target.closest('[data-view-pdf]');if(pdfView){const item=state.received?.[Number(pdfView.dataset.viewPdf)];const url=getReceivedPdf(item);if(url)viewPdf(url);else showToast('PDF não disponível para visualização.','error');return}const del=e.target.closest('[data-delete-received]');if(del){deleteReceivedCadastro(Number(del.dataset.deleteReceived));return}const approve=e.target.closest('[data-approve]');if(approve){authorizeReceivedCadastro(Number(approve.dataset.approve));return}const edit=e.target.closest('[data-edit-received]');if(edit){openReceivedEditor(Number(edit.dataset.editReceived));return}});
+  els.receivedList.addEventListener('click',e=>{const receivedLyricsSearch=e.target.closest('[data-search-received-lyrics]');if(receivedLyricsSearch){const item=state.received?.[Number(receivedLyricsSearch.dataset.searchReceivedLyrics)];const title=item?.musica||item?.title||item?.cadastroCompleto?.title||'';if(title)openLyricsSearch(title);return}const select=e.target.closest('[data-received-select]');if(select){const index=Number(select.dataset.receivedSelect);if(select.checked)state.receivedSelected.add(index);else state.receivedSelected.delete(index);renderReceived();return}const detail=e.target.closest('[data-detail]');if(detail){viewReceivedCadastro(Number(detail.dataset.detail));return}const pdfView=e.target.closest('[data-view-pdf]');if(pdfView){const item=state.received?.[Number(pdfView.dataset.viewPdf)];const url=getReceivedPdf(item);if(url)viewPdf(url);else showToast('PDF não disponível para visualização.','error');return}const del=e.target.closest('[data-delete-received]');if(del){deleteReceivedCadastro(Number(del.dataset.deleteReceived));return}const approve=e.target.closest('[data-approve]');if(approve){authorizeReceivedCadastro(Number(approve.dataset.approve));return}const edit=e.target.closest('[data-edit-received]');if(edit){openReceivedEditor(Number(edit.dataset.editReceived));return}});
   document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{const target=btn.dataset.tab;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));document.querySelectorAll('.tab-panel').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===target));if(target==='catalog')loadLocal();if(target==='received')loadReceived();}));
  els.detailModal.querySelectorAll('[data-close-detail]').forEach(b=>b.addEventListener('click',closeDetail));els.confirmModal.querySelectorAll('[data-close-confirm]').forEach(b=>b.addEventListener('click',closeConfirm));els.confirmBtn.addEventListener('click',()=>state.confirmAction?.());
  document.addEventListener('keydown',e=>{if(els.pdfViewerScreen?.classList.contains('open')){if(e.key==='Escape')closePdfViewer();else if(e.key==='ArrowLeft')changeAdminPdfPage(-1);else if(e.key==='ArrowRight')changeAdminPdfPage(1);return}if(e.key==='Escape'){closeDetail();closeConfirm();closeStyleModal();closeReceivedEditor()}});
