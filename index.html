@@ -661,7 +661,10 @@ Não reintroduzir Supabase, login de usuário, sincronização em nuvem ou token
 'use strict';
 const LOGIN='fabricio', PASSWORD='fabricio';
 const APPS_SCRIPT_URL='https://script.google.com/macros/s/AKfycbweGCvcOlO76O2CRVQTQUp5Unu2yOB5cKKvs1iFFf8RQpRI1jObEvfh4D4y-8gW2Ibr/exec';
+const LOCAL_CATALOG_URL='./catalogo.json';
 const MAIN_CATALOG_URL='https://fabriciobenigno.github.io/Palco-Pro/catalogo.json';
+const CDN_CATALOG_URL='https://cdn.jsdelivr.net/gh/fabriciobenigno/Palco-Pro@main/catalogo.json';
+const RAW_CATALOG_URL='https://raw.githubusercontent.com/fabriciobenigno/Palco-Pro/main/catalogo.json';
 const WATERMARK_LOGO_URL='./marca-dagua-palco-pro.png';
 const PDF_LIB_URL='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js';
 const CATALOG_KEY='palco-pro-admin-catalog-v4';
@@ -864,8 +867,45 @@ function showToast(message,type='success'){els.toast.textContent=message;els.toa
 function setStatus(message,type=''){if(els.formStatus){els.formStatus.textContent=message||'';els.formStatus.className=`status-line ${type?'status-'+type:''}`}if(els.catalogStatus){els.catalogStatus.textContent=message||'';els.catalogStatus.className=`status-line ${type?'status-'+type:''}`}}
 async function persist(){const payload=JSON.stringify(state.songs.map(normalizeSong),null,2);localStorage.setItem(CATALOG_KEY,payload);if(state.catalogHandle){try{const writable=await state.catalogHandle.createWritable();await writable.write(payload);await writable.close();els.fileStatus.textContent='catalogo.json sincronizado';els.fileStatus.className='badge'}catch(error){els.catalogStatus.textContent='Alteração local salva, mas não foi possível escrever no catalogo.json: '+error.message;els.catalogStatus.className='status-line status-warn'}}}
 async function publishCatalogToServer(options={}){if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='COLE_AQUI_A_MESMA_URL_DO_APPS_SCRIPT_DO_INDEX_PRINCIPAL'){return {sucesso:false,mensagem:'URL do Apps Script não configurada.'}}try{const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveCatalog',catalogo:state.songs.map(normalizeSong),allowCatalogShrink:!!options.allowCatalogShrink})},20000);if(!data?.sucesso)throw new Error(data?.mensagem||'Falha ao publicar o catálogo.');return data}catch(error){return {sucesso:false,mensagem:error.name==='AbortError'?'Tempo limite excedido na comunicação com o Apps Script.':error.message}}}
-async function loadMainCatalog(){if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='COLE_AQUI_A_MESMA_URL_DO_APPS_SCRIPT_DO_INDEX_PRINCIPAL')throw new Error('URL do Apps Script não configurada.');const data=await fetchJson(APPS_SCRIPT_URL+'?action=getCatalog&ts='+Date.now(),{},15000);if(!data?.sucesso||!Array.isArray(data.catalogo))throw new Error(data?.mensagem||'Catálogo principal inválido.');state.songs=data.catalogo.map(normalizeSong);localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs));state.catalogHandle=null;if(els.fileStatus){els.fileStatus.textContent='Catálogo principal carregado';els.fileStatus.className='badge'}renderCatalog()}
-async function loadLocal(){try{await loadMainCatalog();return}catch(error){try{const response=await fetch(MAIN_CATALOG_URL,{cache:'no-store'});if(response.ok){const parsed=await response.json();const arr=Array.isArray(parsed)?parsed:(Array.isArray(parsed?.songs)?parsed.songs:[]);state.songs=arr.map(normalizeSong);localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs));renderCatalog();return}}catch(_){ } try{const parsed=JSON.parse(localStorage.getItem(CATALOG_KEY)||'[]');const arr=Array.isArray(parsed)?parsed:(Array.isArray(parsed?.songs)?parsed.songs:[]);state.songs=arr.map(normalizeSong)}catch(_){state.songs=[]}renderCatalog();els.catalogStatus.textContent='Não foi possível carregar o catálogo principal pelo Apps Script; exibindo cópia local.';els.catalogStatus.className='status-line status-warn'}}
+function parseCatalogPayload(parsed){const arr=Array.isArray(parsed)?parsed:(Array.isArray(parsed?.catalogo)?parsed.catalogo:(Array.isArray(parsed?.songs)?parsed.songs:null));if(!arr)throw new Error('O catálogo recebido não contém uma lista de músicas.');return arr.map(normalizeSong)}
+async function fetchCatalogFromUrl(url){const response=await fetch(url+'?ts='+Date.now(),{cache:'no-store',headers:{Accept:'application/json'}});if(!response.ok)throw new Error('HTTP '+response.status);const parsed=await response.json();const arr=parseCatalogPayload(parsed);if(!arr.length)throw new Error('O catálogo retornou 0 músicas.');return arr}
+async function loadMainCatalog(){
+  const errors=[];
+  const previousCount=Array.isArray(state.songs)&&state.songs.length ? state.songs.length : (()=>{try{const cached=JSON.parse(localStorage.getItem(CATALOG_KEY)||'[]');return Array.isArray(cached)?cached.length:(Array.isArray(cached?.songs)?cached.songs.length:0)}catch(_){return 0}})();
+  const publicSources=[MAIN_CATALOG_URL,CDN_CATALOG_URL,RAW_CATALOG_URL,LOCAL_CATALOG_URL];
+  for(const url of publicSources){
+    try{
+      const arr=await fetchCatalogFromUrl(url);
+      if(previousCount>=300&&arr.length<Math.floor(previousCount*0.6)){throw new Error(`Resposta rejeitada por segurança: ${arr.length} músicas contra ${previousCount} na cópia conhecida.`)}
+      state.songs=arr;
+      localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs));
+      state.catalogHandle=null;
+      if(els.fileStatus){els.fileStatus.textContent=`Catálogo carregado (${arr.length} músicas)`;els.fileStatus.className='badge'}
+      renderCatalog();
+      return;
+    }catch(error){errors.push(String(url).replace(/^https?:\/\//,'' )+': '+(error?.message||'erro'))}
+  }
+  if(APPS_SCRIPT_URL&&APPS_SCRIPT_URL!=='COLE_AQUI_A_MESMA_URL_DO_APPS_SCRIPT_DO_INDEX_PRINCIPAL'){
+    try{
+      const data=await fetchJson(APPS_SCRIPT_URL+'?action=getCatalog&ts='+Date.now(),{},20000);
+      const arr=parseCatalogPayload(data);
+      if(!arr.length)throw new Error('O Apps Script retornou 0 músicas.');
+      if(previousCount>=300&&arr.length<Math.floor(previousCount*0.6))throw new Error(`Resposta rejeitada por segurança: ${arr.length} músicas contra ${previousCount} na cópia conhecida.`);
+      state.songs=arr;localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs));state.catalogHandle=null;if(els.fileStatus){els.fileStatus.textContent=`Catálogo carregado pelo Apps Script (${arr.length} músicas)`;els.fileStatus.className='badge'}renderCatalog();return;
+    }catch(error){errors.push('Apps Script: '+(error?.message||'erro'))}
+  }
+  throw new Error('Não foi possível carregar o catálogo por nenhuma fonte. '+errors.join(' | '));
+}
+async function loadLocal(){
+  try{await loadMainCatalog();return}catch(error){}
+  try{
+    const parsed=JSON.parse(localStorage.getItem(CATALOG_KEY)||'[]');
+    state.songs=parseCatalogPayload(parsed);
+  }catch(_){state.songs=[]}
+  renderCatalog();
+  els.catalogStatus.textContent=state.songs.length?`Catálogo remoto indisponível; exibindo ${state.songs.length} músicas salvas neste dispositivo.`:'Não foi possível carregar o catálogo. Verifique a conexão e use ↻ Atualizar catálogo.';
+  els.catalogStatus.className=`status-line ${state.songs.length?'status-warn':'status-error'}`;
+}
 function filtered(){const q=normalizeSearch(els.search.value);return state.songs.filter(song=>{const filterOk=state.filter==='all'||(state.filter==='active'?song.active:!song.active);const textOk=!q||normalizeSearch(`${song.title} ${song.artist} ${song.style}`).includes(q);return filterOk&&textOk}).sort((a,b)=>a.title.localeCompare(b.title,'pt-BR',{sensitivity:'base'}))}
 function updateBulkUI(){const visible=filtered();const visibleIds=new Set(visible.map(s=>s.id));state.selectedIds=new Set([...state.selectedIds].filter(id=>state.songs.some(s=>s.id===id)));const count=state.selectedIds.size;els.bulkActions.classList.toggle('active',count>0);els.bulkCount.textContent=`${count} música${count===1?'':'s'} selecionada${count===1?'':'s'}`;els.selectAll.textContent=visible.length&&visible.every(s=>state.selectedIds.has(s.id))?'Desmarcar todas':'Selecionar todas'}
 function renderCatalog(){
@@ -2635,25 +2675,11 @@ async function refreshMainCatalog(){
   els.refreshCatalog.textContent='↻ Atualizando...';
   setStatus('Atualizando o catálogo principal...');
   try{
-    try{
-      await loadMainCatalog();
-    }catch(primaryError){
-      const response=await fetch(MAIN_CATALOG_URL+'?ts='+Date.now(),{cache:'no-store'});
-      if(!response.ok)throw new Error('Não foi possível consultar o catálogo principal pelo Apps Script nem pelo catálogo público.');
-      const parsed=await response.json();
-      const arr=Array.isArray(parsed)?parsed:(Array.isArray(parsed?.songs)?parsed.songs:[]);
-      if(!Array.isArray(arr))throw new Error(primaryError.message||'Catálogo inválido.');
-      state.songs=arr.map(normalizeSong);
-      localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs));
-      renderCatalog();
-      state.localPdfPreviewSongId='';state.localPdfPreviewDataUrl='';
-      setStatus('✅ Catálogo atualizado pelo arquivo público.','success');
-      showToast('Catálogo atualizado.','success');
-      return;
-    }
+    await loadMainCatalog();
     state.localPdfPreviewSongId='';state.localPdfPreviewDataUrl='';
-    setStatus('✅ Catálogo principal atualizado.','success');
-    showToast('Catálogo atualizado.','success');
+    setStatus(`✅ Catálogo atualizado com ${state.songs.length} músicas.`,'success');
+    showToast(`Catálogo atualizado: ${state.songs.length} músicas.`,'success');
+    if(document.querySelector('.tab-btn.active')?.dataset.tab==='pdf')refreshPdfAudit({silent:true}).catch(()=>{});
   }catch(error){
     setStatus('Não foi possível atualizar o catálogo: '+error.message,'error');
     showToast('Falha ao atualizar catálogo.','error');
@@ -2871,7 +2897,7 @@ init();
 <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(() => {});
+    navigator.serviceWorker.register('./sw.js?v=20260918-catalog-fix', { scope: './' }).catch(() => {});
   });
 }
 </script>
