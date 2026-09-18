@@ -496,7 +496,7 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
               <div id="musicSearchSelected" class="music-search-selected hidden"></div>
               <div id="bulkMusicSearchPanel" class="bulk-music-search-panel hidden">
                 <div class="bulk-music-search-title">✨ Sugestões para o catálogo</div>
-                <div class="bulk-music-search-help">Não é preciso digitar nada. As sugestões são buscadas automaticamente no catálogo musical do Brasil, priorizando músicas populares e ampliando a descoberta por <strong>todos os principais estilos brasileiros</strong>. Músicas que já estão no catálogo são excluídas mesmo quando aparecem em outra interpretação, usando também a comparação da letra.</div>
+                <div class="bulk-music-search-help">Não é preciso digitar nada. A pesquisa automática amplia a descoberta por <strong>todos os principais estilos e períodos da música brasileira</strong>, dando um bônus para músicas populares sem ficar limitada a elas. Até <strong>300 faixas são efetivamente conferidas por rodada</strong>, e só entram sugestões com título, artista, estilo e letra completos. Músicas já presentes no catálogo são excluídas, inclusive em outras interpretações, pela comparação da letra.</div>
                 <div class="bulk-music-search-actions">
                   <button id="bulkMusicSearchBtn" type="button" class="btn btn-primary btn-small">✨ Gerar novas sugestões</button>
                   <button id="closeBulkMusicSearchBtn" type="button" class="btn btn-secondary btn-small">Fechar sugestões</button>
@@ -1154,7 +1154,7 @@ function buildCatalogSuggestionCandidateMap(chart,genreResults){
     const key=normalizeSuggestionText(title)+'|'+normalizeSuggestionText(artist);
     let current=map.get(key);
     if(!current){current={trackName:title,artistName:artist,primaryGenreName:normalize(item?.primaryGenreName||''),collectionName:normalize(item?.collectionName||item?.albumName||''),trackTimeMillis:Number(item?.trackTimeMillis||0)||0,trackId:item?.trackId||item?.id||'',collectionId:item?.collectionId||'',trackViewUrl:item?.trackViewUrl||item?.url||'',previewUrl:item?.previewUrl||'',chartRank:null,chartScore:0,sourceScore:0,sources:[],sourceStyles:[]};map.set(key,current);}
-    if(meta.chartRank!=null){const rank=Number(meta.chartRank);if(!current.chartRank||rank<current.chartRank){current.chartRank=rank;current.chartScore=6000+(201-rank)*22;}}
+    if(meta.chartRank!=null){const rank=Number(meta.chartRank);if(!current.chartRank||rank<current.chartRank){current.chartRank=rank;current.chartScore=2200+(201-rank)*5;}}
     if(meta.source){current.sourceScore+=Math.max(80,900-(Number(meta.rank||50)*5));if(!current.sources.includes(meta.source))current.sources.push(meta.source);if(meta.style&&!current.sourceStyles.includes(meta.style))current.sourceStyles.push(meta.style);}
     if(!current.primaryGenreName&&item?.primaryGenreName)current.primaryGenreName=item.primaryGenreName;
     if(!current.collectionName&&item?.collectionName)current.collectionName=item.collectionName;
@@ -1207,34 +1207,29 @@ async function searchCatalogSuggestions(){
   state.bulkMusicSelected.clear();
   renderBulkMusicSearchResults();
   if(els.bulkMusicSearchBtn){els.bulkMusicSearchBtn.disabled=true;els.bulkMusicSearchBtn.textContent='Gerando sugestões...';}
-  if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent='Consultando músicas populares no Brasil e ampliando a descoberta por estilos...';
+  if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent='Ampliando a descoberta por estilos, épocas e repertórios brasileiros...';
   const catalogIndex=buildCatalogSuggestionDuplicateIndex();
   const genreQueries=[
     {q:'música brasileira',label:'Música brasileira',style:'Música brasileira'},
-    {q:'sucessos brasileiros',label:'Sucessos brasileiros',style:'Pop brasileiro'},
-    {q:'clássicos brasileiros',label:'Clássicos brasileiros',style:'Clássicos brasileiros'},
-    {q:'sertanejo brasileiro',label:'Sertanejo brasileiro',style:'Sertanejo'},
-    {q:'pagode brasileiro',label:'Pagode brasileiro',style:'Pagode'},
-    {q:'samba brasileiro',label:'Samba brasileiro',style:'Samba'},
-    {q:'mpb brasileira',label:'MPB brasileira',style:'MPB'},
-    {q:'forró brasileiro',label:'Forró brasileiro',style:'Forró'},
-    {q:'piseiro brasileiro',label:'Piseiro brasileiro',style:'Forró'},
+    {q:'sertanejo brasileiro modão',label:'Sertanejo e modão',style:'Sertanejo'},
+    {q:'pagode samba brasileiro',label:'Pagode e samba',style:'Pagode / Samba'},
+    {q:'mpb bossa nova brasileira',label:'MPB e bossa nova',style:'MPB'},
+    {q:'forró piseiro xote brasileiro',label:'Forró e piseiro',style:'Forró'},
     {q:'funk brasileiro',label:'Funk brasileiro',style:'Funk'},
-    {q:'rap brasileiro',label:'Rap brasileiro',style:'Rap / Hip Hop'},
-    {q:'trap brasileiro',label:'Trap brasileiro',style:'Trap'},
-    {q:'rock brasileiro',label:'Rock brasileiro',style:'Rock'},
-    {q:'pop brasileiro',label:'Pop brasileiro',style:'Pop'},
-    {q:'axé brasileiro',label:'Axé brasileiro',style:'Axé'},
-    {q:'arrocha brasileiro',label:'Arrocha brasileiro',style:'Arrocha'},
-    {q:'brega brasileiro',label:'Brega brasileiro',style:'Brega'},
+    {q:'rap hip hop trap brasileiro',label:'Rap, hip hop e trap',style:'Rap / Hip Hop / Trap'},
+    {q:'rock pop brasileiro rock nacional',label:'Rock e pop nacional',style:'Rock / Pop'},
+    {q:'axé arrocha brega brasileiro',label:'Axé, arrocha e brega',style:'Axé / Arrocha / Brega'},
     {q:'gospel brasileiro',label:'Gospel brasileiro',style:'Gospel'},
     {q:'reggae brasileiro',label:'Reggae brasileiro',style:'Reggae'},
-    {q:'frevo brasileiro',label:'Frevo brasileiro',style:'Folclore / Regional'},
-    {q:'bossa nova brasileira',label:'Bossa nova brasileira',style:'MPB'},
-    {q:'samba-enredo brasileiro',label:'Samba-enredo brasileiro',style:'Samba'},
-    {q:'modão sertanejo',label:'Modão sertanejo',style:'Sertanejo'}
-  ];
-  try{
+    {q:'frevo maracatu coco carimbó brasileiro',label:'Ritmos regionais',style:'Regional brasileiro'},
+    {q:'choro chorinho brasileiro',label:'Choro brasileiro',style:'Choro'},
+    {q:'música caipira moda de viola brasileira',label:'Caipira e viola',style:'Caipira / Sertanejo'},
+    {q:'músicas brasileiras antigas clássicos',label:'Clássicos brasileiros',style:'Clássicos brasileiros'},
+    {q:'música brasileira anos 1960 1970',label:'Brasil anos 1960–1970',style:'Décadas / Brasil'},
+    {q:'música brasileira anos 1980 1990',label:'Brasil anos 1980–1990',style:'Décadas / Brasil'},
+    {q:'música brasileira anos 2000 2010',label:'Brasil anos 2000–2010',style:'Décadas / Brasil'},
+    {q:'música brasileira anos 2020 atuais',label:'Brasil anos 2020',style:'Brasil contemporâneo'}
+  ];  try{
     let chart=null;
     try{
       const chartResponse=await fetch('https://rss.applemarketingtools.com/api/v2/br/music/most-played/200/songs.json',{method:'GET',mode:'cors',cache:'no-store',signal:controller.signal,headers:{Accept:'application/json'}});
@@ -1242,51 +1237,57 @@ async function searchCatalogSuggestions(){
     }catch(_){chart=null;}
     const genreResults=[];
     let completedSources=0;
-    const sourceConcurrency=4;
+    const sourceConcurrency=3;
     let nextSource=0;
     const sourceWorker=async()=>{
       while(true){
         const idx=nextSource++;if(idx>=genreQueries.length)return;
         const group=genreQueries[idx];
         try{
-          const response=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(group.q)+'&media=music&entity=song&limit=100&country=BR',{method:'GET',mode:'cors',cache:'no-store',signal:controller.signal,headers:{Accept:'application/json'}});
+          const response=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(group.q)+'&media=music&entity=song&limit=200&country=BR',{method:'GET',mode:'cors',cache:'no-store',signal:controller.signal,headers:{Accept:'application/json'}});
           if(response.ok){const data=await response.json();genreResults.push({label:group.label,style:group.style,results:Array.isArray(data?.results)?data.results:[]});}
         }catch(error){if(error?.name==='AbortError')return;}
         completedSources++;
-        if(token===state.bulkMusicSearchToken&&!controller.signal.aborted&&els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`Fontes consultadas: ${completedSources}/${genreQueries.length} • preparando sugestões e conferindo o catálogo...`;
+        if(token===state.bulkMusicSearchToken&&!controller.signal.aborted&&els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`Fontes consultadas: ${completedSources}/${genreQueries.length} • montando uma base ampla e retirando músicas já cadastradas...`;
       }
     };
     await Promise.all(Array.from({length:sourceConcurrency},()=>sourceWorker()));
     if(token!==state.bulkMusicSearchToken||controller.signal.aborted)return;
-    const allCandidates=buildCatalogSuggestionCandidateMap(chart,genreResults).filter(candidate=>candidate.sourceStyles.length>0);
+    const allCandidates=buildCatalogSuggestionCandidateMap(chart,genreResults).filter(candidate=>{if(!candidate.sourceStyles.length)return false;const titleKey=normalizeSuggestionText(candidate.trackName),artistKey=normalizeSuggestionText(candidate.artistName);return !(catalogIndex.titleMap.get(titleKey)||[]).some(i=>catalogIndex.entries[i]?.artistKey===artistKey);});
     const candidates=diversifyCatalogSuggestionCandidates(allCandidates);
     let checked=0,excluded=0,found=0,missedLyrics=0;
     const extraEntries=[];
-    const MAX_CANDIDATES_TO_CHECK=220;
-    for(const candidate of candidates){
-      if(token!==state.bulkMusicSearchToken||controller.signal.aborted)return;
-      if(checked>=MAX_CANDIDATES_TO_CHECK)break;
-      checked++;
-      const titleKey=normalizeSuggestionText(candidate.trackName),artistKey=normalizeSuggestionText(candidate.artistName);
-      const exactArtistTitle=(catalogIndex.titleMap.get(titleKey)||[]).some(i=>catalogIndex.entries[i]?.artistKey===artistKey);
-      if(exactArtistTitle){excluded++;continue;}
-      let lyrics='';
-      try{lyrics=await fetchLyricsForCatalogSuggestion(candidate);}catch(_){lyrics='';}
-      if(!lyrics){missedLyrics++;continue;}
-      const enriched={...candidate,lyrics,suggestionStyle:candidate.suggestionStyle||candidate.primaryGenreName||'Música brasileira'};
-      if(candidateMatchesCatalog(enriched,catalogIndex,extraEntries)){excluded++;continue;}
-      const entry={song:{title:enriched.trackName,artist:enriched.artistName,lyrics:enriched.lyrics},titleKey,artistKey,signature:buildLyricsSignature(enriched.lyrics)};
-      extraEntries.push(entry);
-      state.bulkMusicSearchResults.push(enriched);
-      found++;
-      renderBulkMusicSearchResults();
-      if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`Encontradas ${found} sugestões válidas • ${excluded} excluídas por já existirem ou terem letra semelhante • ${checked}/${Math.min(MAX_CANDIDATES_TO_CHECK,candidates.length)} candidatos conferidos.`;
-      await sleep(220);
-    }
+    const MAX_CANDIDATES_TO_CHECK=300;
+    const lyricConcurrency=4;
+    let nextCandidate=0;
+    const processCandidate=async()=>{
+      while(true){
+        if(token!==state.bulkMusicSearchToken||controller.signal.aborted)return;
+        const idx=nextCandidate++;
+        if(idx>=candidates.length||idx>=MAX_CANDIDATES_TO_CHECK)return;
+        const candidate=candidates[idx];
+        checked++;
+        const titleKey=normalizeSuggestionText(candidate.trackName),artistKey=normalizeSuggestionText(candidate.artistName);
+        const exactArtistTitle=(catalogIndex.titleMap.get(titleKey)||[]).some(i=>catalogIndex.entries[i]?.artistKey===artistKey);
+        if(exactArtistTitle){excluded++;continue;}
+        let lyrics='';
+        try{lyrics=await fetchLyricsForCatalogSuggestion(candidate);}catch(_){lyrics='';}
+        if(!lyrics){missedLyrics++;continue;}
+        const enriched={...candidate,lyrics,suggestionStyle:candidate.suggestionStyle||candidate.primaryGenreName||'Música brasileira'};
+        if(candidateMatchesCatalog(enriched,catalogIndex,extraEntries)){excluded++;continue;}
+        const entry={song:{title:enriched.trackName,artist:enriched.artistName,lyrics:enriched.lyrics},titleKey,artistKey,signature:buildLyricsSignature(enriched.lyrics)};
+        extraEntries.push(entry);
+        state.bulkMusicSearchResults.push(enriched);
+        found++;
+        renderBulkMusicSearchResults();
+        if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`Encontradas ${found} sugestões válidas • ${excluded} excluídas • ${missedLyrics} sem letra • ${checked}/${Math.min(MAX_CANDIDATES_TO_CHECK,candidates.length)} faixas conferidas.`;
+      }
+    };
+    await Promise.all(Array.from({length:lyricConcurrency},()=>processCandidate()));
     if(token!==state.bulkMusicSearchToken||controller.signal.aborted)return;
     if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=found
-      ? `✅ ${found} sugestões válidas encontradas. ${excluded} foram excluídas por já existirem no catálogo ou por terem letra suficientemente semelhante. ${missedLyrics} não entraram porque a letra não foi encontrada.`
-      : `Nenhuma sugestão nova foi encontrada nesta rodada. ${excluded} coincidências com o catálogo foram excluídas${missedLyrics?` e ${missedLyrics} faixas ficaram sem letra.`:''}`;
+      ? `✅ ${found} sugestões válidas encontradas. Foram conferidas ${checked} faixas; ${excluded} foram excluídas por já estarem no catálogo ou por terem letra suficientemente semelhante. ${missedLyrics} ficaram de fora por não terem letra completa disponível.`
+      : `Nenhuma sugestão nova foi encontrada nesta rodada. Foram conferidas ${checked} faixas e ${excluded} coincidências com o catálogo foram excluídas${missedLyrics?`; ${missedLyrics} ficaram sem letra completa.`:''}`;
   }catch(error){
     if(error?.name==='AbortError')return;
     if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent='Não foi possível gerar as sugestões agora: '+(error?.message||'erro desconhecido')+'.';
