@@ -502,7 +502,7 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
     <nav class="tabs" aria-label="Navegação administrativa">
       <button class="tab-btn active" data-tab="catalog" type="button">🎵 Catálogo</button>
       <button class="tab-btn" data-tab="editor" type="button">✚ Cadastrar</button>
-      <button class="tab-btn" data-tab="received" type="button">📥 Cadastros recebidos</button><button class="tab-btn" data-tab="pdf" type="button">📄 PDFs</button>
+      <button class="tab-btn" data-tab="received" type="button">📥 Cadastros recebidos</button>
       <button class="tab-btn" data-tab="project" type="button">ℹ️ Projeto</button>
     </nav>
 
@@ -525,14 +525,14 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
           <div class="form-grid">
             <div class="music-search-box">
               <div class="field"><label for="musicSearchQuery">Buscar música</label><input id="musicSearchQuery" type="text" autocomplete="off" placeholder="Ex.: Flor de Liz Djavan" /></div>
-              <div class="music-search-actions"><button id="searchMusicBtn" type="button" class="btn btn-secondary btn-small">🔎 Buscar música</button><button id="openBulkMusicSearchBtn" type="button" class="btn btn-secondary btn-small">✨ Sugerir músicas para o catálogo</button><span id="musicSearchStatus" class="music-search-status"></span></div>
+              <div class="music-search-actions"><button id="searchMusicBtn" type="button" class="btn btn-secondary btn-small">🔎 Buscar música</button><button id="openBulkMusicSearchBtn" type="button" class="btn btn-secondary btn-small">📚 Cadastrar músicas em massa</button><span id="musicSearchStatus" class="music-search-status"></span></div>
               <div id="musicSearchResults" class="music-search-results"></div>
               <div id="musicSearchSelected" class="music-search-selected hidden"></div>
               <div id="bulkMusicSearchPanel" class="bulk-music-search-panel hidden">
-                <div class="bulk-music-search-title">✨ Sugestões para o catálogo</div>
+                <div class="bulk-music-search-title">📚 Cadastro de músicas em massa</div>
                 <div class="bulk-music-search-help">Não é preciso digitar nada. O sistema pesquisa automaticamente músicas brasileiras de vários estilos e épocas, priorizando sinais de popularidade sem ficar limitado às músicas famosas. A rodada continua pesquisando até reunir <strong>200 sugestões válidas</strong>, sempre exigindo título, artista, estilo e letra completos. Músicas já existentes no catálogo são excluídas por título + artista e, quando houver outro intérprete, pela comparação da letra.</div>
                 <div class="bulk-music-search-actions">
-                  <button id="bulkMusicSearchBtn" type="button" class="btn btn-primary btn-small">✨ Gerar novas sugestões</button>
+                  <button id="bulkMusicSearchBtn" type="button" class="btn btn-primary btn-small">🔎 Pesquisar músicas</button>
                   <button id="closeBulkMusicSearchBtn" type="button" class="btn btn-secondary btn-small">Fechar sugestões</button>
                 </div>
                 <div id="bulkMusicSearchStatus" class="bulk-music-search-status"></div>
@@ -540,7 +540,7 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
                   <span id="bulkMusicSelectionCount" class="bulk-music-selection-count">0 músicas selecionadas</span>
                   <button id="selectAllBulkMusicBtn" type="button" class="btn btn-secondary btn-small">Selecionar todas</button>
                   <button id="clearBulkMusicSelectionBtn" type="button" class="btn btn-secondary btn-small">Limpar seleção</button>
-                  <button id="addSelectedBulkMusicBtn" type="button" class="btn btn-success btn-small">➕ Adicionar selecionadas</button>
+                  <button id="addSelectedBulkMusicBtn" type="button" class="btn btn-success btn-small">➕ Cadastrar selecionadas</button>
                 </div>
                 <div id="bulkMusicSearchResults" class="bulk-music-results" aria-live="polite"></div>
               </div>
@@ -550,9 +550,7 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
               <div class="field"><label for="songArtist">Artista</label><input id="songArtist" type="text" autocomplete="off" placeholder="Ex.: Chitãozinho & Xororó" /></div>
             </div>
             <div class="two-col"><div class="field"><label for="songStyle">Estilo</label><input id="songStyle" type="text" autocomplete="off" placeholder="Ex.: Sertanejo" /></div><div class="field"><label for="songNote">Tom</label><input id="songNote" type="text" autocomplete="off" placeholder="Ex.: G, Am, C, D7" maxlength="20" /></div></div>
-            <div class="field"><label for="songLyrics">Letra completa</label><textarea id="songLyrics" placeholder="Cole a letra completa aqui..."></textarea></div>
-            <div class="field pdf-form-field"><label>PDF da música <span class="field-optional">(opcional)</span></label><div class="pdf-picker"><button id="selectSongPdfBtn" class="btn btn-secondary btn-small" type="button">📄 Anexar PDF</button><span id="songPdfStatus" class="pdf-status">Nenhum PDF selecionado</span><button id="viewSongPdfBtn" class="btn btn-secondary btn-small hidden" type="button">👁 Ver PDF</button></div></div>
-            <div class="actions-grid"><button id="saveSongBtn" class="btn btn-primary" type="button">Salvar música</button><button id="cancelEditBtn" class="btn btn-secondary hidden" type="button">Cancelar edição</button></div>
+            <div class="field"><label for="songLyrics">Letra completa</label><textarea id="songLyrics" placeholder="Cole a letra completa aqui..."></textarea></div><div class="actions-grid"><button id="saveSongBtn" class="btn btn-primary" type="button">Salvar música</button><button id="cancelEditBtn" class="btn btn-secondary hidden" type="button">Cancelar edição</button></div>
             <div id="formStatus" class="status-line"></div>
           </div>
         </section>
@@ -568,49 +566,9 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
       </section>
 
       
-      <section class="tab-panel" data-panel="pdf">
-        <section class="card pdf-dashboard">
-          <div class="card-head">
-            <div><h2>Controle de PDFs</h2><p>O painel considera válido somente o PDF físico que realmente existe no repositório e está vinculado à música.</p></div>
-            <span id="pdfCatalogCounter" class="badge">0 PDFs válidos</span>
-          </div>
-          <div class="stats-grid" style="margin-bottom:4px">
-            <div class="stat"><div class="stat-label">PDFs válidos</div><div id="pdfStatValid" class="stat-value">0</div></div>
-            <div class="stat"><div class="stat-label">Sem PDF válido</div><div id="pdfStatMissing" class="stat-value">0</div></div>
-            <div class="stat"><div class="stat-label">Órfãos</div><div id="pdfStatOrphans" class="stat-value">0</div></div>
-          </div>
-          <div class="pdf-integrity-note">Referências antigas no <strong>catalogo.json</strong> não são consideradas válidas sozinhas. Se o arquivo físico não existir mais, a música aparece abaixo como pendente e pode receber um novo PDF.</div>
-          <div class="pdf-toolbar">
-            <button id="refreshPdfPanelBtn" type="button" class="btn btn-secondary btn-small">↻ Verificar PDFs</button>
-            <button id="generateMissingPdfsBtn" type="button" class="btn btn-primary btn-small">📄 Gerar PDFs pendentes</button>
-            <button id="bulkPdfUploadBtn" type="button" class="btn btn-secondary btn-small">📚 Adicionar PDFs em massa</button>
-            <input id="bulkPdfUploadInput" type="file" accept="application/pdf,.pdf" multiple class="hidden" />
-            <button id="retryFailedPdfsBtn" type="button" class="btn btn-amber btn-small hidden">🔄 Tentar falhas</button>
-            <button id="clearBrokenPdfRefsBtn" type="button" class="btn btn-amber btn-small" disabled>🧹 Limpar referências quebradas</button>
-            <button id="deleteOrphanPdfsBtn" type="button" class="btn btn-danger btn-small">🧹 Excluir PDFs não vinculados</button>
-          </div>
-          <div id="pdfBatchProgress" class="pdf-batch-progress hidden" aria-live="polite"></div>
-          <div id="pdfPanelStatus" class="status-line"></div>
-          <div class="pdf-lists">
-            <section class="pdf-list-card">
-              <div class="pdf-list-head"><h3>🎵 Músicas no catálogo sem PDF válido</h3><span id="pdfMissingCount">0</span></div>
-              <div id="pdfMissingList" class="pdf-song-list"></div>
-            </section>
-            <section class="pdf-list-card">
-              <div class="pdf-list-head"><h3>📄 PDFs vinculados ao catálogo</h3><span id="pdfValidCount">0</span></div>
-              <div id="pdfValidList" class="pdf-song-list"></div>
-            </section>
-            <section class="pdf-list-card">
-              <div class="pdf-list-head"><h3>🗑️ PDFs físicos não vinculados</h3><span id="pdfOrphanCount">0</span></div>
-              <div id="pdfOrphanList" class="pdf-file-list"></div>
-            </section>
-          </div>
-        </section>
-      </section>
-
-<section class="tab-panel" data-panel="project">
+      <section class="tab-panel" data-panel="project">
         <section class="card">
-          <div class="card-head"><div><h2>Contexto do projeto</h2><p>Notas permanentes para manter este painel e futuras alterações alinhados com o projeto.</p></div><span class="badge">Palco Pro</span></div>
+          <div class="card-head"><div><h2>Contexto do projeto</h2><p>Notas permanentes para manter este painel e futuras alterações alinhadas com o projeto.</p></div><span class="badge">Palco Pro</span></div>
           <div class="project-context note">
             <p><strong>Aplicativo principal:</strong> Palco Pro, voltado para músicos, com aparência de teleprompter.</p>
             <p><strong>Repertório pessoal:</strong> armazenado localmente no dispositivo do usuário. Não depende de conta ou Supabase.</p>
@@ -626,23 +584,7 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
   </div>
 </section>
 </main>
-
-<input id="catalogPdfInput" type="file" accept="application/pdf,.pdf" class="hidden" />
-<input id="receivedPdfInput" type="file" accept="application/pdf,.pdf" class="hidden" />
-<div class="pdf-viewer-screen" id="pdfViewerScreen" aria-hidden="true">
-  <div class="page-swipe-edge left"></div>
-  <div class="page-swipe-edge right"></div>
-  <button type="button" class="pdf-viewer-close" id="pdfViewerClose" aria-label="Fechar visualização do PDF" title="Fechar">✕</button>
-  <div class="pdf-viewer-note hidden" id="pdfViewerNote" aria-hidden="true"></div>
-  <div class="pdf-viewer-page-wrap" id="pdfViewerPageWrap">
-    <div class="page-swipe-preview pdf" id="pdfPagePreview"><canvas id="pdfPagePreviewCanvas" aria-label="Prévia da próxima página"></canvas></div>
-    <iframe id="pdfNativeFrame" class="pdf-native-frame hidden" title="Visualização nativa do PDF" referrerpolicy="no-referrer"></iframe>
-    <canvas class="pdf-viewer-canvas" id="pdfViewerCanvas" aria-label="Página do PDF da música"></canvas>
-  </div>
-  <div class="pdf-viewer-hint hidden" id="pdfViewerHint">Deslize para trocar de folha</div>
-  <div class="pdf-viewer-page-indicator hidden" id="pdfViewerPageIndicator"></div>
-</div>
-<div id="receivedEditModal" class="modal"><div class="modal-card"><div class="modal-head"><h3>Cadastro recebido</h3><button class="icon-btn" type="button" data-close-received-edit>✕</button></div><div class="modal-body"><div class="received-editor"><div class="detail-block"><label for="receivedEditTitle">Música</label><input id="receivedEditTitle" type="text" /></div><div class="detail-block"><label for="receivedEditArtist">Artista</label><input id="receivedEditArtist" type="text" /></div><div class="two-col"><div class="detail-block"><label for="receivedEditStyle">Estilo</label><input id="receivedEditStyle" type="text" /></div><div class="detail-block"><label for="receivedEditNote">Tom</label><input id="receivedEditNote" type="text" maxlength="20" /></div></div><div class="detail-block"><label for="receivedEditUser">Usuário</label><input id="receivedEditUser" type="text" /></div><div class="detail-block"><label for="receivedEditLyrics">Letra</label><textarea id="receivedEditLyrics"></textarea></div><div class="detail-block"><label>PDF</label><div id="receivedEditPdfStatus" class="pdf-status">Nenhum PDF anexado</div><div class="pdf-actions"><button id="receivedEditPdfBtn" type="button" class="btn btn-secondary btn-small">📄 Adicionar PDF</button><button id="receivedEditViewPdfBtn" type="button" class="btn btn-secondary btn-small hidden">👁 Ver PDF</button></div></div></div></div><div class="modal-foot"><div class="received-editor-actions"><button id="saveReceivedEditBtn" type="button" class="btn btn-primary">Salvar alterações</button><button type="button" class="btn btn-secondary" data-close-received-edit>Fechar</button></div></div></div></div><div id="detailModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="detailTitle">Detalhes da música</h3><button class="icon-btn" type="button" data-close-detail>✕</button></div><div id="detailBody" class="modal-body"></div><div class="modal-foot"><button type="button" class="btn btn-secondary" data-close-detail>Fechar</button></div></div></div>
+<div id="receivedEditModal" class="modal"><div class="modal-card"><div class="modal-head"><h3>Cadastro recebido</h3><button class="icon-btn" type="button" data-close-received-edit>✕</button></div><div class="modal-body"><div class="received-editor"><div class="detail-block"><label for="receivedEditTitle">Música</label><input id="receivedEditTitle" type="text" /></div><div class="detail-block"><label for="receivedEditArtist">Artista</label><input id="receivedEditArtist" type="text" /></div><div class="two-col"><div class="detail-block"><label for="receivedEditStyle">Estilo</label><input id="receivedEditStyle" type="text" /></div><div class="detail-block"><label for="receivedEditNote">Tom</label><input id="receivedEditNote" type="text" maxlength="20" /></div></div><div class="detail-block"><label for="receivedEditUser">Usuário</label><input id="receivedEditUser" type="text" /></div><div class="detail-block"><label for="receivedEditLyrics">Letra</label><textarea id="receivedEditLyrics"></textarea></div></div></div><div class="modal-foot"><div class="received-editor-actions"><button id="saveReceivedEditBtn" type="button" class="btn btn-primary">Salvar alterações</button><button type="button" class="btn btn-secondary" data-close-received-edit>Fechar</button></div></div></div></div><div id="detailModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="detailTitle">Detalhes da música</h3><button class="icon-btn" type="button" data-close-detail>✕</button></div><div id="detailBody" class="modal-body"></div><div class="modal-foot"><button type="button" class="btn btn-secondary" data-close-detail>Fechar</button></div></div></div>
 <div id="styleModal" class="modal"><div class="modal-card"><div class="modal-head"><h3>Alterar nome do estilo</h3><button class="icon-btn" type="button" data-close-style>✕</button></div><div class="modal-body"><div class="style-modal-copy">Digite o novo nome do estilo para todas as músicas selecionadas.</div><div class="field"><label for="bulkStyleInput">Novo estilo</label><input id="bulkStyleInput" type="text" placeholder="Ex.: Sertanejo" /></div></div><div class="modal-foot"><button id="continueStyleBtn" type="button" class="btn btn-primary">Continuar</button><button type="button" class="btn btn-secondary" data-close-style>Cancelar</button></div></div></div><div id="confirmModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="confirmTitle">Confirmar ação</h3><button class="icon-btn" type="button" data-close-confirm>✕</button></div><div id="confirmBody" class="modal-body"></div><div class="modal-foot"><button id="confirmBtn" class="btn btn-danger" type="button">Confirmar</button><button type="button" class="btn btn-secondary" data-close-confirm>Cancelar</button></div></div></div>
 <div id="toast" class="toast" aria-live="polite"></div><div id="confirmationOverlay" class="confirmation-overlay" aria-live="polite" aria-hidden="true"><div class="confirmation-card" role="status"><div class="confirmation-icon">✓</div><h3 class="confirmation-title">Música cadastrada</h3><p class="confirmation-text">A música foi adicionada ao catálogo com sucesso.</p><div id="confirmationSong" class="confirmation-song"></div></div></div>
 
@@ -650,7 +592,7 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
 PALCO PRO — CONTEXTO DO PROJETO
 
 Este arquivo é o painel administrativo do Palco Pro.
-Objetivo: administrar manualmente o catálogo público de músicas usado pela aba “Sugestões” do index.html principal, preservando nome, artista, estilo, tom, letra e PDF.
+Objetivo: administrar manualmente o catálogo público de músicas usado pela aba “Sugestões” do index.html principal, preservando nome, artista, estilo, tom e letra.
 Arquitetura aprovada: sem Supabase, sem banco de dados, sem GitHub Actions e sem publicação automática.
 Fluxo: anexar o catalogo.json atual -> visualizar -> cadastrar/editar/excluir/ativar/desativar -> baixar um novo catalogo.json -> substituir manualmente o arquivo no mesmo diretório do index.html principal.
 O index principal mantém repertório pessoal no dispositivo, backup/restauração e teleprompter contínuo.
@@ -947,7 +889,7 @@ function renderCatalog(){
     const row=document.createElement('article');
     row.className=`song-row ${state.selectedIds.has(song.id)?'selected':''}`;
     row.dataset.songSwipe='1';
-    row.innerHTML=`<div class="song-actions"><span class="badge ${song.active?'':'inactive'}">${song.active?'Ativa':'Inativa'}</span><button class="btn btn-secondary btn-small" type="button" data-view="${escapeHtml(song.id)}">Ver</button><button class="btn btn-secondary btn-small" type="button" data-edit="${escapeHtml(song.id)}">Editar</button>${(songHasPdf(song)||state.localPdfPreviewSongId===song.id)?`<button class="btn btn-secondary btn-small" type="button" data-view-pdf="${escapeHtml(song.id)}">👁 PDF</button>`:''}<button class="btn btn-secondary btn-small" type="button" data-pdf="${escapeHtml(song.id)}">${songHasPdf(song)?'Alterar PDF':'Adicionar PDF'}</button><button class="btn ${song.active?'btn-amber':'btn-success'} btn-small" type="button" data-toggle="${escapeHtml(song.id)}">${song.active?'Desativar':'Ativar'}</button><button class="btn btn-danger btn-small" type="button" data-delete="${escapeHtml(song.id)}">Excluir</button></div><div class="song-card"><input class="song-select" type="checkbox" data-select="${escapeHtml(song.id)}" aria-label="Selecionar música" ${state.selectedIds.has(song.id)?'checked':''}><div class="song-main"><div class="song-title-line"><div class="song-title">${escapeHtml(song.title)}</div>${songHasPdf(song)?'<span class="song-pdf-indicator" aria-label="PDF anexado" title="PDF anexado">📄</span>':''}<button class="song-lyrics-search-btn" type="button" data-search-lyrics="${escapeHtml(song.id)}" aria-label="Buscar letra na internet" title="Buscar letra na internet">🔎</button></div><div class="song-meta">${escapeHtml(song.artist||'Sem artista')}${song.style?' • '+escapeHtml(song.style):''}${song.note?' • Tom: '+escapeHtml(song.note):''}</div></div></div>`;
+    row.innerHTML=`<div class="song-actions"><span class="badge ${song.active?'':'inactive'}">${song.active?'Ativa':'Inativa'}</span><button class="btn btn-secondary btn-small" type="button" data-view="${escapeHtml(song.id)}">Ver</button><button class="btn btn-secondary btn-small" type="button" data-edit="${escapeHtml(song.id)}">Editar</button><button class="btn ${song.active?'btn-amber':'btn-success'} btn-small" type="button" data-toggle="${escapeHtml(song.id)}">${song.active?'Desativar':'Ativar'}</button><button class="btn btn-danger btn-small" type="button" data-delete="${escapeHtml(song.id)}">Excluir</button></div><div class="song-card"><input class="song-select" type="checkbox" data-select="${escapeHtml(song.id)}" aria-label="Selecionar música" ${state.selectedIds.has(song.id)?'checked':''}><div class="song-main"><div class="song-title-line"><div class="song-title">${escapeHtml(song.title)}</div><button class="song-lyrics-search-btn" type="button" data-search-lyrics="${escapeHtml(song.id)}" aria-label="Buscar letra na internet" title="Buscar letra na internet">🔎</button></div><div class="song-meta">${escapeHtml(song.artist||'Sem artista')}${song.style?' • '+escapeHtml(song.style):''}${song.note?' • Tom: '+escapeHtml(song.note):''}</div></div></div>`;
     els.catalogList.appendChild(row);
   }
   updateBulkUI();
@@ -1627,7 +1569,7 @@ async function searchCatalogSuggestions(){
   }finally{
     if(token===state.bulkMusicSearchToken){
       state.bulkMusicSearchBusy=false;
-      if(els.bulkMusicSearchBtn){els.bulkMusicSearchBtn.disabled=false;els.bulkMusicSearchBtn.textContent='✨ Gerar novas sugestões';}
+      if(els.bulkMusicSearchBtn){els.bulkMusicSearchBtn.disabled=false;els.bulkMusicSearchBtn.textContent='🔎 Pesquisar músicas';}
       updateBulkMusicSelectionUI();
     }
   }
@@ -1658,7 +1600,7 @@ async function addSelectedBulkMusic(){
     const title=normalize(item.trackName),artist=normalize(item.artistName),style=normalize(item.suggestionStyle||item.style||item.primaryGenreName),lyrics=formatFetchedLyrics(item.lyrics);
     if(!title||!artist||!style||!lyrics)continue;
     if(candidateMatchesCatalog({trackName:title,artistName:artist,lyrics},duplicateIndex,seenEntries)){duplicates++;continue;}
-    pending.push({id:makeId(),title,artist,style,note:'',lyrics,pdfUrl:'',pdfFileName:'',active:true});
+    pending.push({id:makeId(),title,artist,style,note:'',lyrics,active:true});
     seenEntries.push({song:{title,artist,lyrics},titleKey:normalizeSuggestionText(title),artistKey:normalizeSuggestionText(artist),signature:buildLyricsSignature(lyrics)});
   }
   if(!pending.length){showToast(duplicates?'As músicas selecionadas já existem no catálogo ou têm letras semelhantes às já cadastradas.':'Nenhuma música válida selecionada.','error');return;}
@@ -1678,40 +1620,11 @@ async function addSelectedBulkMusic(){
         showToast('Falha na sincronização do lote.','error');
         return;
       }
-      let pdfOk=0,pdfFail=0;
-      for(let i=0;i<pending.length;i++){
-        const music=pending[i];
-        if(els.bulkMusicSearchStatus){
-          els.bulkMusicSearchStatus.textContent=
-            `🔄 PDF ${i+1}/${pending.length} • Gerando: ${music.title} — ${music.artist} • ✅ ${pdfOk} concluído • ❌ ${pdfFail} falha`;
-        }
-        const row=els.catalogList?.querySelector(`[data-generate-pdf="${CSS.escape(String(music.id))}"]`);
-        if(row){row.disabled=true;row.textContent='⏳';}
-
-        // UMA música por vez. A próxima só começa depois do retorno do servidor.
-        const ok=await generatePdfForCatalogSong(music.id,{silent:true,retryCount:3});
-        if(ok){
-          pdfOk++;
-          if(els.bulkMusicSearchStatus){
-            els.bulkMusicSearchStatus.textContent=
-              `✅ PDF ${i+1}/${pending.length} concluído • ${music.title} — ${music.artist} • Próxima música: ${i+1<pending.length?'sim':'fim da fila'}`;
-          }
-        }else{
-          pdfFail++;
-          if(els.bulkMusicSearchStatus){
-            els.bulkMusicSearchStatus.textContent=
-              `⚠️ PDF ${i+1}/${pending.length} não foi concluído: ${music.title} — ${music.artist}. A fila continuará para a próxima.`;
-          }
-        }
-        renderCatalog();
-      }
       state.bulkMusicSelected.clear();
       if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=
-        `✅ Lote finalizado: ${pending.length} música${pending.length===1?'':'s'} adicionada${pending.length===1?'':'s'}. `+
-        `PDFs concluídos: ${pdfOk}. `+
-        `${pdfFail?`PDFs com falha: ${pdfFail}. Use “Tentar falhas” no painel de PDFs para repetir somente os que falharam.`:'Todos os PDFs foram gerados e vinculados com sucesso.'}`;
+        `✅ ${pending.length} música${pending.length===1?'':'s'} cadastrada${pending.length===1?'':'s'} no catálogo principal. Os PDFs serão gerados localmente no aparelho de cada usuário quando as músicas forem salvas no repertório.`;
       renderBulkMusicSearchResults();
-      showToast(`${pending.length} música${pending.length===1?'':'s'} adicionada${pending.length===1?'':'s'} em lote.`,'success');
+            showToast(`${pending.length} música${pending.length===1?'':'s'} adicionada${pending.length===1?'':'s'} em lote.`,'success');
     }catch(error){
       if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent='Erro ao adicionar o lote: '+(error?.message||'erro desconhecido')+'.';
       showToast('Erro na adição em lote.','error');
@@ -1933,31 +1846,17 @@ async function selectMusicSearchResult(index){
     els.musicSearchSelected.classList.remove('hidden');
   }
   els.musicSearchResults.innerHTML='';
-  els.musicSearchStatus.textContent='Preparando o cadastro da música selecionada...';
+  els.musicSearchStatus.textContent='Buscando a letra da música selecionada...';
   els.musicSearchStatus.className='music-search-status';
-  selectedFormPdf=null;
-  updateFormPdfUI(null);
   try{
     const lyrics=normalize(item.lyrics)||await fetchLyricsForSelection(title,artist);
     if(lyrics){
       els.songLyrics.value=lyrics;
-      els.musicSearchStatus.textContent='Letra encontrada. Gerando o PDF automaticamente...';
-      els.musicSearchStatus.className='music-search-status';
-      state.autoPdfGenerating=true;
-      try{
-        selectedFormPdf=await generateAutomaticLyricsPdf(title,artist,lyrics);
-        updateFormPdfUI(null);
-        els.musicSearchStatus.textContent='✅ Música, estilo, letra e PDF automático preenchidos. Confira em 👁 Ver PDF e salve manualmente.';
-        els.musicSearchStatus.className='music-search-status status-success';
-      }catch(pdfError){
-        selectedFormPdf=null;
-        updateFormPdfUI(null);
-        els.musicSearchStatus.textContent='✅ Música, estilo e letra preenchidos, mas não foi possível gerar o PDF automático: '+(pdfError?.message||'erro desconhecido')+'.';
-        els.musicSearchStatus.className='music-search-status status-warn';
-      }finally{state.autoPdfGenerating=false}
+      els.musicSearchStatus.textContent='✅ Música, estilo e letra preenchidos. O PDF será gerado somente no aparelho do usuário quando a música for salva no repertório.';
+      els.musicSearchStatus.className='music-search-status status-success';
     }else{
       els.songLyrics.value='';
-      els.musicSearchStatus.textContent='✅ Dados da música preenchidos, mas a letra não foi encontrada automaticamente. Você pode inseri-la manualmente e salvar.';
+      els.musicSearchStatus.textContent='✅ Dados da música preenchidos, mas a letra não foi encontrada automaticamente. Você pode inseri-la manualmente.';
       els.musicSearchStatus.className='music-search-status status-warn';
     }
   }catch(error){
@@ -1965,7 +1864,8 @@ async function selectMusicSearchResult(index){
     els.musicSearchStatus.className='music-search-status status-warn';
   }
 }
-function clearForm(){selectedFormPdf=null;state.autoPdfGenerating=false;pendingReceivedPdf=null;els.catalogPdfInput.value='';delete els.catalogPdfInput.dataset.formMode;state.editingId=null;els.formTitle.textContent='Cadastrar música';els.formSubtitle.textContent='A música será incluída no catálogo que o Palco Pro principal lê.';els.editingBadge.textContent='Nova música';els.editingBadge.className='badge';els.saveSong.textContent='Salvar música';els.cancelEdit.classList.add('hidden');els.songTitle.value='';els.songArtist.value='';els.songStyle.value='';if(els.songNote)els.songNote.value='';els.songLyrics.value='';els.formStatus.textContent='';clearMusicSearchUI();clearBulkMusicSearchUI();closeBulkMusicSearch();updateFormPdfUI(null)}
+
+function clearForm(){selectedFormPdf=null;state.autoPdfGenerating=false;pendingReceivedPdf=null;state.editingId=null;els.formTitle.textContent='Cadastrar música';els.formSubtitle.textContent='A música será incluída no catálogo que o Palco Pro principal lê.';els.editingBadge.textContent='Nova música';els.editingBadge.className='badge';els.saveSong.textContent='Salvar música';els.cancelEdit.classList.add('hidden');els.songTitle.value='';els.songArtist.value='';els.songStyle.value='';if(els.songNote)els.songNote.value='';els.songLyrics.value='';els.formStatus.textContent='';clearMusicSearchUI();clearBulkMusicSearchUI();closeBulkMusicSearch();updateFormPdfUI(null)}
 function beginEdit(id){const s=state.songs.find(x=>x.id===id);if(!s)return;state.editingId=id;els.formTitle.textContent='Editar música';els.formSubtitle.textContent='Atualize os dados e salve. A alteração ficará pronta para o próximo catalogo.json.';els.editingBadge.textContent='Edição';els.editingBadge.className='badge';els.saveSong.textContent='Salvar alterações';els.cancelEdit.classList.remove('hidden');els.songTitle.value=s.title;els.songArtist.value=s.artist;els.songStyle.value=s.style;if(els.songNote)els.songNote.value=normalize(s.note);els.songLyrics.value=s.lyrics;selectedFormPdf=null;state.autoPdfGenerating=false;pendingReceivedPdf=null;clearBulkMusicSearchUI();closeBulkMusicSearch();updateFormPdfUI(s);els.formStatus.textContent='Você está editando esta música.';clearMusicSearchUI();els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})}
 async function saveSong(){
  if(saveSong.busy)return;
@@ -1979,17 +1879,11 @@ async function saveSong(){
  saveSong.busy=true;els.saveSong.disabled=true;els.saveSong.textContent='Salvando...';
  try{
   if(editing){const idx=state.songs.findIndex(s=>s.id===state.editingId);if(idx<0)throw new Error('Música em edição não encontrada.');state.songs[idx]={...state.songs[idx],title,artist,style,note,lyrics}}
-  else state.songs.unshift({id:makeId(),title,artist,style,note,lyrics,active:true,pdfUrl:'',pdfFileName:''});
+  else state.songs.unshift({id:makeId(),title,artist,style,note,lyrics,active:true});
   localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs.map(normalizeSong)));renderCatalog();
   setStatus('Alteração salva no dispositivo. Sincronizando catálogo principal...');
   const publicado=await publishCatalogToServer();
   if(!publicado.sucesso){setStatus('Foi salvo neste dispositivo, mas não foi sincronizado com o catálogo principal: '+publicado.mensagem,'error');showToast('Falha na sincronização.','error');return}
-  const savedSong=editing?state.songs.find(s=>s.id===state.editingId):state.songs[0];
-  if(selectedFormPdf && savedSong){
-    setStatus('Catálogo sincronizado. Enviando PDF...');
-    const pdfOk=await uploadCatalogPdfFile(savedSong.id,selectedFormPdf);
-    if(!pdfOk){setStatus('⚠ Música salva no catálogo, mas o PDF não foi enviado. Você pode anexá-lo pela lista da música.','error')}
-  }
   clearForm();setStatus(editing?'✅ Música atualizada no catálogo principal.':'✅ Música adicionada ao catálogo principal.','success');showToast(editing?'Música atualizada.':'Música adicionada.','success');if(!editing)showConfirmationAnimation(title);
  }catch(error){setStatus('Não foi possível salvar: '+error.message,'error');showToast('Erro ao salvar.','error')}finally{saveSong.busy=false;els.saveSong.disabled=false;els.saveSong.textContent=oldText}
 }
@@ -2822,132 +2716,22 @@ function viewReceivedCadastro(index){
 }
 async function loadReceived(){if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='COLE_AQUI_A_MESMA_URL_DO_APPS_SCRIPT_DO_INDEX_PRINCIPAL'){els.receivedStatus.textContent='Configure a URL do Apps Script nesta página.';els.receivedStatus.className='status-line status-error';return}els.receivedStatus.textContent='Consultando cadastros...';els.receivedStatus.className='status-line';try{const response=await fetch(APPS_SCRIPT_URL+'?action=listCadastros&ts='+Date.now(),{cache:'no-store'});if(!response.ok)throw new Error('HTTP '+response.status);const data=await response.json();if(!data?.sucesso)throw new Error(data?.mensagem||'Resposta inválida.');state.received=Array.isArray(data.cadastros)?data.cadastros:[];state.receivedSelected.clear();renderReceived();els.receivedStatus.textContent=`Atualizado em ${new Date().toLocaleString('pt-BR')}.`;els.receivedStatus.className='status-line status-success'}catch(error){els.receivedStatus.textContent='Não foi possível consultar os cadastros: '+error.message;els.receivedStatus.className='status-line status-error'}}
 function getReceivedPdf(item){const pdfUrl=String(item?.cadastroCompleto?.pdfUrl||item?.pdfUrl||'');if(pdfUrl)return pdfUrl;const fileId=String(item?.cadastroCompleto?.pdfDriveFileId||item?.pdfDriveFileId||'');return fileId?`https://drive.google.com/file/d/${encodeURIComponent(fileId)}/view`:''}
-function openReceivedEditor(index){const item=state.received?.[index];if(!item)return;const complete=item.cadastroCompleto||{};const originalUser=normalize(item.usuario||item.nome||item.nomeUsuario||item.username||item.userName||complete.usuario||complete.nome||complete.nomeUsuario||complete.username||complete.userName||'');state.receivedEditingIndex=index;pendingReceivedPdf=null;els.receivedEditTitle.value=normalize(item.musica||item.title||complete.title);els.receivedEditArtist.value=normalize(item.artista||item.artist||complete.artist);els.receivedEditStyle.value=normalize(item.estilo||item.style||complete.style);els.receivedEditNote.value=normalize(item.tom??item.note??item.key??complete.tom??complete.tone??complete.note);els.receivedEditUser.value=originalUser;els.receivedEditLyrics.value=sanitizeLyrics(item.letra||item.lyrics||complete.letra||complete.lyrics);const pdfUrl=getReceivedPdf(item);els.receivedEditPdfStatus.textContent=pdfUrl?'📄 PDF anexado':'Nenhum PDF anexado';els.receivedEditPdfBtn.textContent=pdfUrl?'Alterar PDF':'Adicionar PDF';els.receivedEditViewPdf.classList.toggle('hidden',!pdfUrl);els.receivedEditViewPdf.onclick=()=>viewPdf(pdfUrl);els.receivedEditPdfBtn.onclick=()=>{els.receivedPdfInput.value='';els.receivedPdfInput.click()};els.receivedEditModal.classList.add('active')}
-function closeReceivedEditor(){els.receivedEditModal.classList.remove('active');state.receivedEditingIndex=null}
-async function saveReceivedEditor(){
-  const index=state.receivedEditingIndex;
+function openReceivedEditor(index){
   const item=state.received?.[index];
   if(!item)return;
-
   const complete=item.cadastroCompleto||{};
-  const originalId=String(item.id||complete.id||'').trim();
-  const musica=normalize(els.receivedEditTitle.value);
-  const artista=normalize(els.receivedEditArtist.value);
-  const estilo=normalize(els.receivedEditStyle.value);
-  const note=normalize(els.receivedEditNote.value);
-  const usuario=normalize(els.receivedEditUser.value)
-    ||normalize(item.usuario||item.nome||item.nomeUsuario||item.username||item.userName
-      ||complete.usuario||complete.nome||complete.nomeUsuario||complete.username||complete.userName||'');
-  const letra=sanitizeLyrics(els.receivedEditLyrics.value);
-  const existingPdfUrl=String(item.cadastroCompleto?.pdfUrl||item.pdfUrl||'');
-  const existingPdfDriveFileId=String(item.cadastroCompleto?.pdfDriveFileId||item.pdfDriveFileId||'');
-  const hasPendingPdf=!!(pendingReceivedPdf&&pendingReceivedPdf.index===index&&pendingReceivedPdf.file);
-
-  if(!musica||!artista||!usuario||(!letra&&!existingPdfUrl&&!existingPdfDriveFileId&&!hasPendingPdf)){
-    showToast('Preencha música, artista, usuário e letra ou PDF.','error');
-    return;
-  }
-  if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='COLE_AQUI_A_MESMA_URL_DO_APPS_SCRIPT_DO_INDEX_PRINCIPAL'){
-    showToast('URL do Apps Script não configurada.','error');
-    return;
-  }
-  if(!originalId){
-    showToast('Este cadastro não possui um identificador válido para atualização.','error');
-    return;
-  }
-
-  const saveBtn=els.saveReceivedEdit;
-  const oldText=saveBtn?.textContent||'Salvar alterações';
-  if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='Salvando...';}
-
-  try{
-    if(hasPendingPdf){
-      /*
-       * O Apps Script atual não possui uma ação específica para substituir o PDF
-       * de um cadastro recebido. Quando a ação é desconhecida, ele cai em
-       * receberNovoCadastro(), que cria uma nova linha.
-       *
-       * Para garantir que NUNCA fiquem duas versões, removemos primeiro o registro
-       * antigo e, em seguida, recriamos UM único registro usando o MESMO id, já com
-       * o PDF processado. Assim a planilha termina com apenas a versão atualizada.
-       */
-      const pdfData=await fileToDataUrl(pendingReceivedPdf.file);
-
-      const deleteResponse=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({
-        action:'deleteCadastro',
-        id:originalId,
-        musica:String(item.musica||item.title||musica),
-        usuario:String(item.usuario||complete.usuario||usuario)
-      })},20000);
-      if(!deleteResponse?.sucesso)throw new Error(deleteResponse?.mensagem||'Não foi possível substituir o cadastro antigo.');
-
-      const recreateResponse=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({
-        id:originalId,
-        musica,
-        artista,
-        estilo,
-        tom:note,
-        tone:note,
-        usuario,
-        nome:usuario,
-        letra,
-        lyrics:letra,
-        dataCadastro:String(item.dataCadastro||item.data||complete.dataCadastro||''),
-        pdfData,
-        pdfFileName:pendingReceivedPdf.file.name
-      })},30000);
-      if(!recreateResponse?.sucesso)throw new Error(recreateResponse?.mensagem||'O cadastro antigo foi removido, mas não foi possível salvar a nova versão.');
-
-      pendingReceivedPdf=null;
-    }else{
-      const completo={...(item.cadastroCompleto||item),
-        id:originalId,
-        title:musica,
-        artist:artista,
-        style:estilo,
-        tone:note,
-        tom:note,
-        lyrics:letra,
-        usuario,
-        pdfDriveFileId:existingPdfDriveFileId,
-        pdfFileId:String(item.cadastroCompleto?.pdfFileId||item.pdfFileId||existingPdfDriveFileId||''),
-        pdfFileName:String(item.cadastroCompleto?.pdfFileName||item.pdfFileName||''),
-        pdfMimeType:String(item.cadastroCompleto?.pdfMimeType||item.pdfMimeType||'application/pdf'),
-        pdfUrl:existingPdfUrl
-      };
-      const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({
-        action:'updateCadastro',
-        id:originalId,
-        musica,
-        artista,
-        estilo,
-        tom:note,
-        tone:note,
-        usuario,
-        nome:usuario,
-        letra,
-        lyrics:letra,
-        dataCadastro:String(item.dataCadastro||item.data||complete.dataCadastro||''),
-        cadastroCompleto:completo,
-        pdfDriveFileId:existingPdfDriveFileId,
-        pdfFileId:completo.pdfFileId,
-        pdfFileName:completo.pdfFileName,
-        pdfMimeType:completo.pdfMimeType,
-        pdfUrl:existingPdfUrl
-      })},20000);
-      if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível salvar o cadastro.');
-    }
-
-    await loadReceived();
-    closeReceivedEditor();
-    showToast('Cadastro atualizado. A versão anterior foi substituída.','success');
-  }catch(error){
-    try{await loadReceived();}catch(_){}
-    showToast('Erro ao salvar cadastro: '+error.message,'error');
-  }finally{
-    if(saveBtn){saveBtn.disabled=false;saveBtn.textContent=oldText;}
-  }
+  const originalUser=normalize(item.usuario||item.nome||item.nomeUsuario||item.username||item.userName||complete.usuario||complete.nome||complete.nomeUsuario||complete.username||complete.userName||'');
+  state.receivedEditingIndex=index;
+  pendingReceivedPdf=null;
+  els.receivedEditTitle.value=normalize(item.musica||item.title||complete.title);
+  els.receivedEditArtist.value=normalize(item.artista||item.artist||complete.artist);
+  els.receivedEditStyle.value=normalize(item.estilo||item.style||complete.style);
+  els.receivedEditNote.value=normalize(item.tom??item.note??item.key??complete.tom??complete.tone??complete.note);
+  els.receivedEditUser.value=originalUser;
+  els.receivedEditLyrics.value=sanitizeLyrics(item.letra||item.lyrics||complete.letra||complete.lyrics);
+  els.receivedEditModal.classList.add('active');
 }
+
 async function uploadReceivedPdf(file){
   const index=state.receivedEditingIndex;const item=state.received?.[index];if(!item||!file)return;
   if(file.type!=='application/pdf'&&!/\.pdf$/i.test(file.name||'')){showToast('Selecione um arquivo PDF.','error');return}
@@ -3192,7 +2976,7 @@ function init(){
    els.searchMusicBtn?.addEventListener('click',searchMusicOnline);els.openBulkMusicSearchBtn?.addEventListener('click',openBulkMusicSearch);els.closeBulkMusicSearchBtn?.addEventListener('click',closeBulkMusicSearch);els.bulkMusicSearchBtn?.addEventListener('click',searchCatalogSuggestions);els.selectAllBulkMusicBtn?.addEventListener('click',selectAllBulkMusic);els.clearBulkMusicSelectionBtn?.addEventListener('click',clearBulkMusicSelection);els.addSelectedBulkMusicBtn?.addEventListener('click',addSelectedBulkMusic);els.bulkMusicSearchResults?.addEventListener('change',e=>{const checkbox=e.target.closest('[data-bulk-music-select]');if(checkbox)toggleBulkMusicSelection(checkbox.dataset.bulkMusicSelect,checkbox.checked)});els.musicSearchResults?.addEventListener('click',e=>{const result=e.target.closest('[data-music-search-index]');if(result)selectMusicSearchResult(result.dataset.musicSearchIndex)});els.musicSearchQuery?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!state.editingId&&els.musicSearchQuery.value.trim()){e.preventDefault();searchMusicOnline()}});els.saveSong.addEventListener('click',saveSong);els.cancelEdit.addEventListener('click',clearForm);els.newSong.addEventListener('click',()=>{document.querySelector('.tab-btn[data-tab="editor"]').click();clearForm();els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})});els.exportBtn?.addEventListener('click',exportCatalog);els.quickExport?.addEventListener('click',exportCatalog);els.selectAll.addEventListener('click',toggleAllVisible);els.clearSelection.addEventListener('click',clearSelection);els.changeStyle.addEventListener('click',openStyleModal);els.continueStyle.addEventListener('click',continueStyleChange);els.styleModal.querySelectorAll('[data-close-style]').forEach(b=>b.addEventListener('click',closeStyleModal));els.linkCatalog?.addEventListener('click',linkCatalog);els.search.addEventListener('input',renderCatalog);document.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click',()=>setFilter(b.dataset.filter)));
  els.catalogList.addEventListener('click',e=>{const lyricsSearch=e.target.closest('[data-search-lyrics]');if(lyricsSearch){const song=state.songs.find(x=>x.id===lyricsSearch.dataset.searchLyrics);if(song)openLyricsSearch(song.title);return;}const select=e.target.closest('[data-select]');if(select){toggleSelected(select.dataset.select,select.checked);return;}const edit=e.target.closest('[data-edit]');const view=e.target.closest('[data-view]');const viewPdfBtn=e.target.closest('[data-view-pdf]');const pdf=e.target.closest('[data-pdf]');const toggle=e.target.closest('[data-toggle]');const del=e.target.closest('[data-delete]');if(edit){beginEdit(edit.dataset.edit);document.querySelector('.tab-btn[data-tab="editor"]').click();}else if(view)showLyrics(view.dataset.view);else if(viewPdfBtn){const song=state.songs.find(x=>x.id===viewPdfBtn.dataset.viewPdf);const localPreview=song&&state.localPdfPreviewSongId===song.id?state.localPdfPreviewDataUrl:'';const catalogPdf=getCatalogPdfUrl(song);if(localPreview)openProcessedPdfPreview(localPreview,'PDF processado recentemente');else if(catalogPdf)viewPdf(catalogPdf);else showToast('PDF não disponível para visualização.','error');}else if(pdf)askPdfForSong(pdf.dataset.pdf);else if(toggle)toggleActive(toggle.dataset.toggle);else if(del)askDelete(del.dataset.delete)});
   els.receivedList.addEventListener('click',e=>{const receivedLyricsSearch=e.target.closest('[data-search-received-lyrics]');if(receivedLyricsSearch){const item=state.received?.[Number(receivedLyricsSearch.dataset.searchReceivedLyrics)];const title=item?.musica||item?.title||item?.cadastroCompleto?.title||'';if(title)openLyricsSearch(title);return}const select=e.target.closest('[data-received-select]');if(select){const index=Number(select.dataset.receivedSelect);if(select.checked)state.receivedSelected.add(index);else state.receivedSelected.delete(index);renderReceived();return}const detail=e.target.closest('[data-detail]');if(detail){viewReceivedCadastro(Number(detail.dataset.detail));return}const pdfView=e.target.closest('[data-view-pdf]');if(pdfView){const item=state.received?.[Number(pdfView.dataset.viewPdf)];const url=getReceivedPdf(item);if(url)viewPdf(url);else showToast('PDF não disponível para visualização.','error');return}const del=e.target.closest('[data-delete-received]');if(del){deleteReceivedCadastro(Number(del.dataset.deleteReceived));return}const approve=e.target.closest('[data-approve]');if(approve){authorizeReceivedCadastro(Number(approve.dataset.approve));return}const edit=e.target.closest('[data-edit-received]');if(edit){openReceivedEditor(Number(edit.dataset.editReceived));return}});
-  document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{const target=btn.dataset.tab;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));document.querySelectorAll('.tab-panel').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===target));if(target==='catalog')loadLocal();if(target==='received')loadReceived();if(target==='pdf'){renderPdfPanel();refreshPdfPanel();}}));
+  document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{const target=btn.dataset.tab;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));document.querySelectorAll('.tab-panel').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===target));if(target==='catalog')loadLocal();if(target==='received')loadReceived();}));
  els.detailModal.querySelectorAll('[data-close-detail]').forEach(b=>b.addEventListener('click',closeDetail));els.confirmModal.querySelectorAll('[data-close-confirm]').forEach(b=>b.addEventListener('click',closeConfirm));els.confirmBtn.addEventListener('click',()=>state.confirmAction?.());
  document.addEventListener('keydown',e=>{if(els.pdfViewerScreen?.classList.contains('open')){if(e.key==='Escape')closePdfViewer();else if(e.key==='ArrowLeft')changeAdminPdfPage(-1);else if(e.key==='ArrowRight')changeAdminPdfPage(1);return}if(e.key==='Escape'){closeDetail();closeConfirm();closeStyleModal();closeReceivedEditor()}});
  if(sessionStorage.getItem(SESSION_KEY)==='1'){els.authCard.classList.add('hidden');els.adminPanel.classList.remove('hidden');loadLocal()}else{els.loginInput.focus()}
