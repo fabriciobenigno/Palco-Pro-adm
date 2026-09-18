@@ -273,6 +273,32 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
 .music-search-selected{padding:10px 12px;border-radius:14px;background:rgba(72,214,138,.06);border:1px solid rgba(72,214,138,.15);color:#baf7d2;font-size:11px;line-height:1.5}
 @media(max-width:680px){.music-search-actions{display:grid;grid-template-columns:1fr}.music-search-actions .btn{width:100%}.music-search-result{display:grid;grid-template-columns:minmax(0,1fr) auto}.music-search-result .music-search-artist{max-width:none;width:100%;grid-column:1/2}.music-search-result .music-search-chevron{grid-column:2;grid-row:1/4;align-self:center}}
 .music-search-result-main{min-width:0;display:grid;gap:3px}.music-search-result-title{font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.music-search-result-artist,.music-search-result-style{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.music-search-result-lyrics{font-size:10px;line-height:1.35;color:var(--soft);white-space:normal;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}.music-search-result .music-search-chevron{align-self:center}
+.bulk-music-search-panel{display:grid;gap:9px;margin-top:9px;padding:12px;border-radius:18px;background:linear-gradient(180deg,rgba(116,200,255,.055),rgba(74,137,255,.022)),rgba(8,14,25,.72);border:1px solid rgba(133,208,255,.13)}
+.bulk-music-search-panel.hidden{display:none}
+.bulk-music-search-title{font-size:12px;font-weight:850;color:#fff}
+.bulk-music-search-help{font-size:10px;line-height:1.5;color:var(--muted)}
+.bulk-music-search-input{width:100%;min-height:145px;resize:vertical;line-height:1.5}
+.bulk-music-search-actions,.bulk-music-selection-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.bulk-music-search-actions .btn,.bulk-music-selection-actions .btn{flex:0 0 auto}
+.bulk-music-search-status{font-size:10px;line-height:1.45;color:var(--muted);min-height:14px}
+.bulk-music-selection-actions{padding-top:2px}
+.bulk-music-selection-count{margin-right:auto;font-size:10px;font-weight:850;color:#bfeaff}
+.bulk-music-results{display:grid;gap:7px;max-height:52dvh;overflow:auto;padding-right:2px}
+.bulk-music-result{display:grid;grid-template-columns:auto minmax(0,1fr);gap:9px;align-items:start;padding:10px 11px;border-radius:14px;background:rgba(255,255,255,.028);border:1px solid rgba(255,255,255,.07)}
+.bulk-music-result.selected{border-color:rgba(72,214,138,.30);background:rgba(72,214,138,.055)}
+.bulk-music-result input{width:18px;height:18px;margin-top:2px;accent-color:#6cb7ff}
+.bulk-music-result-main{min-width:0;display:grid;gap:3px}
+.bulk-music-result-title{font-size:12px;font-weight:850;line-height:1.3}
+.bulk-music-result-meta{font-size:10px;color:var(--muted);line-height:1.4}
+.bulk-music-result-lyrics{font-size:10px;line-height:1.4;color:var(--soft);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.bulk-music-result-source{font-size:9px;color:#9fd0ff;font-weight:800}
+@media(max-width:680px){
+  .bulk-music-search-actions,.bulk-music-selection-actions{display:grid;grid-template-columns:1fr}
+  .bulk-music-search-actions .btn,.bulk-music-selection-actions .btn{width:100%}
+  .bulk-music-selection-count{margin-right:0;text-align:center}
+  .bulk-music-search-input{min-height:175px}
+}
+
 
 /* === PDF INDIVIDUAL — somente adição funcional === */
 .pdf-status{color:#bfeaff;font-size:12px;line-height:1.5}
@@ -466,9 +492,29 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
           <div class="form-grid">
             <div class="music-search-box">
               <div class="field"><label for="musicSearchQuery">Buscar música</label><input id="musicSearchQuery" type="text" autocomplete="off" placeholder="Ex.: Flor de Liz Djavan" /></div>
-              <div class="music-search-actions"><button id="searchMusicBtn" type="button" class="btn btn-secondary btn-small">🔎 Buscar música</button><span id="musicSearchStatus" class="music-search-status"></span></div>
+              <div class="music-search-actions"><button id="searchMusicBtn" type="button" class="btn btn-secondary btn-small">🔎 Buscar música</button><button id="openBulkMusicSearchBtn" type="button" class="btn btn-secondary btn-small">📚 Adicionar músicas em massa</button><span id="musicSearchStatus" class="music-search-status"></span></div>
               <div id="musicSearchResults" class="music-search-results"></div>
               <div id="musicSearchSelected" class="music-search-selected hidden"></div>
+              <div id="bulkMusicSearchPanel" class="bulk-music-search-panel hidden">
+                <div class="bulk-music-search-title">📚 Adicionar músicas em massa</div>
+                <div class="bulk-music-search-help">Digite <strong>uma música por linha</strong>. Você pode colocar apenas o nome ou nome + artista. Não existe limite de quantidade de músicas nesta pesquisa em massa.</div>
+                <textarea id="bulkMusicSearchInput" class="bulk-music-search-input" placeholder="Ex.: Flor de Liz Djavan
+Evidências Chitãozinho & Xororó
+Anunciação Alceu Valença
+Trem Bala Ana Vilela"></textarea>
+                <div class="bulk-music-search-actions">
+                  <button id="bulkMusicSearchBtn" type="button" class="btn btn-primary btn-small">🔎 Pesquisar músicas em massa</button>
+                  <button id="closeBulkMusicSearchBtn" type="button" class="btn btn-secondary btn-small">Fechar pesquisa em massa</button>
+                </div>
+                <div id="bulkMusicSearchStatus" class="bulk-music-search-status"></div>
+                <div id="bulkMusicSelectionActions" class="bulk-music-selection-actions hidden">
+                  <span id="bulkMusicSelectionCount" class="bulk-music-selection-count">0 músicas selecionadas</span>
+                  <button id="selectAllBulkMusicBtn" type="button" class="btn btn-secondary btn-small">Selecionar todas</button>
+                  <button id="clearBulkMusicSelectionBtn" type="button" class="btn btn-secondary btn-small">Limpar seleção</button>
+                  <button id="addSelectedBulkMusicBtn" type="button" class="btn btn-success btn-small">➕ Adicionar selecionadas</button>
+                </div>
+                <div id="bulkMusicSearchResults" class="bulk-music-results" aria-live="polite"></div>
+              </div>
             </div>
             <div class="two-col">
               <div class="field"><label for="songTitle">Nome da música</label><input id="songTitle" type="text" autocomplete="off" placeholder="Ex.: Evidências" /></div>
@@ -554,14 +600,28 @@ const PDF_LIB_URL='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.
 const CATALOG_KEY='palco-pro-admin-catalog-v4';
 const SESSION_KEY='palco-pro-admin-session-v4';
 const $=id=>document.getElementById(id);
-const state={songs:[],editingId:null,filter:'all',confirmAction:null,lastFileName:'',selectedIds:new Set(),catalogHandle:null,received:[],receivedSelected:new Set(),receivedEditingIndex:null,musicSearchResults:[],musicSearchController:null,pdfProcessing:false,pdfDoc:null,pdfPage:1,pdfPageCount:0,pdfRenderToken:0,pdfUrl:'',pdfSwipeStartX:0,pdfSwipeStartY:0,pdfSwipeTracking:false,pdfNativeFrame:false,localPdfPreviewSongId:'',localPdfPreviewDataUrl:'',autoPdfGenerating:false};
+const state={songs:[],editingId:null,filter:'all',confirmAction:null,lastFileName:'',selectedIds:new Set(),catalogHandle:null,received:[],receivedSelected:new Set(),receivedEditingIndex:null,musicSearchResults:[],musicSearchController:null,musicSearchTimer:null,musicSearchToken:0,bulkMusicSearchResults:[],bulkMusicSearchController:null,bulkMusicSearchToken:0,bulkMusicSelected:new Set(),bulkMusicSearchBusy:false,pdfProcessing:false,pdfDoc:null,pdfPage:1,pdfPageCount:0,pdfRenderToken:0,pdfUrl:'',pdfSwipeStartX:0,pdfSwipeStartY:0,pdfSwipeTracking:false,pdfNativeFrame:false,localPdfPreviewSongId:'',localPdfPreviewDataUrl:'',autoPdfGenerating:false};
 const els={
  authCard:$('authCard'),adminPanel:$('adminPanel'),loginInput:$('loginInput'),passwordInput:$('passwordInput'),showPassword:$('showPasswordToggle'),loginBtn:$('loginBtn'),authStatus:$('authStatus'),logoutBtn:$('logoutBtn'),refreshIndexBtn:$('refreshIndexBtn'), refreshCatalog:$('refreshCatalogBtn'),
- songTitle:$('songTitle'),songArtist:$('songArtist'),songStyle:$('songStyle'),musicSearchQuery:$('musicSearchQuery'),searchMusicBtn:$('searchMusicBtn'),musicSearchStatus:$('musicSearchStatus'),musicSearchResults:$('musicSearchResults'),musicSearchSelected:$('musicSearchSelected'),songNote:$('songNote'),songLyrics:$('songLyrics'),selectSongPdfBtn:$('selectSongPdfBtn'),songPdfStatus:$('songPdfStatus'),viewSongPdfBtn:$('viewSongPdfBtn'),formTitle:$('formTitle'),formSubtitle:$('formSubtitle'),editingBadge:$('editingBadge'),saveSong:$('saveSongBtn'),cancelEdit:$('cancelEditBtn'),formStatus:$('formStatus'),
+ songTitle:$('songTitle'),songArtist:$('songArtist'),songStyle:$('songStyle'),musicSearchQuery:$('musicSearchQuery'),searchMusicBtn:$('searchMusicBtn'),openBulkMusicSearchBtn:$('openBulkMusicSearchBtn'),closeBulkMusicSearchBtn:$('closeBulkMusicSearchBtn'),bulkMusicSearchPanel:$('bulkMusicSearchPanel'),bulkMusicSearchInput:$('bulkMusicSearchInput'),bulkMusicSearchBtn:$('bulkMusicSearchBtn'),bulkMusicSearchStatus:$('bulkMusicSearchStatus'),bulkMusicSelectionActions:$('bulkMusicSelectionActions'),bulkMusicSelectionCount:$('bulkMusicSelectionCount'),selectAllBulkMusicBtn:$('selectAllBulkMusicBtn'),clearBulkMusicSelectionBtn:$('clearBulkMusicSelectionBtn'),addSelectedBulkMusicBtn:$('addSelectedBulkMusicBtn'),bulkMusicSearchResults:$('bulkMusicSearchResults'),musicSearchStatus:$('musicSearchStatus'),musicSearchResults:$('musicSearchResults'),musicSearchSelected:$('musicSearchSelected'),songNote:$('songNote'),songLyrics:$('songLyrics'),selectSongPdfBtn:$('selectSongPdfBtn'),songPdfStatus:$('songPdfStatus'),viewSongPdfBtn:$('viewSongPdfBtn'),formTitle:$('formTitle'),formSubtitle:$('formSubtitle'),editingBadge:$('editingBadge'),saveSong:$('saveSongBtn'),cancelEdit:$('cancelEditBtn'),formStatus:$('formStatus'),
  importZone:$('importZone'),importFile:$('importFile'),exportBtn:$('exportBtn'),quickExport:$('quickExportBtn'),fileStatus:$('fileStatus'),catalogStatus:$('catalogStatus'),search:$('searchInput'),searchCounter:$('searchCounter'),catalogList:$('catalogList'),catalogCounter:$('catalogCounter'),statTotal:$('statTotal'),statActive:$('statActive'),statInactive:$('statInactive'),newSong:$('newSongBtn'),receivedList:$('receivedList'),receivedCounter:$('receivedCounter'),refreshReceived:$('refreshReceivedBtn'),receivedStatus:$('receivedStatus'),receivedBulk:$('receivedBulk'),receivedBulkCount:$('receivedBulkCount'),selectAllReceived:$('selectAllReceivedBtn'),clearReceivedSelection:$('clearReceivedSelectionBtn'),approveSelectedReceived:$('approveSelectedReceivedBtn'),receivedEditModal:$('receivedEditModal'),receivedEditTitle:$('receivedEditTitle'),receivedEditArtist:$('receivedEditArtist'),receivedEditStyle:$('receivedEditStyle'),receivedEditNote:$('receivedEditNote'),receivedEditUser:$('receivedEditUser'),receivedEditLyrics:$('receivedEditLyrics'),receivedEditPdfStatus:$('receivedEditPdfStatus'),receivedEditPdfBtn:$('receivedEditPdfBtn'),receivedEditViewPdf:$('receivedEditViewPdfBtn'),catalogPdfInput:$('catalogPdfInput'),receivedPdfInput:$('receivedPdfInput'),saveReceivedEdit:$('saveReceivedEditBtn'),bulkActions:$('bulkActions'),bulkCount:$('bulkCount'),selectAll:$('selectAllBtn'),clearSelection:$('clearSelectionBtn'),changeStyle:$('changeStyleBtn'),styleModal:$('styleModal'),bulkStyleInput:$('bulkStyleInput'),continueStyle:$('continueStyleBtn'),linkCatalog:$('linkCatalogBtn'),detailModal:$('detailModal'),detailTitle:$('detailTitle'),detailBody:$('detailBody'),confirmModal:$('confirmModal'),confirmTitle:$('confirmTitle'),confirmBody:$('confirmBody'),confirmBtn:$('confirmBtn'),toast:$('toast'),confirmationOverlay:$('confirmationOverlay'),confirmationSong:$('confirmationSong'),pdfViewerScreen:$('pdfViewerScreen'),pdfViewerPageWrap:$('pdfViewerPageWrap'),pdfViewerCanvas:$('pdfViewerCanvas'),pdfPagePreview:$('pdfPagePreview'),pdfPagePreviewCanvas:$('pdfPagePreviewCanvas'),pdfViewerPrev:$('pdfViewerPrev'),pdfViewerNext:$('pdfViewerNext'),pdfViewerClose:$('pdfViewerClose'),pdfViewerPageIndicator:$('pdfViewerPageIndicator'),pdfViewerHint:$('pdfViewerHint'),pdfNativeFrame:$('pdfNativeFrame')
 };
 function normalize(v){return String(v??'').trim()}
 function sanitizeLyrics(v){return String(v??'').replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim()}
+function formatFetchedLyrics(v){
+  const normalized=sanitizeLyrics(v);
+  if(!normalized)return '';
+  const lines=normalized.split('\n').map(line=>line.trimEnd());
+  const output=[];
+  const heading=/^(verso|estrofe|refr[aã]o|pré[- ]?refr[aã]o|ponte|introdu[cç][aã]o|intro|final|solo)(\s*\d+)?\s*:??\s*$/i;
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i];
+    if(heading.test(line)&&output.length&&output[output.length-1]!=='')output.push('');
+    output.push(line);
+    if(heading.test(line)&&i<lines.length-1&&lines[i+1]!=='')output.push('');
+  }
+  return output.join('\n').replace(/\n{3,}/g,'\n\n').trim();
+}
 function escapeHtml(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 function normalizeSearch(v){return normalize(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()}
 function makeId(){return (crypto?.randomUUID?.()||`song-${Date.now()}-${Math.random().toString(36).slice(2,10)}`)}
@@ -968,6 +1028,202 @@ async function searchMusicOnline(){
     els.searchMusicBtn.textContent='🔎 Buscar música';
   }
 }
+function clearBulkMusicSearchUI(){
+  state.bulkMusicSearchToken++;
+  if(state.bulkMusicSearchController){try{state.bulkMusicSearchController.abort()}catch(_){}state.bulkMusicSearchController=null;}
+  state.bulkMusicSearchResults=[];
+  state.bulkMusicSelected.clear();
+  state.bulkMusicSearchBusy=false;
+  if(els.bulkMusicSearchStatus){els.bulkMusicSearchStatus.textContent='';els.bulkMusicSearchStatus.className='bulk-music-search-status';}
+  if(els.bulkMusicSearchResults)els.bulkMusicSearchResults.innerHTML='';
+  updateBulkMusicSelectionUI();
+}
+function openBulkMusicSearch(){
+  if(els.bulkMusicSearchPanel)els.bulkMusicSearchPanel.classList.remove('hidden');
+  updateBulkMusicSelectionUI();
+}
+function closeBulkMusicSearch(){
+  if(state.bulkMusicSearchController){try{state.bulkMusicSearchController.abort()}catch(_){}state.bulkMusicSearchController=null;}
+  state.bulkMusicSearchToken++;
+  state.bulkMusicSearchBusy=false;
+  if(els.bulkMusicSearchPanel)els.bulkMusicSearchPanel.classList.add('hidden');
+}
+function updateBulkMusicSelectionUI(){
+  const count=state.bulkMusicSelected.size;
+  const available=state.bulkMusicSearchResults.length;
+  if(els.bulkMusicSelectionActions)els.bulkMusicSelectionActions.classList.toggle('hidden',available===0);
+  if(els.bulkMusicSelectionCount)els.bulkMusicSelectionCount.textContent=`${count} música${count===1?'':'s'} selecionada${count===1?'':'s'}`;
+  if(els.addSelectedBulkMusicBtn)els.addSelectedBulkMusicBtn.disabled=count===0;
+  const all=available>0&&state.bulkMusicSelected.size===available;
+  if(els.selectAllBulkMusicBtn)els.selectAllBulkMusicBtn.textContent=all?'Desmarcar todas':'Selecionar todas';
+}
+function renderBulkMusicSearchResults(){
+  if(!els.bulkMusicSearchResults)return;
+  els.bulkMusicSearchResults.innerHTML='';
+  const items=state.bulkMusicSearchResults||[];
+  if(!items.length){updateBulkMusicSelectionUI();return;}
+  items.forEach((item,index)=>{
+    const row=document.createElement('label');
+    row.className=`bulk-music-result ${state.bulkMusicSelected.has(index)?'selected':''}`;
+    row.dataset.bulkMusicIndex=String(index);
+    const checkbox=document.createElement('input');
+    checkbox.type='checkbox';
+    checkbox.checked=state.bulkMusicSelected.has(index);
+    checkbox.dataset.bulkMusicSelect=String(index);
+    const main=document.createElement('div');
+    main.className='bulk-music-result-main';
+    main.innerHTML=`<div class="bulk-music-result-title">🎵 ${escapeHtml(item.trackName)}</div><div class="bulk-music-result-meta">👤 ${escapeHtml(item.artistName)} • 🎼 ${escapeHtml(item.style||item.primaryGenreName||'Sem estilo')}</div><div class="bulk-music-result-lyrics">📝 ${escapeHtml(shortLyricsPreview(item.lyrics||''))}</div><div class="bulk-music-result-source">Pesquisa: ${escapeHtml(item.searchQuery||'')}</div>`;
+    row.append(checkbox,main);
+    els.bulkMusicSearchResults.appendChild(row);
+  });
+  updateBulkMusicSelectionUI();
+}
+async function searchBulkMusicOnline(){
+  if(state.bulkMusicSearchBusy)return;
+  const raw=String(els.bulkMusicSearchInput?.value||'').replace(/\r/g,'');
+  const queries=[...new Set(raw.split('\n').map(s=>normalize(s)).filter(Boolean).map(s=>s.replace(/^[-•]+\s*/,'')))];
+  if(!queries.length){
+    if(els.bulkMusicSearchStatus){els.bulkMusicSearchStatus.textContent='Digite pelo menos uma música, com uma música por linha.';els.bulkMusicSearchStatus.className='bulk-music-search-status';}
+    els.bulkMusicSearchInput?.focus();
+    return;
+  }
+  if(state.bulkMusicSearchController){try{state.bulkMusicSearchController.abort()}catch(_){} }
+  const controller=new AbortController();
+  state.bulkMusicSearchController=controller;
+  const token=++state.bulkMusicSearchToken;
+  state.bulkMusicSearchBusy=true;
+  state.bulkMusicSearchResults=[];
+  state.bulkMusicSelected.clear();
+  renderBulkMusicSearchResults();
+  els.bulkMusicSearchBtn.disabled=true;
+  els.bulkMusicSearchBtn.textContent='Pesquisando...';
+  if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`0/${queries.length} músicas processadas. Não há limite de quantidade.`;
+  let nextQuery=0,completed=0,totalFound=0;
+  const querySeen=new Set();
+  const worker=async()=>{
+    while(true){
+      const index=nextQuery++;
+      if(index>=queries.length)return;
+      const query=queries[index];
+      if(token!==state.bulkMusicSearchToken||controller.signal.aborted)return;
+      try{
+        const url='https://itunes.apple.com/search?term='+encodeURIComponent(query)+'&media=music&entity=song&limit=50&country=BR';
+        const response=await fetch(url,{method:'GET',mode:'cors',cache:'no-store',signal:controller.signal,headers:{Accept:'application/json'}});
+        if(!response.ok)throw new Error('HTTP '+response.status);
+        const data=await response.json();
+        const seenCandidates=new Set();
+        const candidates=(Array.isArray(data?.results)?data.results:[])
+          .filter(item=>normalize(item.trackName)&&normalize(item.artistName))
+          .map(item=>({trackName:item.trackName||'',artistName:item.artistName||'',primaryGenreName:item.primaryGenreName||'',collectionName:item.collectionName||'',releaseDate:item.releaseDate||'',trackId:item.trackId||'',collectionId:item.collectionId||'',trackViewUrl:item.trackViewUrl||'',previewUrl:item.previewUrl||''}))
+          .sort((a,b)=>rankMusicSearchResult(b,query)-rankMusicSearchResult(a,query))
+          .filter(item=>{const key=normalizeCompare(item.trackName)+'|'+normalizeCompare(item.artistName);if(seenCandidates.has(key))return false;seenCandidates.add(key);return true;});
+        let foundForQuery=0;
+        for(const candidate of candidates){
+          if(token!==state.bulkMusicSearchToken||controller.signal.aborted)return;
+          let valid=null;
+          try{valid=await enrichMusicSearchCandidate(candidate,query);}catch(_){}
+          if(!valid)continue;
+          const key=normalizeCompare(valid.trackName)+'|'+normalizeCompare(valid.artistName);
+          if(querySeen.has(key))continue;
+          querySeen.add(key);
+          state.bulkMusicSearchResults.push({...valid,searchQuery:query,lyrics:formatFetchedLyrics(valid.lyrics)});
+          totalFound++;foundForQuery++;
+          renderBulkMusicSearchResults();
+          if(foundForQuery>=3)break;
+        }
+      }catch(error){
+        if(error?.name==='AbortError')return;
+      }finally{
+        completed++;
+        if(token===state.bulkMusicSearchToken&&!controller.signal.aborted&&els.bulkMusicSearchStatus){
+          els.bulkMusicSearchStatus.textContent=`${completed}/${queries.length} pesquisas processadas • ${totalFound} resultado${totalFound===1?'':'s'} válido${totalFound===1?'':'s'} encontrados. Sem limite global de músicas.`;
+        }
+      }
+    }
+  };
+  try{
+    await Promise.all(Array.from({length:Math.min(3,queries.length)},()=>worker()));
+    if(token!==state.bulkMusicSearchToken||controller.signal.aborted)return;
+    if(els.bulkMusicSearchStatus){
+      els.bulkMusicSearchStatus.textContent=totalFound
+        ? `${totalFound} resultado${totalFound===1?'':'s'} válido${totalFound===1?'':'s'} encontrado${totalFound===1?'':'s'} para ${queries.length} música${queries.length===1?'':'s'} pesquisada${queries.length===1?'':'s'}. Não há limite global de músicas.`
+        : 'Nenhuma das músicas pesquisadas retornou dados completos de título, artista, estilo e letra.';
+    }
+  }catch(error){
+    if(error?.name==='AbortError')return;
+    if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent='Não foi possível concluir a pesquisa em massa: '+(error?.message||'erro desconhecido')+'.';
+  }finally{
+    if(state.bulkMusicSearchController===controller)state.bulkMusicSearchController=null;
+    state.bulkMusicSearchBusy=false;
+    els.bulkMusicSearchBtn.disabled=false;
+    els.bulkMusicSearchBtn.textContent='🔎 Pesquisar músicas em massa';
+    updateBulkMusicSelectionUI();
+  }
+}
+function toggleBulkMusicSelection(index,checked){
+  const i=Number(index);
+  if(!Number.isInteger(i)||!state.bulkMusicSearchResults[i])return;
+  if(checked)state.bulkMusicSelected.add(i);else state.bulkMusicSelected.delete(i);
+  const row=els.bulkMusicSearchResults?.querySelector(`[data-bulk-music-index="${CSS.escape(String(i))}"]`);
+  row?.classList.toggle('selected',checked);
+  updateBulkMusicSelectionUI();
+}
+function selectAllBulkMusic(){
+  const all=state.bulkMusicSearchResults.length>0&&state.bulkMusicSelected.size===state.bulkMusicSearchResults.length;
+  state.bulkMusicSelected=all?new Set():new Set(state.bulkMusicSearchResults.map((_,i)=>i));
+  renderBulkMusicSearchResults();
+}
+function clearBulkMusicSelection(){state.bulkMusicSelected.clear();renderBulkMusicSearchResults();}
+async function addSelectedBulkMusic(){
+  const indexes=[...state.bulkMusicSelected].sort((a,b)=>a-b);
+  if(!indexes.length){showToast('Selecione pelo menos uma música para adicionar.','error');return;}
+  const candidates=indexes.map(i=>state.bulkMusicSearchResults[i]).filter(Boolean);
+  const seen=new Set();
+  const pending=[];
+  let duplicates=0;
+  for(const item of candidates){
+    const title=normalize(item.trackName),artist=normalize(item.artistName),style=normalize(item.style||item.primaryGenreName),lyrics=formatFetchedLyrics(item.lyrics);
+    if(!title||!artist||!style||!lyrics)continue;
+    const key=normalizeCompare(title)+'|'+normalizeCompare(artist);
+    if(seen.has(key)||state.songs.some(song=>normalizeCompare(song.title)+'|'+normalizeCompare(song.artist)===key)){duplicates++;continue;}
+    seen.add(key);
+    pending.push({id:makeId(),title,artist,style,note:'',lyrics,pdfUrl:'',pdfFileName:'',active:true});
+  }
+  if(!pending.length){showToast(duplicates?'As músicas selecionadas já existem no catálogo ou são duplicadas entre si.':'Nenhuma música válida selecionada.','error');return;}
+  els.confirmTitle.textContent='Adicionar músicas em massa';
+  els.confirmBody.innerHTML=`<div class="confirm-text">Adicionar <strong>${pending.length} música${pending.length===1?'':'s'}</strong> ao catálogo principal?${duplicates?`<br><br>${duplicates} música${duplicates===1?' foi':'s foram'} ignorada${duplicates===1?'':'s'} por já existir ou estar duplicada na seleção.`:''}</div>`;
+  els.confirmBtn.textContent='Sim, adicionar selecionadas';
+  state.confirmAction=async()=>{
+    closeConfirm();
+    state.songs=[...pending,...state.songs];
+    localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs.map(normalizeSong)));
+    renderCatalog();
+    if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`Salvando ${pending.length} música${pending.length===1?'':'s'} no catálogo principal...`;
+    try{
+      const publicado=await publishCatalogToServer();
+      if(!publicado?.sucesso){
+        if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent='As músicas foram salvas neste dispositivo, mas não foi possível sincronizar o catálogo principal: '+(publicado?.mensagem||'erro desconhecido')+'.';
+        showToast('Falha na sincronização do lote.','error');
+        return;
+      }
+      let pdfOk=0,pdfFail=0;
+      for(let i=0;i<pending.length;i++){
+        if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`Catálogo sincronizado. Preparando PDFs: ${i+1}/${pending.length}...`;
+        const ok=await generatePdfForCatalogSong(pending[i].id);
+        if(ok)pdfOk++;else pdfFail++;
+      }
+      state.bulkMusicSelected.clear();
+      if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`✅ ${pending.length} música${pending.length===1?'':'s'} adicionada${pending.length===1?'':'s'} ao catálogo. ${pdfOk} PDF${pdfOk===1?'':'s'} gerado${pdfOk===1?'':'s'} automaticamente${pdfFail?`; ${pdfFail} PDF${pdfFail===1?'':'s'} não gerado${pdfFail===1?'':'s'}`:''}.`;
+      renderBulkMusicSearchResults();
+      showToast(`${pending.length} música${pending.length===1?'':'s'} adicionada${pending.length===1?'':'s'} em massa.`,'success');
+    }catch(error){
+      if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent='Erro ao adicionar o lote: '+(error?.message||'erro desconhecido')+'.';
+      showToast('Erro na adição em massa.','error');
+    }
+  };
+  els.confirmModal.classList.add('active');
+}
+
 async function fetchRhythmForSelection(item,title,artist){
   const fallback=normalize(item?.primaryGenreName||'');
   const cleanTitle=normalize(title),cleanArtist=normalize(artist);
@@ -1013,11 +1269,14 @@ async function fetchLyricsForSelection(title,artist){
   if(response.status===404)return '';
   if(!response.ok)throw new Error('A fonte de letras respondeu com HTTP '+response.status+'.');
   const data=await response.json();
-  const plain=sanitizeLyrics(data?.plainLyrics);
+  const plain=formatFetchedLyrics(data?.plainLyrics);
   if(plain)return plain;
   const synced=normalize(data?.syncedLyrics);
   if(!synced)return '';
-  return sanitizeLyrics(synced.split('\n').map(line=>line.replace(/^\s*\[[^\]]+\]\s*/,'').trim()).filter(Boolean).join('\n'));
+  // Mantém as linhas em branco existentes no LRC para preservar a separação
+  // entre estrofes. O sanitizeLyrics normaliza excesso de quebras sem eliminar
+  // os espaçamentos simples entre blocos.
+  return formatFetchedLyrics(synced.split('\n').map(line=>line.replace(/^\s*\[[^\]]+\]\s*/,'').trim()).join('\n'));
 }
 
 function safePdfText(value){
@@ -1213,8 +1472,8 @@ async function selectMusicSearchResult(index){
     els.musicSearchStatus.className='music-search-status status-warn';
   }
 }
-function clearForm(){selectedFormPdf=null;state.autoPdfGenerating=false;pendingReceivedPdf=null;els.catalogPdfInput.value='';delete els.catalogPdfInput.dataset.formMode;state.editingId=null;els.formTitle.textContent='Cadastrar música';els.formSubtitle.textContent='A música será incluída no catálogo que o Palco Pro principal lê.';els.editingBadge.textContent='Nova música';els.editingBadge.className='badge';els.saveSong.textContent='Salvar música';els.cancelEdit.classList.add('hidden');els.songTitle.value='';els.songArtist.value='';els.songStyle.value='';if(els.songNote)els.songNote.value='';els.songLyrics.value='';els.formStatus.textContent='';clearMusicSearchUI();updateFormPdfUI(null)}
-function beginEdit(id){const s=state.songs.find(x=>x.id===id);if(!s)return;state.editingId=id;els.formTitle.textContent='Editar música';els.formSubtitle.textContent='Atualize os dados e salve. A alteração ficará pronta para o próximo catalogo.json.';els.editingBadge.textContent='Edição';els.editingBadge.className='badge';els.saveSong.textContent='Salvar alterações';els.cancelEdit.classList.remove('hidden');els.songTitle.value=s.title;els.songArtist.value=s.artist;els.songStyle.value=s.style;if(els.songNote)els.songNote.value=normalize(s.note);els.songLyrics.value=s.lyrics;selectedFormPdf=null;state.autoPdfGenerating=false;pendingReceivedPdf=null;updateFormPdfUI(s);els.formStatus.textContent='Você está editando esta música.';clearMusicSearchUI();els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})}
+function clearForm(){selectedFormPdf=null;state.autoPdfGenerating=false;pendingReceivedPdf=null;els.catalogPdfInput.value='';delete els.catalogPdfInput.dataset.formMode;state.editingId=null;els.formTitle.textContent='Cadastrar música';els.formSubtitle.textContent='A música será incluída no catálogo que o Palco Pro principal lê.';els.editingBadge.textContent='Nova música';els.editingBadge.className='badge';els.saveSong.textContent='Salvar música';els.cancelEdit.classList.add('hidden');els.songTitle.value='';els.songArtist.value='';els.songStyle.value='';if(els.songNote)els.songNote.value='';els.songLyrics.value='';els.formStatus.textContent='';clearMusicSearchUI();clearBulkMusicSearchUI();closeBulkMusicSearch();updateFormPdfUI(null)}
+function beginEdit(id){const s=state.songs.find(x=>x.id===id);if(!s)return;state.editingId=id;els.formTitle.textContent='Editar música';els.formSubtitle.textContent='Atualize os dados e salve. A alteração ficará pronta para o próximo catalogo.json.';els.editingBadge.textContent='Edição';els.editingBadge.className='badge';els.saveSong.textContent='Salvar alterações';els.cancelEdit.classList.remove('hidden');els.songTitle.value=s.title;els.songArtist.value=s.artist;els.songStyle.value=s.style;if(els.songNote)els.songNote.value=normalize(s.note);els.songLyrics.value=s.lyrics;selectedFormPdf=null;state.autoPdfGenerating=false;pendingReceivedPdf=null;closeBulkMusicSearch();clearBulkMusicSearchUI();updateFormPdfUI(s);els.formStatus.textContent='Você está editando esta música.';clearMusicSearchUI();els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})}
 async function saveSong(){
  if(saveSong.busy)return;
  const title=normalize(els.songTitle.value),artist=normalize(els.songArtist.value),style=normalize(els.songStyle.value),note=normalize(els.songNote?.value),lyrics=sanitizeLyrics(els.songLyrics.value);
@@ -1872,7 +2131,7 @@ function init(){
  initCatalogSwipe();
  initReceivedSwipe();
  els.catalogPdfInput?.addEventListener('change',e=>{const file=e.target.files?.[0];if(!file)return;if(e.target.dataset.formMode==='1'){delete e.target.dataset.formMode;handleFormPdfSelection(file)}else uploadCatalogPdf(file)});els.selectSongPdfBtn?.addEventListener('click',selectFormPdf);els.viewSongPdfBtn?.addEventListener('click',async()=>{if(selectedFormPdf){await openProcessedPdfPreview(selectedFormPdf,selectedFormPdf.__palcoAutoGenerated?'Pré-visualização do PDF automático':'Pré-visualização do PDF processado');return;}const song=state.songs.find(s=>s.id===state.editingId);if(song?.pdfUrl)viewPdf(song.pdfUrl);else showToast('PDF não disponível para visualização.','error')});els.receivedPdfInput?.addEventListener('change',e=>{const file=e.target.files?.[0];if(file)uploadReceivedPdf(file)});els.showPassword.addEventListener('change',()=>els.passwordInput.type=els.showPassword.checked?'text':'password');els.loginBtn.addEventListener('click',handleLogin);[els.loginInput,els.passwordInput].forEach(el=>el.addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin()}));els.logoutBtn.addEventListener('click',logout);els.refreshIndexBtn?.addEventListener('click',()=>{window.location.reload()});els.refreshCatalog?.addEventListener('click',refreshMainCatalog);els.refreshReceived.addEventListener('click',loadReceived);els.selectAllReceived.addEventListener('click',()=>{const all=state.received.length>0&&state.received.every((_,i)=>state.receivedSelected.has(i));state.receivedSelected=all?new Set():new Set(state.received.map((_,i)=>i));renderReceived()});els.clearReceivedSelection.addEventListener('click',()=>{state.receivedSelected.clear();renderReceived()});els.approveSelectedReceived.addEventListener('click',authorizeSelectedReceived);els.saveReceivedEdit.addEventListener('click',saveReceivedEditor);els.receivedEditModal.querySelectorAll('[data-close-received-edit]').forEach(b=>b.addEventListener('click',closeReceivedEditor));
- els.searchMusicBtn?.addEventListener('click',searchMusicOnline);els.musicSearchResults?.addEventListener('click',e=>{const result=e.target.closest('[data-music-search-index]');if(result)selectMusicSearchResult(result.dataset.musicSearchIndex)});els.musicSearchQuery?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!state.editingId&&els.musicSearchQuery.value.trim()){e.preventDefault();searchMusicOnline()}});els.saveSong.addEventListener('click',saveSong);els.cancelEdit.addEventListener('click',clearForm);els.newSong.addEventListener('click',()=>{document.querySelector('.tab-btn[data-tab="editor"]').click();clearForm();els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})});els.exportBtn?.addEventListener('click',exportCatalog);els.quickExport?.addEventListener('click',exportCatalog);els.selectAll.addEventListener('click',toggleAllVisible);els.clearSelection.addEventListener('click',clearSelection);els.changeStyle.addEventListener('click',openStyleModal);els.continueStyle.addEventListener('click',continueStyleChange);els.styleModal.querySelectorAll('[data-close-style]').forEach(b=>b.addEventListener('click',closeStyleModal));els.linkCatalog?.addEventListener('click',linkCatalog);els.search.addEventListener('input',renderCatalog);document.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click',()=>setFilter(b.dataset.filter)));
+   els.searchMusicBtn?.addEventListener('click',searchMusicOnline);els.openBulkMusicSearchBtn?.addEventListener('click',openBulkMusicSearch);els.closeBulkMusicSearchBtn?.addEventListener('click',closeBulkMusicSearch);els.bulkMusicSearchBtn?.addEventListener('click',searchBulkMusicOnline);els.selectAllBulkMusicBtn?.addEventListener('click',selectAllBulkMusic);els.clearBulkMusicSelectionBtn?.addEventListener('click',clearBulkMusicSelection);els.addSelectedBulkMusicBtn?.addEventListener('click',addSelectedBulkMusic);els.bulkMusicSearchResults?.addEventListener('change',e=>{const checkbox=e.target.closest('[data-bulk-music-select]');if(checkbox)toggleBulkMusicSelection(checkbox.dataset.bulkMusicSelect,checkbox.checked)});els.musicSearchResults?.addEventListener('click',e=>{const result=e.target.closest('[data-music-search-index]');if(result)selectMusicSearchResult(result.dataset.musicSearchIndex)});els.musicSearchQuery?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!state.editingId&&els.musicSearchQuery.value.trim()){e.preventDefault();searchMusicOnline()}});els.bulkMusicSearchInput?.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();searchBulkMusicOnline()}});els.saveSong.addEventListener('click',saveSong);els.cancelEdit.addEventListener('click',clearForm);els.newSong.addEventListener('click',()=>{document.querySelector('.tab-btn[data-tab="editor"]').click();clearForm();els.songTitle.focus();window.scrollTo({top:0,behavior:'smooth'})});els.exportBtn?.addEventListener('click',exportCatalog);els.quickExport?.addEventListener('click',exportCatalog);els.selectAll.addEventListener('click',toggleAllVisible);els.clearSelection.addEventListener('click',clearSelection);els.changeStyle.addEventListener('click',openStyleModal);els.continueStyle.addEventListener('click',continueStyleChange);els.styleModal.querySelectorAll('[data-close-style]').forEach(b=>b.addEventListener('click',closeStyleModal));els.linkCatalog?.addEventListener('click',linkCatalog);els.search.addEventListener('input',renderCatalog);document.querySelectorAll('.filter-btn').forEach(b=>b.addEventListener('click',()=>setFilter(b.dataset.filter)));
  els.catalogList.addEventListener('click',e=>{const generatePdf=e.target.closest('[data-generate-pdf]');if(generatePdf){generatePdfForCatalogSong(generatePdf.dataset.generatePdf);return;}const lyricsSearch=e.target.closest('[data-search-lyrics]');if(lyricsSearch){const song=state.songs.find(x=>x.id===lyricsSearch.dataset.searchLyrics);if(song)openLyricsSearch(song.title);return;}const select=e.target.closest('[data-select]');if(select){toggleSelected(select.dataset.select,select.checked);return;}const edit=e.target.closest('[data-edit]');const view=e.target.closest('[data-view]');const viewPdfBtn=e.target.closest('[data-view-pdf]');const pdf=e.target.closest('[data-pdf]');const toggle=e.target.closest('[data-toggle]');const del=e.target.closest('[data-delete]');if(edit){beginEdit(edit.dataset.edit);document.querySelector('.tab-btn[data-tab="editor"]').click();}else if(view)showLyrics(view.dataset.view);else if(viewPdfBtn){const song=state.songs.find(x=>x.id===viewPdfBtn.dataset.viewPdf);const localPreview=song&&state.localPdfPreviewSongId===song.id?state.localPdfPreviewDataUrl:'';const catalogPdf=getCatalogPdfUrl(song);if(localPreview)openProcessedPdfPreview(localPreview,'PDF processado recentemente');else if(catalogPdf)viewPdf(catalogPdf);else showToast('PDF não disponível para visualização.','error');}else if(pdf)askPdfForSong(pdf.dataset.pdf);else if(toggle)toggleActive(toggle.dataset.toggle);else if(del)askDelete(del.dataset.delete)});
   els.receivedList.addEventListener('click',e=>{const receivedLyricsSearch=e.target.closest('[data-search-received-lyrics]');if(receivedLyricsSearch){const item=state.received?.[Number(receivedLyricsSearch.dataset.searchReceivedLyrics)];const title=item?.musica||item?.title||item?.cadastroCompleto?.title||'';if(title)openLyricsSearch(title);return}const select=e.target.closest('[data-received-select]');if(select){const index=Number(select.dataset.receivedSelect);if(select.checked)state.receivedSelected.add(index);else state.receivedSelected.delete(index);renderReceived();return}const detail=e.target.closest('[data-detail]');if(detail){viewReceivedCadastro(Number(detail.dataset.detail));return}const pdfView=e.target.closest('[data-view-pdf]');if(pdfView){const item=state.received?.[Number(pdfView.dataset.viewPdf)];const url=getReceivedPdf(item);if(url)viewPdf(url);else showToast('PDF não disponível para visualização.','error');return}const del=e.target.closest('[data-delete-received]');if(del){deleteReceivedCadastro(Number(del.dataset.deleteReceived));return}const approve=e.target.closest('[data-approve]');if(approve){authorizeReceivedCadastro(Number(approve.dataset.approve));return}const edit=e.target.closest('[data-edit-received]');if(edit){openReceivedEditor(Number(edit.dataset.editReceived));return}});
   document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{const target=btn.dataset.tab;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b===btn));document.querySelectorAll('.tab-panel').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===target));if(target==='catalog')loadLocal();if(target==='received')loadReceived();}));
