@@ -501,7 +501,7 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
 
     <nav class="tabs" aria-label="Navegação administrativa">
       <button class="tab-btn active" data-tab="catalog" type="button">🎵 Catálogo</button>
-      <button class="tab-btn" data-tab="editor" type="button">📚 Cadastro em massa</button>
+      <button class="tab-btn" data-tab="editor" type="button" onclick="openPalcoAdminTab('editor')">📚 Cadastro em massa</button>
       <button class="tab-btn" data-tab="received" type="button">📥 Cadastros recebidos</button>
       <button class="tab-btn" data-tab="project" type="button">ℹ️ Projeto</button>
     </nav>
@@ -512,7 +512,7 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
           <div class="card-head"><div><h2>Catálogo atual</h2><p>Visualize e administre exatamente a lista que será disponibilizada em Sugestões.</p></div><span id="catalogCounter" class="badge">0 músicas</span></div>
           <div class="stats-grid" style="margin-bottom:12px"><div class="stat"><div class="stat-label">Total</div><div id="statTotal" class="stat-value">0</div></div><div class="stat"><div class="stat-label">Ativas</div><div id="statActive" class="stat-value">0</div></div><div class="stat"><div class="stat-label">Inativas</div><div id="statInactive" class="stat-value">0</div></div></div>
           <div class="catalog-top">
-            <div class="catalog-toolbar"><div class="search-wrap"><input id="searchInput" type="text" placeholder="Buscar por música, artista ou letra" aria-label="Buscar no catálogo" /><span id="searchCounter" class="search-counter">0 resultados</span></div><div class="catalog-toolbar-actions"><button id="refreshCatalogBtn" type="button" class="btn btn-secondary btn-small">↻ Atualizar catálogo</button><button id="removeDuplicatesBtn" type="button" class="btn btn-danger btn-small">🧹 Remover músicas copiadas</button><button id="newSongBtn" type="button" class="btn btn-primary btn-small">📚 Cadastro em massa</button></div></div>
+            <div class="catalog-toolbar"><div class="search-wrap"><input id="searchInput" type="text" placeholder="Buscar por música, artista ou letra" aria-label="Buscar no catálogo" /><span id="searchCounter" class="search-counter">0 resultados</span></div><div class="catalog-toolbar-actions"><button id="refreshCatalogBtn" type="button" class="btn btn-secondary btn-small">↻ Atualizar catálogo</button><button id="removeDuplicatesBtn" type="button" class="btn btn-danger btn-small">🧹 Remover músicas copiadas</button><button id="newSongBtn" type="button" class="btn btn-primary btn-small" onclick="openPalcoAdminTab('editor')">📚 Cadastro em massa</button></div></div>
             <div class="filter-row"><button class="filter-btn active" data-filter="all" type="button">Todas</button><button class="filter-btn" data-filter="active" type="button">Ativas</button><button class="filter-btn" data-filter="inactive" type="button">Inativas</button></div><div id="bulkActions" class="bulk-actions"><span id="bulkCount" class="bulk-count">0 músicas selecionadas</span><button id="selectAllBtn" type="button" class="btn btn-secondary btn-small">Selecionar todas</button><button id="clearSelectionBtn" type="button" class="btn btn-secondary btn-small">Limpar seleção</button><button id="changeStyleBtn" type="button" class="btn btn-primary btn-small">✏️ Editar nome do estilo</button></div>
           </div>
           <div id="catalogList" class="catalog-list" style="margin-top:12px"></div>
@@ -580,6 +580,37 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
 <div id="styleModal" class="modal"><div class="modal-card"><div class="modal-head"><h3>Alterar nome do estilo</h3><button class="icon-btn" type="button" data-close-style>✕</button></div><div class="modal-body"><div class="style-modal-copy">Digite o novo nome do estilo para todas as músicas selecionadas.</div><div class="field"><label for="bulkStyleInput">Novo estilo</label><input id="bulkStyleInput" type="text" placeholder="Ex.: Sertanejo" /></div></div><div class="modal-foot"><button id="continueStyleBtn" type="button" class="btn btn-primary">Continuar</button><button type="button" class="btn btn-secondary" data-close-style>Cancelar</button></div></div></div><div id="confirmModal" class="modal"><div class="modal-card"><div class="modal-head"><h3 id="confirmTitle">Confirmar ação</h3><button class="icon-btn" type="button" data-close-confirm>✕</button></div><div id="confirmBody" class="modal-body"></div><div class="modal-foot"><button id="confirmBtn" class="btn btn-danger" type="button">Confirmar</button><button type="button" class="btn btn-secondary" data-close-confirm>Cancelar</button></div></div></div>
 <div id="toast" class="toast" aria-live="polite"></div><div id="confirmationOverlay" class="confirmation-overlay" aria-live="polite" aria-hidden="true"><div class="confirmation-card" role="status"><div class="confirmation-icon">✓</div><h3 class="confirmation-title">Música cadastrada</h3><p class="confirmation-text">A música foi adicionada ao catálogo com sucesso.</p><div id="confirmationSong" class="confirmation-song"></div></div></div>
 
+<script>
+(function(){
+  'use strict';
+  function openPalcoAdminTab(target){
+    if(!target)return;
+    document.querySelectorAll('.tab-btn').forEach(function(btn){
+      btn.classList.toggle('active', btn.dataset.tab === target);
+    });
+    document.querySelectorAll('.tab-panel').forEach(function(panel){
+      panel.classList.toggle('active', panel.dataset.panel === target);
+    });
+    if(target === 'editor'){
+      try{
+        var status=document.getElementById('bulkMusicSearchStatus');
+        if(status && !status.textContent) status.textContent='Cadastro em massa pronto.';
+      }catch(_){ }
+    }
+    try{ window.scrollTo({top:0, behavior:'smooth'}); }catch(_){ window.scrollTo(0,0); }
+  }
+  window.openPalcoAdminTab=openPalcoAdminTab;
+  document.addEventListener('click', function(event){
+    var button=event.target && event.target.closest ? event.target.closest('.tab-btn') : null;
+    if(!button)return;
+    var target=button.dataset.tab;
+    if(!target)return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    openPalcoAdminTab(target);
+  }, true);
+})();
+</script>
 <!--
 PALCO PRO — CONTEXTO DO PROJETO
 
