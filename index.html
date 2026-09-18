@@ -2057,44 +2057,96 @@ async function generatePdfForCatalogSong(songId,options={}){
   const song=state.songs.find(s=>String(s.id)===String(songId));
   if(!song)return false;
   const silent=!!options.silent;
-  if(songHasPdf(song)){if(!silent)showToast('Esta música já possui PDF válido.','error');return false;}
+  const force=!!options.force;
+  if(!force && songHasPdf(song)){
+    if(!silent)showToast('Esta música já possui PDF válido.','error');
+    return false;
+  }
   const lyrics=sanitizeLyrics(song.lyrics||song.letra);
-  if(!lyrics){if(!silent)showToast('Esta música não possui letra cadastrada.','error');return false;}
-  if(state.pdfProcessing){if(!silent)showToast('Já existe uma operação de PDF em andamento.','error');return false;}
+  if(!lyrics){
+    if(!silent)showToast('Esta música não possui letra cadastrada.','error');
+    return false;
+  }
+  if(state.pdfProcessing){
+    if(!silent)showToast('Já existe uma operação de PDF em andamento.','error');
+    return false;
+  }
+
   state.pdfProcessing=true;
   const button=els.catalogList?.querySelector(`[data-generate-pdf="${CSS.escape(String(songId))}"]`);
   const oldText=button?.textContent||'🖨️ PDF';
   if(button){button.disabled=true;button.textContent='⏳';}
   const attempts=options.retryCount==null?3:Math.max(1,Number(options.retryCount)||1);
   let lastError=null;
+
   try{
+    if(!silent)setPdfPanelStatus('📄 Gerando PDF de '+song.title+'...');
+    // GERA PRIMEIRO NO NAVEGADOR usando exatamente os dados da música do catálogo.
+    // O servidor só recebe o PDF depois que o arquivo foi efetivamente criado.
     const generated=await generateAutomaticLyricsPdf(song.title,song.artist,lyrics);
+    if(!generated || !generated.size)throw new Error('O PDF foi gerado sem conteúdo.');
     const pdfDataUrl=await fileToDataUrl(generated);
+    if(!/^data:application\/pdf;base64,/i.test(pdfDataUrl))throw new Error('O PDF gerado não pôde ser convertido para envio.');
+
     for(let attempt=1;attempt<=attempts;attempt++){
       try{
-        const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveSongPdf',songId:song.id,id:song.id,title:song.title,musica:song.title,nome:song.title,songTitle:song.title,artist:song.artist,artista:song.artist,interprete:song.artist,songArtist:song.artist,lyrics:lyrics,letra:lyrics,lyric:lyrics,pdfData:pdfDataUrl,pdfFileName:generated.name})},120000);
-        if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível salvar o PDF.');
+        if(!silent)setPdfPanelStatus(`☁️ Salvando PDF de ${song.title}... tentativa ${attempt}/${attempts}`);
+        const data=await fetchJson(APPS_SCRIPT_URL,{
+          method:'POST',
+          headers:{'Content-Type':'text/plain;charset=utf-8'},
+          body:JSON.stringify({
+            action:'saveSongPdf',
+            songId:song.id,
+            id:song.id,
+            title:song.title,
+            musica:song.title,
+            nome:song.title,
+            songTitle:song.title,
+            artist:song.artist,
+            artista:song.artist,
+            interprete:song.artist,
+            songArtist:song.artist,
+            lyrics:lyrics,
+            letra:lyrics,
+            lyric:lyrics,
+            pdfData:pdfDataUrl,
+            pdfFileName:generated.name
+          })
+        },120000);
+        if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível salvar o PDF no servidor.');
+
         song.pdfUrl=data.pdfUrl||'';
         song.pdfFileName=data.pdfFileName||generated.name;
         song.pdfMimeType='application/pdf';
+        song.pdfFileId=data.pdfFileId||'';
+        song.pdfDriveFileId=data.pdfDriveFileId||'';
         if(state.pdfIntegrity?.checked){
           state.pdfIntegrity.validIds.add(String(song.id));
           state.pdfIntegrity.missingIds.delete(String(song.id));
           state.pdfIntegrity.brokenIds.delete(String(song.id));
         }
         localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs.map(normalizeSong)));
+        await persist().catch(()=>{});
         state.localPdfPreviewSongId=song.id;
         state.localPdfPreviewDataUrl=pdfDataUrl;
-        if(!silent){renderCatalog();showToast('✅ PDF gerado e adicionado ao catálogo.','success');}
+        if(!silent){
+          renderCatalog();
+          setPdfPanelStatus('✅ PDF gerado, salvo e vinculado: '+song.title,'success');
+          showToast('✅ PDF gerado e adicionado ao catálogo.','success');
+        }
         return true;
       }catch(error){
         lastError=error;
-        if(attempt<attempts)await sleep(1500*attempt);
+        if(!silent)setPdfPanelStatus(`⚠️ Falha ao salvar ${song.title}: ${error?.message||'erro'}${attempt<attempts?' · tentando novamente...':''}`,'warn');
+        if(attempt<attempts)await sleep(1800*attempt);
       }
     }
     throw lastError||new Error('Não foi possível salvar o PDF.');
   }catch(error){
-    if(!silent)showToast('Não foi possível gerar o PDF: '+(error?.message||'erro desconhecido'),'error');
+    if(!silent){
+      setPdfPanelStatus('❌ Não foi possível gerar o PDF de '+song.title+': '+(error?.message||'erro desconhecido'),'error');
+      showToast('Não foi possível gerar o PDF: '+(error?.message||'erro desconhecido'),'error');
+    }
     return false;
   }finally{
     state.pdfProcessing=false;
@@ -2477,7 +2529,7 @@ async function generatePdfQueue(ids,options={}){
         `🟢 Em processamento agora · ✅ ${ok} concluído · ❌ ${fail} falha · ⏳ ${queue.length-i-1} restante`,
         pct
       );
-      const done=await generatePdfForCatalogSong(id,{silent:true,retryCount:3});
+      const done=await generatePdfForCatalogSong(id,{silent:true,retryCount:3,force:true});
       if(done){
         ok++;
       }else{
@@ -2511,29 +2563,42 @@ async function generatePdfQueue(ids,options={}){
 async function startMissingPdfGeneration(){
   if(state.pdfBatchBusy)return;
 
-  // Diagnóstico rápido antes da fila. É somente leitura.
-  try{
-    const diag=await fetchJson(APPS_SCRIPT_URL+'?action=diagnosePdfPipeline&ts='+Date.now(),{method:'GET'},20000).catch(()=>null);
-    if(diag && diag.sucesso===false){
-      throw new Error(diag.mensagem||'Apps Script indisponível.');
-    }
-  }catch(_){ /* a verificação principal abaixo continua responsável */ }
-
+  // Tentamos atualizar a integridade, mas a geração NÃO fica dependente dela.
+  // O PDF automático é criado a partir do catálogo local e só depois é enviado
+  // ao Apps Script. Assim, uma falha momentânea da auditoria não bloqueia o botão.
   const verified=await refreshPdfPanel({silent:true});
-  if(!verified){
-    setPdfPanelStatus('❌ Não foi possível verificar os PDFs no repositório. O processo não foi iniciado para evitar sobrescrever PDFs válidos. Clique em “Verificar PDFs” e tente novamente.','error');
-    return;
+
+  let missing=[];
+  if(verified && state.pdfIntegrity?.checked){
+    missing=(state.songs||[]).filter(song=>{
+      const id=String(song.id||'');
+      return (state.pdfIntegrity.missingIds.has(id)||state.pdfIntegrity.brokenIds.has(id)) && !!sanitizeLyrics(song.lyrics||song.letra);
+    });
+  }else{
+    // Fallback seguro quando o servidor de auditoria estiver indisponível.
+    missing=(state.songs||[]).filter(song=>{
+      const hasLocalReference=!!(normalize(song.pdfUrl)||normalize(song.pdfFileId)||normalize(song.pdfDriveFileId));
+      return !hasLocalReference && !!sanitizeLyrics(song.lyrics||song.letra);
+    });
   }
-  const missing=(state.songs||[]).filter(song=>!songHasPdf(song)&&sanitizeLyrics(song.lyrics||song.letra));
-  const noLyrics=(state.songs||[]).filter(song=>!songHasPdf(song)&&!sanitizeLyrics(song.lyrics||song.letra)).length;
+
+  const withoutLyrics=(state.songs||[]).filter(song=>{
+    const id=String(song.id||'');
+    const pending=verified&&state.pdfIntegrity?.checked
+      ? (state.pdfIntegrity.missingIds.has(id)||state.pdfIntegrity.brokenIds.has(id))
+      : !(normalize(song.pdfUrl)||normalize(song.pdfFileId)||normalize(song.pdfDriveFileId));
+    return pending&&!sanitizeLyrics(song.lyrics||song.letra);
+  }).length;
+
   if(!missing.length){
-    setPdfPanelStatus(noLyrics?`✅ Não há PDFs pendentes com letra. ${noLyrics} música${noLyrics===1?'':'s'} não possui letra cadastrada.`:'✅ Não há PDFs pendentes.','success');
+    setPdfPanelStatus(noLyrics?`✅ Não há PDFs pendentes com letra. ${withoutLyrics} música${withoutLyrics===1?'':'s'} não possui letra cadastrada.`:'✅ Não há PDFs pendentes para gerar.','success');
     return;
   }
+
   els.confirmTitle.textContent='Gerar PDFs pendentes';
-  els.confirmBody.innerHTML=`<div class="confirm-text">Serão processadas <strong>${missing.length} música${missing.length===1?'':'s'}</strong>, uma por vez. A próxima só começa depois que o PDF anterior terminar de ser gerado e salvo. ${noLyrics?`<br><br>${noLyrics} música${noLyrics===1?'':'s'} sem letra serão ignoradas.`:''}<br><br>Uma falha não interrompe o restante da fila.</div>`;
+  els.confirmBody.innerHTML=`<div class="confirm-text">Serão processadas <strong>${missing.length} música${missing.length===1?'':'s'}</strong>, <strong>uma por vez</strong>.<br><br>Para cada música o Palco Pro pega <strong>título, artista e letra do catálogo</strong>, gera o PDF automaticamente no navegador e só inicia a próxima música depois que o PDF anterior for salvo e confirmado pelo servidor.${withoutLyrics?`<br><br>${withoutLyrics} música${withoutLyrics===1?'':'s'} sem letra serão ignoradas.`:''}<br><br>Uma falha não interrompe o restante da fila.</div>`;
   els.confirmBtn.textContent='Iniciar geração';
-  state.confirmAction=async()=>{closeConfirm();await generatePdfQueue(missing.map(s=>s.id));};
+  state.confirmAction=async()=>{closeConfirm();await generatePdfQueue(missing.map(s=>s.id),{force:true});};
   els.confirmModal.classList.add('active');
 }
 async function retryFailedPdfs(){
@@ -2608,7 +2673,7 @@ function askDeleteOrphanPdfs(){
 }
 function handlePdfPanelClick(e){
   const generate=e.target.closest('[data-pdf-generate]');
-  if(generate){generatePdfForCatalogSong(generate.dataset.pdfGenerate);return;}
+  if(generate){generatePdfForCatalogSong(generate.dataset.pdfGenerate,{force:true});return;}
   const view=e.target.closest('[data-pdf-view]');
   if(view){
     const song=state.songs.find(s=>String(s.id)===String(view.dataset.pdfView));
