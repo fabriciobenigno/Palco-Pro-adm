@@ -872,40 +872,29 @@ async function fetchCatalogFromUrl(url){const response=await fetch(url+'?ts='+Da
 async function loadMainCatalog(){
   const errors=[];
   const previousCount=Array.isArray(state.songs)&&state.songs.length ? state.songs.length : (()=>{try{const cached=JSON.parse(localStorage.getItem(CATALOG_KEY)||'[]');return Array.isArray(cached)?cached.length:(Array.isArray(cached?.songs)?cached.songs.length:0)}catch(_){return 0}})();
-
-  // O Apps Script e o mesmo servidor usado para salvar PDFs. Ele fica como
-  // fonte primaria para garantir que o ADM trabalhe com o mesmo catalogo que
-  // sera atualizado durante a geracao do PDF.
-  if(APPS_SCRIPT_URL&&APPS_SCRIPT_URL!=='COLE_AQUI_A_MESMA_URL_DO_APPS_SCRIPT_DO_INDEX_PRINCIPAL'){
-    try{
-      const data=await fetchJson(APPS_SCRIPT_URL+'?action=getCatalog&ts='+Date.now(),{},20000);
-      const arr=parseCatalogPayload(data);
-      if(!arr.length)throw new Error('O Apps Script retornou 0 musicas.');
-      if(previousCount>=300&&arr.length<Math.floor(previousCount*0.6))throw new Error(`Resposta rejeitada por seguranca: ${arr.length} musicas contra ${previousCount} na copia conhecida.`);
-      state.songs=arr;
-      localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs));
-      state.catalogHandle=null;
-      if(els.fileStatus){els.fileStatus.textContent=`Catalogo carregado pelo servidor (${arr.length} musicas)`;els.fileStatus.className='badge'}
-      renderCatalog();
-      return;
-    }catch(error){errors.push('Apps Script: '+(error?.message||'erro'))}
-  }
-
-  // Fallback somente quando o servidor estiver indisponivel.
   const publicSources=[MAIN_CATALOG_URL,CDN_CATALOG_URL,RAW_CATALOG_URL,LOCAL_CATALOG_URL];
   for(const url of publicSources){
     try{
       const arr=await fetchCatalogFromUrl(url);
-      if(previousCount>=300&&arr.length<Math.floor(previousCount*0.6)){throw new Error(`Resposta rejeitada por seguranca: ${arr.length} musicas contra ${previousCount} na copia conhecida.`)}
+      if(previousCount>=300&&arr.length<Math.floor(previousCount*0.6)){throw new Error(`Resposta rejeitada por segurança: ${arr.length} músicas contra ${previousCount} na cópia conhecida.`)}
       state.songs=arr;
       localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs));
       state.catalogHandle=null;
-      if(els.fileStatus){els.fileStatus.textContent=`Catalogo carregado (${arr.length} musicas)`;els.fileStatus.className='badge'}
+      if(els.fileStatus){els.fileStatus.textContent=`Catálogo carregado (${arr.length} músicas)`;els.fileStatus.className='badge'}
       renderCatalog();
       return;
     }catch(error){errors.push(String(url).replace(/^https?:\/\//,'' )+': '+(error?.message||'erro'))}
   }
-  throw new Error('Nao foi possivel carregar o catalogo por nenhuma fonte. '+errors.join(' | '));
+  if(APPS_SCRIPT_URL&&APPS_SCRIPT_URL!=='COLE_AQUI_A_MESMA_URL_DO_APPS_SCRIPT_DO_INDEX_PRINCIPAL'){
+    try{
+      const data=await fetchJson(APPS_SCRIPT_URL+'?action=getCatalog&ts='+Date.now(),{},20000);
+      const arr=parseCatalogPayload(data);
+      if(!arr.length)throw new Error('O Apps Script retornou 0 músicas.');
+      if(previousCount>=300&&arr.length<Math.floor(previousCount*0.6))throw new Error(`Resposta rejeitada por segurança: ${arr.length} músicas contra ${previousCount} na cópia conhecida.`);
+      state.songs=arr;localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs));state.catalogHandle=null;if(els.fileStatus){els.fileStatus.textContent=`Catálogo carregado pelo Apps Script (${arr.length} músicas)`;els.fileStatus.className='badge'}renderCatalog();return;
+    }catch(error){errors.push('Apps Script: '+(error?.message||'erro'))}
+  }
+  throw new Error('Não foi possível carregar o catálogo por nenhuma fonte. '+errors.join(' | '));
 }
 async function loadLocal(){
   try{await loadMainCatalog();return}catch(error){}
@@ -2192,6 +2181,16 @@ async function fetchPdfIntegrityStatus(options={}){
   }
   const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'getCatalogPdfStatus'})},120000);
   if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível verificar os PDFs.');
+  // O servidor pode reparar automaticamente vínculos antigos de PDFs físicos
+  // que ainda estavam sem referência no catálogo. Atualizamos a música local
+  // com esses dados para que o botão "Ver" e a interface usem o mesmo vínculo.
+  (data.vinculosReparadosDetalhes||[]).forEach(item=>{
+    const song=state.songs.find(s=>String(s.id)===String(item.id));
+    if(!song)return;
+    song.pdfUrl=item.pdfUrl||song.pdfUrl||'';
+    song.pdfFileName=item.pdfFileName||song.pdfFileName||'';
+    song.pdfMimeType='application/pdf';
+  });
   state.pdfIntegrity={
     checked:true,
     validIds:new Set((data.pdfsValidos||[]).map(x=>String(x.songId||x.id||''))),
@@ -2264,7 +2263,11 @@ async function refreshPdfPanel(options={}){
     resetPdfIntegrity();
     const data=await fetchPdfIntegrityStatus(options);
     renderPdfPanel();
-    if(!silent)setPdfPanelStatus(`✅ Verificação concluída: ${data.quantidadePdfsValidos||0} PDF${Number(data.quantidadePdfsValidos||0)===1?'':'s'} válido${Number(data.quantidadePdfsValidos||0)===1?'':'s'}; ${data.quantidadeMusicasSemPdf||0} música${Number(data.quantidadeMusicasSemPdf||0)===1?'':'s'} sem PDF válido.`);
+    if(!silent){
+      const reparados=Number(data.vinculosReparados||0);
+      setPdfPanelStatus(`✅ Verificação concluída: ${data.quantidadePdfsValidos||0} PDF${Number(data.quantidadePdfsValidos||0)===1?'':'s'} válido${Number(data.quantidadePdfsValidos||0)===1?'':'s'}; ${data.quantidadeMusicasSemPdf||0} música${Number(data.quantidadeMusicasSemPdf||0)===1?'':'s'} sem PDF válido${reparados?`; ${reparados} vínculo${reparados===1?'':'s'} reparado${reparados===1?'':'s'}`:''}.`);
+      if(reparados)showToast(`✅ ${reparados} vínculo${reparados===1?'':'s'} de PDF reparado${reparados===1?'':'s'}.`,'success');
+    }
     return true;
   }catch(error){
     resetPdfIntegrity();
