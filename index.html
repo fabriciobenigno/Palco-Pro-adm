@@ -1252,9 +1252,143 @@ async function searchCatalogSuggestions(){
   state.bulkMusicSearchResults=[];
   state.bulkMusicSelected.clear();
   renderBulkMusicSearchResults();
-  if(els.bulkMusicSearchBtn){els.bulkMusicSearchBtn.disabled=true;els.bulkMusicSearchBtn.textContent='Buscando 200 sugestões...';}
-  if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent='Preparando uma busca ampla de música brasileira...';
+  if(els.bulkMusicSearchBtn){els.bulkMusicSearchBtn.disabled=true;els.bulkMusicSearchBtn.textContent='Buscando 200 sugestões válidas...';}
+  if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent='Iniciando descoberta de músicas brasileiras...';
+
+  const TARGET_SUGGESTIONS=200;
+  const WORKERS=5;
   const catalogIndex=buildCatalogSuggestionDuplicateIndex();
+  const acceptedKeys=new Set();
+  const extraEntries=[];
+  const candidateMap=new Map();
+  let checked=0,excluded=0,found=0,missedLyrics=0,failedLookups=0,discovered=0;
+  let stopped=false;
+
+  const putCandidate=(item,meta={})=>{
+    const title=normalize(item?.trackName||item?.name),artist=normalize(item?.artistName||item?.artist);
+    if(!title||!artist)return null;
+    const key=normalizeSuggestionText(title)+'|'+normalizeSuggestionText(artist);
+    let current=candidateMap.get(key);
+    if(!current){
+      current={
+        trackName:title,
+        artistName:artist,
+        primaryGenreName:normalize(item?.primaryGenreName||''),
+        collectionName:normalize(item?.collectionName||item?.albumName||''),
+        trackTimeMillis:Number(item?.trackTimeMillis||0)||0,
+        trackId:item?.trackId||item?.id||'',
+        collectionId:item?.collectionId||'',
+        trackViewUrl:item?.trackViewUrl||item?.url||'',
+        previewUrl:item?.previewUrl||'',
+        chartRank:null,
+        chartScore:0,
+        sourceScore:0,
+        sources:[],
+        sourceStyles:[]
+      };
+      candidateMap.set(key,current);
+      discovered++;
+    }
+    if(meta.chartRank!=null){
+      const rank=Number(meta.chartRank);
+      if(!current.chartRank||rank<current.chartRank){current.chartRank=rank;current.chartScore=2200+(201-rank)*5;}
+    }
+    if(meta.source){
+      current.sourceScore+=Math.max(80,900-(Number(meta.rank||50)*5));
+      if(!current.sources.includes(meta.source))current.sources.push(meta.source);
+      if(meta.style&&!current.sourceStyles.includes(meta.style))current.sourceStyles.push(meta.style);
+    }
+    if(!current.primaryGenreName&&item?.primaryGenreName)current.primaryGenreName=item.primaryGenreName;
+    if(!current.collectionName&&item?.collectionName)current.collectionName=item.collectionName;
+    if(!current.trackTimeMillis&&item?.trackTimeMillis)current.trackTimeMillis=Number(item.trackTimeMillis)||0;
+    if(!current.trackId&&item?.trackId)current.trackId=item.trackId;
+    if(!current.collectionId&&item?.collectionId)current.collectionId=item.collectionId;
+    if(!current.trackViewUrl&&item?.trackViewUrl)current.trackViewUrl=item.trackViewUrl;
+    current.suggestionStyle=inferCatalogSuggestionStyle(current,current.sourceStyles.length?current.sourceStyles:current.sources);
+    current.score=current.chartScore+current.sourceScore+(current.sourceStyles.length*65);
+    return current;
+  };
+
+  const candidateQueue=[];
+  const queuedKeys=new Set();
+  const enqueueFromResults=(items,meta={})=>{
+    const local=[];
+    (Array.isArray(items)?items:[]).forEach((item,i)=>{
+      const candidate=putCandidate(item,{...meta,rank:i+1});
+      if(!candidate)return;
+      const key=normalizeSuggestionText(candidate.trackName)+'|'+normalizeSuggestionText(candidate.artistName);
+      if(acceptedKeys.has(key)||queuedKeys.has(key))return;
+      const titleKey=normalizeSuggestionText(candidate.trackName);
+      const artistKey=normalizeSuggestionText(candidate.artistName);
+      // If the exact same title + artist is already in the catalog, exclude before any lyric lookup.
+      if(catalogHasArtistTitle(catalogIndex,titleKey,artistKey)){excluded++;return;}
+      queuedKeys.add(key);
+      local.push(candidate);
+    });
+    local.sort((a,b)=>b.score-a.score||String(a.trackName).localeCompare(String(b.trackName),'pt-BR',{sensitivity:'base'}));
+    local.forEach(candidate=>candidateQueue.push(candidate));
+  };
+
+  const updateStatus=(phase='')=>{
+    if(!els.bulkMusicSearchStatus||token!==state.bulkMusicSearchToken)return;
+    const suffix=phase?` • ${phase}`:'';
+    els.bulkMusicSearchStatus.textContent=`Encontradas ${found}/${TARGET_SUGGESTIONS} sugestões válidas • ${discovered} músicas descobertas • ${checked} verificadas • ${excluded} excluídas do catálogo/letra • ${missedLyrics} sem letra${failedLookups?` • ${failedLookups} consultas com falha`:''}${suffix}`;
+  };
+
+  const processOne=async(candidate)=>{
+    if(stopped||token!==state.bulkMusicSearchToken)return;
+    const candidateKey=normalizeSuggestionText(candidate.trackName)+'|'+normalizeSuggestionText(candidate.artistName);
+    checked++;
+    let lyrics='';
+    try{
+      lyrics=await fetchLyricsForCatalogSuggestion(candidate);
+    }catch(_){
+      lyrics='';
+      failedLookups++;
+    }
+    if(stopped||token!==state.bulkMusicSearchToken)return;
+    if(!lyrics){
+      missedLyrics++;
+      queuedKeys.delete(candidateKey);
+      updateStatus('aguardando mais músicas');
+      return;
+    }
+    const enriched={
+      ...candidate,
+      lyrics,
+      style:candidate.suggestionStyle,
+      suggestionStyle:candidate.suggestionStyle||candidate.primaryGenreName||'Música brasileira'
+    };
+    if(candidateMatchesCatalog(enriched,catalogIndex,extraEntries)){
+      excluded++;
+      queuedKeys.delete(candidateKey);
+      updateStatus('eliminando duplicidades');
+      return;
+    }
+    const key=normalizeSuggestionText(enriched.trackName)+'|'+normalizeSuggestionText(enriched.artistName);
+    if(acceptedKeys.has(key)){queuedKeys.delete(candidateKey);return;}
+    acceptedKeys.add(key);
+    queuedKeys.delete(key);
+    extraEntries.push({
+      song:{title:enriched.trackName,artist:enriched.artistName,lyrics:enriched.lyrics},
+      titleKey:normalizeSuggestionText(enriched.trackName),
+      artistKey:normalizeSuggestionText(enriched.artistName),
+      signature:buildLyricsSignature(enriched.lyrics)
+    });
+    state.bulkMusicSearchResults.push(enriched);
+    found++;
+    renderBulkMusicSearchResults();
+    updateStatus('novas sugestões aparecem automaticamente');
+    if(found>=TARGET_SUGGESTIONS)stopped=true;
+  };
+
+  const drainQueue=async()=>{
+    while(!stopped&&token===state.bulkMusicSearchToken&&candidateQueue.length){
+      const batch=candidateQueue.splice(0,Math.min(WORKERS,candidateQueue.length));
+      await Promise.all(batch.map(candidate=>processOne(candidate)));
+    }
+  };
+
   const genreQueries=[
     {q:'música brasileira',label:'Música brasileira',style:'Música brasileira'},
     {q:'sertanejo',label:'Sertanejo',style:'Sertanejo'},
@@ -1293,66 +1427,68 @@ async function searchCatalogSuggestions(){
     {q:'música brasileira anos 2020',label:'Brasil anos 2020',style:'Brasil contemporâneo'}
   ];
   const artistQueries=[
-    ['Tim Maia','MPB / Soul'],['Jorge Ben Jor','MPB / Samba'],['Gilberto Gil','MPB'],['Caetano Veloso','MPB'],['Milton Nascimento','MPB'],['Djavan','MPB'],['Elis Regina','MPB'],['Gal Costa','MPB'],['Maria Bethânia','MPB'],['Chico Buarque','MPB'],['Ney Matogrosso','MPB / Pop'],['Alceu Valença','Regional / MPB'],['Zé Ramalho','Regional / MPB'],['Fagner','MPB / Regional'],['Luiz Gonzaga','Forró'],['Dominguinhos','Forró'],['Elba Ramalho','Forró'],['Geraldo Azevedo','MPB / Regional'],['Belchior','MPB'],['Raul Seixas','Rock'],['Legião Urbana','Rock'],['Titãs','Rock'],['Paralamas do Sucesso','Rock'],['Engenheiros do Hawaii','Rock'],['Cássia Eller','Rock / Pop'],['Skank','Rock / Pop'],['Jota Quest','Pop / Rock'],['Charlie Brown Jr.','Rock'],['O Rappa','Rock / Reggae'],['Rita Lee','Rock / Pop'],['Roberto Carlos','Pop / MPB'],['Erasmo Carlos','Rock / MPB'],['Jovem Guarda','Pop / Rock'],['Chitãozinho e Xororó','Sertanejo'],['Zezé Di Camargo & Luciano','Sertanejo'],['Bruno & Marrone','Sertanejo'],['Leonardo','Sertanejo'],['Daniel','Sertanejo'],['Gusttavo Lima','Sertanejo'],['Jorge & Mateus','Sertanejo'],['Henrique & Juliano','Sertanejo'],['Marília Mendonça','Sertanejo'],['Maiara & Maraisa','Sertanejo'],['Ana Castela','Sertanejo'],['Zé Neto & Cristiano','Sertanejo'],['Sorriso Maroto','Pagode'],['Exaltasamba','Pagode'],['Revelação','Pagode'],['Grupo Pixote','Pagode'],['Zeca Pagodinho','Samba / Pagode'],['Arlindo Cruz','Samba / Pagode'],['Beth Carvalho','Samba'],['Martinho da Vila','Samba'],['Jorge Aragão','Samba / Pagode'],['Alcione','Samba'],['Fundo de Quintal','Samba / Pagode'],['Ferrugem','Pagode'],['Dilsinho','Pagode'],['Thiaguinho','Pagode'],['Ivete Sangalo','Axé'],['Claudia Leitte','Axé / Pop'],['Daniela Mercury','Axé'],['Carlinhos Brown','Axé'],['Saulo Fernandes','Axé'],['Bell Marques','Axé'],['Calcinha Preta','Forró'],['Aviões do Forró','Forró'],['Wesley Safadão','Forró'],['Mastruz com Leite','Forró'],['Limão com Mel','Forró'],['Desejo de Menina','Forró'],['Gaby Amarantos','Tecnobrega'],['Pabllo Vittar','Pop / Eletrônica'],['Anitta','Pop / Funk'],['Ludmilla','Funk / Pop'],['MC Kevin o Chris','Funk'],['MC Hariel','Funk / Rap'],['Emicida','Rap'],['Racionais MC\'s','Rap'],['Criolo','Rap / MPB'],['Mano Brown','Rap'],['Planet Hemp','Rap / Rock'],['Natiruts','Reggae'],['Cidade Negra','Reggae'],['Maneva','Reggae / Pop'],['Capital Inicial','Rock'],['Nando Reis','Rock / MPB'],['Pitty','Rock'],['Cazuza','Rock / Pop'],['Barão Vermelho','Rock'],['Paralamas','Rock'],['Mamonas Assassinas','Rock'],['O Terno','Rock / Pop'],['Pitty','Rock'],['Liniker','MPB / Soul'],['Marisa Monte','MPB / Pop'],['Adriana Calcanhotto','MPB / Pop'],['Ana Carolina','MPB / Pop'],['Nando Reis','MPB / Rock'],['Seu Jorge','MPB / Samba'],['Seu Jorge','MPB / Samba'],['Natiruts','Reggae']
+    ['Tim Maia','MPB / Soul'],['Jorge Ben Jor','MPB / Samba'],['Gilberto Gil','MPB'],['Caetano Veloso','MPB'],['Milton Nascimento','MPB'],['Djavan','MPB'],['Elis Regina','MPB'],['Gal Costa','MPB'],['Maria Bethânia','MPB'],['Chico Buarque','MPB'],['Ney Matogrosso','MPB / Pop'],['Alceu Valença','Regional / MPB'],['Zé Ramalho','Regional / MPB'],['Fagner','MPB / Regional'],['Luiz Gonzaga','Forró'],['Dominguinhos','Forró'],['Elba Ramalho','Forró'],['Geraldo Azevedo','MPB / Regional'],['Belchior','MPB'],['Raul Seixas','Rock'],['Legião Urbana','Rock'],['Titãs','Rock'],['Paralamas do Sucesso','Rock'],['Engenheiros do Hawaii','Rock'],['Cássia Eller','Rock / Pop'],['Skank','Rock / Pop'],['Jota Quest','Pop / Rock'],['Charlie Brown Jr.','Rock'],['O Rappa','Rock / Reggae'],['Rita Lee','Rock / Pop'],['Roberto Carlos','Pop / MPB'],['Erasmo Carlos','Rock / MPB'],['Chitãozinho e Xororó','Sertanejo'],['Zezé Di Camargo & Luciano','Sertanejo'],['Bruno & Marrone','Sertanejo'],['Leonardo','Sertanejo'],['Daniel','Sertanejo'],['Gusttavo Lima','Sertanejo'],['Jorge & Mateus','Sertanejo'],['Henrique & Juliano','Sertanejo'],['Marília Mendonça','Sertanejo'],['Maiara & Maraisa','Sertanejo'],['Ana Castela','Sertanejo'],['Zé Neto & Cristiano','Sertanejo'],['Sorriso Maroto','Pagode'],['Exaltasamba','Pagode'],['Revelação','Pagode'],['Grupo Pixote','Pagode'],['Zeca Pagodinho','Samba / Pagode'],['Arlindo Cruz','Samba / Pagode'],['Beth Carvalho','Samba'],['Martinho da Vila','Samba'],['Jorge Aragão','Samba / Pagode'],['Alcione','Samba'],['Fundo de Quintal','Samba / Pagode'],['Ferrugem','Pagode'],['Dilsinho','Pagode'],['Thiaguinho','Pagode'],['Ivete Sangalo','Axé'],['Claudia Leitte','Axé / Pop'],['Daniela Mercury','Axé'],['Carlinhos Brown','Axé'],['Saulo Fernandes','Axé'],['Bell Marques','Axé'],['Calcinha Preta','Forró'],['Aviões do Forró','Forró'],['Wesley Safadão','Forró'],['Mastruz com Leite','Forró'],['Limão com Mel','Forró'],['Desejo de Menina','Forró'],['Gaby Amarantos','Tecnobrega'],['Pabllo Vittar','Pop / Eletrônica'],['Anitta','Pop / Funk'],['Ludmilla','Funk / Pop'],['MC Kevin o Chris','Funk'],['MC Hariel','Funk / Rap'],['Emicida','Rap'],['Racionais MC\'s','Rap'],['Criolo','Rap / MPB'],['Mano Brown','Rap'],['Planet Hemp','Rap / Rock'],['Natiruts','Reggae'],['Cidade Negra','Reggae'],['Maneva','Reggae / Pop'],['Capital Inicial','Rock'],['Nando Reis','Rock / MPB'],['Pitty','Rock'],['Cazuza','Rock / Pop'],['Barão Vermelho','Rock'],['Mamonas Assassinas','Rock'],['O Terno','Rock / Pop'],['Liniker','MPB / Soul'],['Marisa Monte','MPB / Pop'],['Adriana Calcanhotto','MPB / Pop'],['Ana Carolina','MPB / Pop'],['Seu Jorge','MPB / Samba'],['Zeca Pagodinho','Samba'],['Jovelina Pérola Negra','Samba'],['Clara Nunes','Samba'],['Paulinho da Viola','Samba'],['Cartola','Samba'],['Noel Rosa','Samba'],['Elis Regina','MPB'],['Iza','Pop / R&B'],['Gloria Groove','Pop / Rap'],['FBC','Rap'],['BK\'','Rap'],['Duda Beat','Pop / MPB'],['Péricles','Pagode'],['Mumuzinho','Pagode'],['Grupo Menos é Mais','Pagode'],['Luan Santana','Sertanejo'],['Jads & Jadson','Sertanejo'],['Edson & Hudson','Sertanejo'],['Rionegro & Solimões','Sertanejo'],['Chrystian & Ralf','Sertanejo'],['João Mineiro & Marciano','Sertanejo'],['Milionário & José Rico','Sertanejo'],['Bruno & Barreto','Sertanejo'],['Mano Walter','Forró'],['Xand Avião','Forró'],['Zé Vaqueiro','Forró'],['João Gomes','Forró / Piseiro'],['Mari Fernandez','Forró / Piseiro'],['Vitor Fernandes','Forró / Piseiro'],['Tarcísio do Acordeon','Forró / Piseiro'],['Nattan','Forró / Pop'],['Raça Negra','Pagode'],['Só Pra Contrariar','Pagode'],['Katinguelê','Pagode'],['Molejo','Pagode'],['Art Popular','Pagode'],['Jeito Moleque','Pagode'],['Os Paralamas do Sucesso','Rock'],['Nenhum de Nós','Rock'],['Ira!','Rock'],['Ultraje a Rigor','Rock'],['RPM','Rock'],['Kid Abelha','Pop / Rock'],['Blitz','Rock / Pop'],['Lulu Santos','Pop / Rock'],['Os Mutantes','Rock / MPB'],['Secos & Molhados','Rock'],['Engenheiros do Hawaii','Rock'],['Los Hermanos','Rock / MPB'],['Pato Fu','Rock / Pop'],['Detonautas','Rock'],['Nx Zero','Rock / Pop'],['Fresno','Rock'],['Jão','Pop'],['Melim','Pop / MPB'],['Vitor Kley','Pop'],['Léo Santana','Axé / Pagode'],['Parangolé','Axé'],['Banda Eva','Axé'],['Cheiro de Amor','Axé'],['Asa de Águia','Axé'],['Ara Ketu','Axé'],['Timbalada','Axé'],['Olodum','Axé'],['Babado Novo','Axé'],['Banda Calypso','Calypso'],['Calypso','Calypso'],['Fafá de Belém','MPB / Pop'],['Chico Science & Nação Zumbi','Manguebeat'],['Nação Zumbi','Manguebeat'],['Cordel do Fogo Encantado','Regional'],['Seu Pereira','Regional'],['Raimundos','Rock'],['Detonautas Roque Clube','Rock']
   ].map(([q,style])=>({q,label:q,style}));
+
   try{
-    let chart=null;
-    try{const r=await fetch('https://rss.applemarketingtools.com/api/v2/br/music/most-played/200/songs.json',{method:'GET',mode:'cors',cache:'no-store',headers:{Accept:'application/json'}});if(r.ok)chart=await r.json();}catch(_){chart=null;}
-    const groups=[...genreQueries,...artistQueries.map(x=>({q:x.q,label:`Artista: ${x.label}`,style:x.style}))];
-    const results=[];
-    for(let i=0;i<groups.length;i++){
-      if(token!==state.bulkMusicSearchToken){return;}
-      const group=groups[i];
-      try{
-        const data=await itunesSearchJsonp(group.q,200);
-        results.push({label:group.label,style:group.style,results:Array.isArray(data?.results)?data.results:[]});
-      }catch(_){results.push({label:group.label,style:group.style,results:[]});}
-      if(els.bulkMusicSearchStatus&&token===state.bulkMusicSearchToken)els.bulkMusicSearchStatus.textContent=`Descobrindo músicas brasileiras: ${i+1}/${groups.length} fontes consultadas...`;
-      await sleep(350);
-    }
-    if(token!==state.bulkMusicSearchToken)return;
-    const allCandidates=buildCatalogSuggestionCandidateMap(chart,results).filter(candidate=>{
-      const titleKey=normalizeSuggestionText(candidate.trackName),artistKey=normalizeSuggestionText(candidate.artistName);
-      // Exact same recording already present: never request its lyrics again.
-      return !catalogHasArtistTitle(catalogIndex,titleKey,artistKey);
-    });
-    const candidates=diversifyCatalogSuggestionCandidates(allCandidates);
-    let checked=0,excluded=0,found=0,missedLyrics=0;
-    const extraEntries=[];
-    const TARGET_SUGGESTIONS=200;
-    let nextCandidate=0;
-    const processCandidate=async()=>{
-      while(true){
-        if(token!==state.bulkMusicSearchToken)return;
-        if(found>=TARGET_SUGGESTIONS)return;
-        const idx=nextCandidate++;
-        if(idx>=candidates.length)return;
-        const candidate=candidates[idx];
-        checked++;
-        let lyrics='';
-        try{lyrics=await fetchLyricsForCatalogSuggestion(candidate);}catch(_){lyrics='';}
-        if(!lyrics){missedLyrics++;continue;}
-        const enriched={...candidate,lyrics,style:candidate.suggestionStyle,suggestionStyle:candidate.suggestionStyle||candidate.primaryGenreName||'Música brasileira'};
-        if(candidateMatchesCatalog(enriched,catalogIndex,extraEntries)){excluded++;continue;}
-        extraEntries.push({song:{title:enriched.trackName,artist:enriched.artistName,lyrics:enriched.lyrics},titleKey:normalizeSuggestionText(enriched.trackName),artistKey:normalizeSuggestionText(enriched.artistName),signature:buildLyricsSignature(enriched.lyrics)});
-        state.bulkMusicSearchResults.push(enriched);
-        found++;
-        renderBulkMusicSearchResults();
-        if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`Encontradas ${found}/${TARGET_SUGGESTIONS} sugestões válidas • ${excluded} excluídas por duplicidade/letra • ${missedLyrics} sem letra • ${checked}/${candidates.length} candidatas verificadas.`;
-        await sleep(300);
+    // Primeiro entram as faixas do ranking brasileiro, apenas como sinal de popularidade.
+    try{
+      const r=await fetch('https://rss.applemarketingtools.com/api/v2/br/music/most-played/200/songs.json',{method:'GET',mode:'cors',cache:'no-store',headers:{Accept:'application/json'}});
+      if(r.ok){
+        const chart=await r.json();
+        const chartItems=Array.isArray(chart?.feed?.results)?chart.feed.results:[];
+        chartItems.forEach((item,i)=>putCandidate({
+          trackName:item.name,
+          artistName:item.artistName,
+          collectionName:item.collectionName||item.albumName||'',
+          trackId:item.id,
+          trackViewUrl:item.url||''
+        },{chartRank:i+1}));
+        enqueueFromResults(chartItems.map(item=>({trackName:item.name,artistName:item.artistName,collectionName:item.collectionName||item.albumName||'',trackId:item.id,trackViewUrl:item.url||''})),{source:'Ranking Brasil',style:'Música brasileira'});
+        updateStatus('processando primeiro as populares');
+        await drainQueue();
       }
-    };
-    // Sequential lyrics lookup follows LRCLIB's documented batching guidance and avoids rate limiting.
-    await processCandidate();
+    }catch(_){
+      updateStatus('ampliando a descoberta por estilos');
+    }
+
+    if(found<TARGET_SUGGESTIONS){
+      const groups=[...genreQueries,...artistQueries.map(x=>({q:x.q,label:`Artista: ${x.label}`,style:x.style}))];
+      for(let i=0;i<groups.length&&!stopped;i++){
+        if(token!==state.bulkMusicSearchToken)return;
+        const group=groups[i];
+        let data=null;
+        try{
+          data=await itunesSearchJsonp(group.q,200);
+        }catch(_){
+          failedLookups++;
+          data={results:[]};
+        }
+        const items=Array.isArray(data?.results)?data.results:[];
+        items.forEach((item,idx)=>putCandidate(item,{source:group.label,style:group.style,rank:idx+1}));
+        enqueueFromResults(items,{source:group.label,style:group.style});
+        updateStatus(`${i+1}/${groups.length} fontes pesquisadas — mostrando resultados conforme encontrados`);
+        await drainQueue();
+        if(found>=TARGET_SUGGESTIONS){stopped=true;break;}
+        await sleep(250);
+      }
+    }
+
     if(token!==state.bulkMusicSearchToken)return;
-    if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=found>=TARGET_SUGGESTIONS
-      ? `✅ ${found}/${TARGET_SUGGESTIONS} sugestões válidas prontas para adicionar ao repertório. A pesquisa parou somente após fechar 200 resultados válidos.`
-      : `A busca percorreu todas as ${candidates.length} candidatas disponíveis nesta rodada e encontrou ${found}/${TARGET_SUGGESTIONS} sugestões válidas. ${checked} candidatas foram verificadas; ${excluded} foram excluídas por duplicidade/letra e ${missedLyrics} ficaram sem letra completa.`;
+    if(found>=TARGET_SUGGESTIONS){
+      if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`✅ ${found}/${TARGET_SUGGESTIONS} sugestões válidas encontradas. A busca foi encerrada somente depois de fechar 200 resultados válidos.`;
+    }else{
+      if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`A busca continua disponível para nova rodada: nesta rodada foram encontradas ${found}/${TARGET_SUGGESTIONS} sugestões válidas após consultar todas as fontes disponíveis. Os resultados apareceram progressivamente enquanto eram encontrados.`;
+    }
   }catch(error){
     if(token!==state.bulkMusicSearchToken)return;
     if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent='Não foi possível gerar as sugestões agora: '+(error?.message||'erro desconhecido')+'.';
   }finally{
-    if(token===state.bulkMusicSearchToken){state.bulkMusicSearchBusy=false;if(els.bulkMusicSearchBtn){els.bulkMusicSearchBtn.disabled=false;els.bulkMusicSearchBtn.textContent='✨ Gerar novas sugestões';}updateBulkMusicSelectionUI();}
+    if(token===state.bulkMusicSearchToken){
+      state.bulkMusicSearchBusy=false;
+      if(els.bulkMusicSearchBtn){els.bulkMusicSearchBtn.disabled=false;els.bulkMusicSearchBtn.textContent='✨ Gerar novas sugestões';}
+      updateBulkMusicSelectionUI();
+    }
   }
 }
 function toggleBulkMusicSelection(index,checked){
