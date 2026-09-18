@@ -1140,7 +1140,7 @@ function candidateMatchesCatalog(candidate,index,extraEntries=[]){
   return false;
 }
 function inferCatalogSuggestionStyle(item,sources){
-  const raw=normalize(item?.primaryGenreName||'').toLowerCase();
+  const raw=(normalize(item?.primaryGenreName||'')+' '+normalize((sources||[]).join(' '))).toLowerCase();
   const map=[
     [/sertanejo|country/,'Sertanejo'],[/pagode/,'Pagode'],[/samba/,'Samba'],[/forr[oó]|piseiro|xote|bai[aã]o/,'Forró'],[/funk/,'Funk'],[/rap|hip hop/,'Rap / Hip Hop'],[/trap/,'Trap'],[/ax[eé]/,'Axé'],[/arrocha/,'Arrocha'],[/brega|tecnobrega/,'Brega'],[/frevo|maracatu|coco|carimb[oó]/,'Folclore / Regional'],[/mpb|bossa nova/,'MPB'],[/rock/,'Rock'],[/pop/,'Pop'],[/gospel|christian/,'Gospel'],[/reggae/,'Reggae'],[/electronic|eletr[oô]nica|dance/,'Eletrônica'],[/r\&b|soul|blues|jazz/,'R&B / Soul / Jazz']
   ];
@@ -1211,25 +1211,100 @@ async function searchCatalogSuggestions(){
   if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent='Ampliando a descoberta por estilos, épocas e repertórios brasileiros...';
   const catalogIndex=buildCatalogSuggestionDuplicateIndex();
   const genreQueries=[
-    {q:'música brasileira',label:'Música brasileira',style:'Música brasileira'},
-    {q:'sertanejo brasileiro modão',label:'Sertanejo e modão',style:'Sertanejo'},
-    {q:'pagode samba brasileiro',label:'Pagode e samba',style:'Pagode / Samba'},
-    {q:'mpb bossa nova brasileira',label:'MPB e bossa nova',style:'MPB'},
-    {q:'forró piseiro xote brasileiro',label:'Forró e piseiro',style:'Forró'},
-    {q:'funk brasileiro',label:'Funk brasileiro',style:'Funk'},
-    {q:'rap hip hop trap brasileiro',label:'Rap, hip hop e trap',style:'Rap / Hip Hop / Trap'},
-    {q:'rock pop brasileiro rock nacional',label:'Rock e pop nacional',style:'Rock / Pop'},
-    {q:'axé arrocha brega brasileiro',label:'Axé, arrocha e brega',style:'Axé / Arrocha / Brega'},
-    {q:'gospel brasileiro',label:'Gospel brasileiro',style:'Gospel'},
-    {q:'reggae brasileiro',label:'Reggae brasileiro',style:'Reggae'},
-    {q:'frevo maracatu coco carimbó brasileiro',label:'Ritmos regionais',style:'Regional brasileiro'},
-    {q:'choro chorinho brasileiro',label:'Choro brasileiro',style:'Choro'},
-    {q:'música caipira moda de viola brasileira',label:'Caipira e viola',style:'Caipira / Sertanejo'},
-    {q:'músicas brasileiras antigas clássicos',label:'Clássicos brasileiros',style:'Clássicos brasileiros'},
-    {q:'música brasileira anos 1960 1970',label:'Brasil anos 1960–1970',style:'Décadas / Brasil'},
-    {q:'música brasileira anos 1980 1990',label:'Brasil anos 1980–1990',style:'Décadas / Brasil'},
-    {q:'música brasileira anos 2000 2010',label:'Brasil anos 2000–2010',style:'Décadas / Brasil'},
-    {q:'música brasileira anos 2020 atuais',label:'Brasil anos 2020',style:'Brasil contemporâneo'}
+    {q:'Anitta',label:'Pop / Funk',style:'Pop / Funk'},
+    {q:'Ludmilla',label:'Pop / Funk',style:'Pop / Funk'},
+    {q:'Pabllo Vittar',label:'Pop / Dance',style:'Pop / Dance'},
+    {q:'Jão',label:'Pop brasileiro',style:'Pop'},
+    {q:'Gustavo Mioto',label:'Sertanejo',style:'Sertanejo'},
+    {q:'Ana Castela',label:'Sertanejo',style:'Sertanejo'},
+    {q:'Jorge e Mateus',label:'Sertanejo',style:'Sertanejo'},
+    {q:'Henrique e Juliano',label:'Sertanejo',style:'Sertanejo'},
+    {q:'Zé Neto e Cristiano',label:'Sertanejo',style:'Sertanejo'},
+    {q:'Maiara e Maraisa',label:'Sertanejo',style:'Sertanejo'},
+    {q:'Marília Mendonça',label:'Sertanejo',style:'Sertanejo'},
+    {q:'Luan Santana',label:'Sertanejo / Pop',style:'Sertanejo / Pop'},
+    {q:'Gusttavo Lima',label:'Sertanejo',style:'Sertanejo'},
+    {q:'Zezé Di Camargo e Luciano',label:'Sertanejo / Modão',style:'Sertanejo / Modão'},
+    {q:'Chitãozinho e Xororó',label:'Sertanejo / Modão',style:'Sertanejo / Modão'},
+    {q:'Bruno e Marrone',label:'Sertanejo / Modão',style:'Sertanejo / Modão'},
+    {q:'Leonardo',label:'Sertanejo / Modão',style:'Sertanejo / Modão'},
+    {q:'Daniel',label:'Sertanejo / Modão',style:'Sertanejo / Modão'},
+    {q:'Amado Batista',label:'Brega / Romântico',style:'Brega / Romântico'},
+    {q:'Eduardo Costa',label:'Sertanejo',style:'Sertanejo'},
+    {q:'Wesley Safadão',label:'Forró',style:'Forró'},
+    {q:'Xand Avião',label:'Forró / Piseiro',style:'Forró / Piseiro'},
+    {q:'Zé Vaqueiro',label:'Forró / Piseiro',style:'Forró / Piseiro'},
+    {q:'Mastruz com Leite',label:'Forró',style:'Forró'},
+    {q:'Calcinha Preta',label:'Forró',style:'Forró'},
+    {q:'Limão com Mel',label:'Forró',style:'Forró'},
+    {q:'Falamansa',label:'Forró',style:'Forró'},
+    {q:'Aviões do Forró',label:'Forró',style:'Forró'},
+    {q:'Ivete Sangalo',label:'Axé',style:'Axé'},
+    {q:'Claudia Leitte',label:'Axé / Pop',style:'Axé / Pop'},
+    {q:'Bell Marques',label:'Axé',style:'Axé'},
+    {q:'Saulo Fernandes',label:'Axé',style:'Axé'},
+    {q:'Banda Eva',label:'Axé',style:'Axé'},
+    {q:'Cheiro de Amor',label:'Axé',style:'Axé'},
+    {q:'É o Tchan',label:'Pagode baiano / Axé',style:'Pagode baiano / Axé'},
+    {q:'Sorriso Maroto',label:'Pagode',style:'Pagode'},
+    {q:'Thiaguinho',label:'Pagode',style:'Pagode'},
+    {q:'Péricles',label:'Pagode',style:'Pagode'},
+    {q:'Ferrugem',label:'Pagode',style:'Pagode'},
+    {q:'Dilsinho',label:'Pagode',style:'Pagode'},
+    {q:'Grupo Revelação',label:'Samba / Pagode',style:'Samba / Pagode'},
+    {q:'Exaltasamba',label:'Pagode',style:'Pagode'},
+    {q:'Pixote',label:'Pagode',style:'Pagode'},
+    {q:'Zeca Pagodinho',label:'Samba / Pagode',style:'Samba / Pagode'},
+    {q:'Arlindo Cruz',label:'Samba / Pagode',style:'Samba / Pagode'},
+    {q:'Jorge Aragão',label:'Samba / Pagode',style:'Samba / Pagode'},
+    {q:'Martinho da Vila',label:'Samba',style:'Samba'},
+    {q:'Alcione',label:'Samba',style:'Samba'},
+    {q:'Beth Carvalho',label:'Samba',style:'Samba'},
+    {q:'Djavan',label:'MPB',style:'MPB'},
+    {q:'Ana Carolina',label:'MPB / Pop',style:'MPB / Pop'},
+    {q:'Maria Gadú',label:'MPB',style:'MPB'},
+    {q:'Marisa Monte',label:'MPB',style:'MPB'},
+    {q:'Adriana Calcanhotto',label:'MPB',style:'MPB'},
+    {q:'Nando Reis',label:'MPB / Rock',style:'MPB / Rock'},
+    {q:'Seu Jorge',label:'MPB / Samba',style:'MPB / Samba'},
+    {q:'Jorge Ben Jor',label:'MPB / Samba / Soul',style:'MPB / Samba / Soul'},
+    {q:'Tim Maia',label:'Soul / MPB',style:'Soul / MPB'},
+    {q:'Caetano Veloso',label:'MPB',style:'MPB'},
+    {q:'Gilberto Gil',label:'MPB',style:'MPB'},
+    {q:'Chico Buarque',label:'MPB',style:'MPB'},
+    {q:'Milton Nascimento',label:'MPB',style:'MPB'},
+    {q:'Elis Regina',label:'MPB',style:'MPB'},
+    {q:'Gal Costa',label:'MPB',style:'MPB'},
+    {q:'João Gilberto',label:'Bossa Nova / MPB',style:'Bossa Nova / MPB'},
+    {q:'Tom Jobim',label:'Bossa Nova / MPB',style:'Bossa Nova / MPB'},
+    {q:'Legião Urbana',label:'Rock nacional',style:'Rock Nacional'},
+    {q:'Titãs',label:'Rock nacional',style:'Rock Nacional'},
+    {q:'Paralamas do Sucesso',label:'Rock nacional',style:'Rock Nacional'},
+    {q:'Skank',label:'Rock nacional',style:'Rock Nacional'},
+    {q:'Capital Inicial',label:'Rock nacional',style:'Rock Nacional'},
+    {q:'Engenheiros do Hawaii',label:'Rock nacional',style:'Rock Nacional'},
+    {q:'Charlie Brown Jr.',label:'Rock nacional',style:'Rock Nacional'},
+    {q:'O Rappa',label:'Rock / Reggae',style:'Rock / Reggae'},
+    {q:'Raimundos',label:'Rock nacional',style:'Rock Nacional'},
+    {q:'Racionais MCs',label:'Rap nacional',style:'Rap Nacional'},
+    {q:'Emicida',label:'Rap nacional',style:'Rap Nacional'},
+    {q:'Criolo',label:'Rap / MPB',style:'Rap / MPB'},
+    {q:'Matuê',label:'Trap nacional',style:'Trap Nacional'},
+    {q:'Hungria Hip Hop',label:'Rap / Hip Hop',style:'Rap / Hip Hop'},
+    {q:'Projota',label:'Rap nacional',style:'Rap Nacional'},
+    {q:'Pitty',label:'Rock nacional',style:'Rock Nacional'},
+    {q:'Natiruts',label:'Reggae nacional',style:'Reggae Nacional'},
+    {q:'Cidade Negra',label:'Reggae nacional',style:'Reggae Nacional'},
+    {q:'Alceu Valença',label:'Regional / MPB',style:'Regional / MPB'},
+    {q:'Elba Ramalho',label:'Forró / MPB',style:'Forró / MPB'},
+    {q:'Luiz Gonzaga',label:'Forró / Baião',style:'Forró / Baião'},
+    {q:'Dominguinhos',label:'Forró / Baião',style:'Forró / Baião'},
+    {q:'Fagner',label:'MPB / Regional',style:'MPB / Regional'},
+    {q:'Reginaldo Rossi',label:'Brega',style:'Brega'},
+    {q:'Waldick Soriano',label:'Brega',style:'Brega'},
+    {q:'Pablo',label:'Arrocha',style:'Arrocha'},
+    {q:'Tayrone',label:'Arrocha',style:'Arrocha'},
+    {q:'Pablo Vittar',label:'Pop / Dance',style:'Pop / Dance'}
   ];  try{
     let chart=null;
     try{
@@ -1238,7 +1313,7 @@ async function searchCatalogSuggestions(){
     }catch(_){chart=null;}
     const genreResults=[];
     let completedSources=0;
-    const sourceConcurrency=3;
+    const sourceConcurrency=2;
     let nextSource=0;
     const sourceWorker=async()=>{
       while(true){
@@ -1254,12 +1329,17 @@ async function searchCatalogSuggestions(){
     };
     await Promise.all(Array.from({length:sourceConcurrency},()=>sourceWorker()));
     if(token!==state.bulkMusicSearchToken||controller.signal.aborted)return;
-    const allCandidates=buildCatalogSuggestionCandidateMap(chart,genreResults).filter(candidate=>{if(!candidate.sourceStyles.length&&candidate.chartRank==null)return false;const titleKey=normalizeSuggestionText(candidate.trackName),artistKey=normalizeSuggestionText(candidate.artistName);return !catalogHasArtistTitle(catalogIndex,titleKey,artistKey);});
+    const rawCandidates=buildCatalogSuggestionCandidateMap(chart,genreResults);
+    const allCandidates=rawCandidates.filter(candidate=>{if(!candidate.sourceStyles.length&&candidate.chartRank==null)return false;const titleKey=normalizeSuggestionText(candidate.trackName),artistKey=normalizeSuggestionText(candidate.artistName);return !catalogHasArtistTitle(catalogIndex,titleKey,artistKey);});
     const candidates=diversifyCatalogSuggestionCandidates(allCandidates);
+    if(!candidates.length){
+      if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent='A descoberta não recebeu faixas das fontes consultadas nesta rodada. Vou tentar novamente por artistas brasileiros, sem alterar seu catálogo.';
+      throw new Error('As fontes de descoberta não retornaram candidatas nesta rodada');
+    }
     let checked=0,excluded=0,found=0,missedLyrics=0;
     const extraEntries=[];
     const TARGET_SUGGESTIONS=300;
-    const MAX_CANDIDATES_TO_CHECK=Math.min(candidates.length,6000);
+    const MAX_CANDIDATES_TO_CHECK=Math.min(candidates.length,12000);
     const lyricConcurrency=6;
     let nextCandidate=0;
     const processCandidate=async()=>{
