@@ -1021,28 +1021,82 @@ function askDeleteOrphanCatalogPdfs(){
 }
 async function generateMissingCatalogPdfs(){
   if(state.pdfBatchBusy)return;
-  try{if(!state.pdfIntegrityChecked)await fetchPdfIntegrityStatus({silent:true});}catch(error){updatePdfPanelStatus('❌ '+(error?.message||'Não foi possível verificar os PDFs antes da geração.'),'error');showToast('Não foi possível verificar os PDFs atuais.','error');return;}
-  const missing=state.songs.filter(song=>!songHasValidPdf(song)&&!!normalize(song.lyrics||song.letra));
+  try{
+    // Sempre atualiza a integridade antes de montar a fila. Assim,
+    // somente músicas que realmente não possuem PDF físico válido entram nela.
+    await fetchPdfIntegrityStatus({silent:true});
+  }catch(error){
+    updatePdfPanelStatus('❌ '+(error?.message||'Não foi possível verificar os PDFs antes da geração.'),'error');
+    showToast('Não foi possível verificar os PDFs atuais.','error');
+    return;
+  }
+
+  // A fila é criada uma única vez. A execução abaixo usa um FOR normal
+  // com await: o próximo PDF NÃO começa enquanto o anterior não terminar.
+  const missing=Array.from(new Map(
+    state.songs
+      .filter(song=>!songHasValidPdf(song)&&!!normalize(song.lyrics||song.letra))
+      .map(song=>[String(song.id),song])
+  ).values());
   const withoutLyrics=state.songs.filter(song=>!songHasValidPdf(song)&&!normalize(song.lyrics||song.letra)).length;
-  if(!missing.length){setPdfBatchProgress(`✅ Nenhuma música com letra e sem PDF válido foi encontrada.${withoutLyrics?` ${withoutLyrics} estão sem letra e não podem ser geradas automaticamente.`:''}`);updatePdfPanelStatus('✅ Nenhum PDF pendente para gerar.','success');renderPdfPanel();return;}
+
+  if(!missing.length){
+    setPdfBatchProgress(`✅ Nenhuma música com letra e sem PDF válido foi encontrada.${withoutLyrics?` ${withoutLyrics} estão sem letra e não podem ser geradas automaticamente.`:''}`);
+    updatePdfPanelStatus('✅ Nenhum PDF pendente para gerar.','success');
+    renderPdfPanel();
+    return;
+  }
+
   els.confirmTitle.textContent='Gerar PDFs pendentes';
-  els.confirmBody.innerHTML=`<div class="confirm-text">Foram encontradas <strong>${missing.length} música${missing.length===1?'':'s'}</strong> no catálogo sem PDF físico válido e com letra cadastrada.<br><br>Uma referência quebrada também será considerada pendente e receberá um novo PDF. As músicas que já possuem PDF físico válido não serão alteradas.${withoutLyrics?`<br><br>${withoutLyrics} música${withoutLyrics===1?'':'s'} sem letra serão ignoradas.`:''}<br><br>Deseja gerar os PDFs agora?</div>`;
+  els.confirmBody.innerHTML=`<div class="confirm-text">Foram encontradas <strong>${missing.length} música${missing.length===1?'':'s'}</strong> no catálogo sem PDF físico válido e com letra cadastrada.<br><br>Uma referência quebrada também será considerada pendente e receberá um novo PDF. As músicas que já possuem PDF físico válido não serão alteradas.${withoutLyrics?`<br><br>${withoutLyrics} música${withoutLyrics===1?'':'s'} sem letra serão ignoradas.`:''}<br><br><strong>A geração será feita uma música por vez.</strong> O próximo PDF só começará depois que o anterior terminar de ser gerado e salvo.<br><br>Deseja gerar os PDFs agora?</div>`;
   els.confirmBtn.textContent='Sim, gerar PDFs pendentes';
+
   state.confirmAction=async()=>{
-    closeConfirm();state.pdfBatchBusy=true;let ok=0,fail=0;
+    closeConfirm();
+    state.pdfBatchBusy=true;
+    let ok=0,fail=0;
     if(els.generateMissingPdfsBtn)els.generateMissingPdfsBtn.disabled=true;
     try{
       for(let i=0;i<missing.length;i++){
-        const song=state.songs.find(x=>String(x.id)===String(missing[i].id));if(!song)continue;
-        setPdfBatchProgress(`<strong>Gerando PDFs:</strong> ${i+1}/${missing.length}<br>${escapeHtml(song.title)} — ${escapeHtml(song.artist||'Sem artista')}`);
-        const done=await generatePdfForCatalogSong(song.id,{silent:true});if(done)ok++;else fail++;
-        renderPdfPanel();setPdfBatchProgress(`<strong>Gerando PDFs:</strong> ${i+1}/${missing.length}<br>✅ ${ok} concluído${ok===1?'':'s'} · ❌ ${fail} falha${fail===1?'':'s'} · ${missing.length-i-1} restante${missing.length-i-1===1?'':'s'}`);
+        const song=state.songs.find(x=>String(x.id)===String(missing[i].id));
+        if(!song)continue;
+
+        // Não inicia o item seguinte antes de TODA a promessa desta música
+        // terminar. Cada tentativa também espera a anterior terminar.
+        setPdfBatchProgress(`<strong>Gerando PDF ${i+1}/${missing.length}</strong><br>⏳ ${escapeHtml(song.title)} — ${escapeHtml(song.artist||'Sem artista')}<br><span>Gerando e salvando este PDF…</span>`);
+        updatePdfPanelStatus(`⏳ Processando ${i+1}/${missing.length}: ${song.title}`,'warn');
+
+        let done=false;
+        for(let tentativa=1;tentativa<=2&&!done;tentativa++){
+          done=await generatePdfForCatalogSong(song.id,{silent:true});
+          if(!done&&tentativa<2){
+            setPdfBatchProgress(`<strong>Gerando PDF ${i+1}/${missing.length}</strong><br>⚠️ Falha na primeira tentativa de ${escapeHtml(song.title)}.<br>🔄 Tentando novamente antes de passar para a próxima…`);
+            await sleep(800);
+          }
+        }
+
+        if(done)ok++;else fail++;
+
+        // Somente depois que a geração/salvamento desta música terminou
+        // atualizamos a interface e liberamos a próxima da fila.
+        renderPdfPanel();
+        setPdfBatchProgress(`<strong>Gerando PDFs:</strong> ${i+1}/${missing.length}<br>✅ ${ok} concluído${ok===1?'':'s'} · ❌ ${fail} falha${fail===1?'':'s'} · ${missing.length-i-1} restante${missing.length-i-1===1?'':'s'}`);
+        await sleep(250);
       }
-      resetPdfIntegrity();await fetchPdfIntegrityStatus({silent:true});
+
+      resetPdfIntegrity();
+      await fetchPdfIntegrityStatus({silent:true});
       setPdfBatchProgress(`<strong>Processo concluído:</strong> ✅ ${ok} PDF${ok===1?'':'s'} gerado${ok===1?'':'s'}${fail?` · ❌ ${fail} falha${fail===1?'':'s'}`:''}.${withoutLyrics?` ${withoutLyrics} sem letra.`:''}`);
-      updatePdfPanelStatus(`✅ ${ok} PDFs gerados${fail?` e ${fail} falharam`:''}.`,'success');showToast(`Geração concluída: ${ok} PDF${ok===1?'':'s'} gerado${ok===1?'':'s'}.`,'success');
-    }catch(error){updatePdfPanelStatus('❌ '+(error?.message||'A geração dos PDFs encontrou um erro.'),'error');showToast('A geração dos PDFs encontrou um erro.','error');}
-    finally{state.pdfBatchBusy=false;if(els.generateMissingPdfsBtn)els.generateMissingPdfsBtn.disabled=false;renderPdfPanel();}
+      updatePdfPanelStatus(`✅ ${ok} PDFs gerados${fail?` e ${fail} falharam`:''}.`,'success');
+      showToast(`Geração concluída: ${ok} PDF${ok===1?'':'s'} gerado${ok===1?'':'s'}.`,'success');
+    }catch(error){
+      updatePdfPanelStatus('❌ '+(error?.message||'A geração dos PDFs encontrou um erro.'),'error');
+      showToast('A geração dos PDFs encontrou um erro.','error');
+    }finally{
+      state.pdfBatchBusy=false;
+      if(els.generateMissingPdfsBtn)els.generateMissingPdfsBtn.disabled=false;
+      renderPdfPanel();
+    }
   };
   els.confirmModal.classList.add('active');
 }
