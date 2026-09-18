@@ -1991,7 +1991,7 @@ async function generatePdfForCatalogSong(songId,options={}){
     const pdfDataUrl=await fileToDataUrl(generated);
     for(let attempt=1;attempt<=attempts;attempt++){
       try{
-        const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveSongPdf',songId:song.id,title:song.title,artist:song.artist,pdfData:pdfDataUrl,pdfFileName:generated.name})},120000);
+        const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveSongPdf',songId:song.id,id:song.id,title:song.title,musica:song.title,artist:song.artist,artista:song.artist,lyrics:lyrics,letra:lyrics,pdfData:pdfDataUrl,pdfFileName:generated.name})},120000);
         if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível salvar o PDF.');
         song.pdfUrl=data.pdfUrl||'';
         song.pdfFileName=data.pdfFileName||generated.name;
