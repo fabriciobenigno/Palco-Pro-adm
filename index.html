@@ -636,7 +636,7 @@ const PDF_LIB_URL='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.
 const CATALOG_KEY='palco-pro-admin-catalog-v4';
 const SESSION_KEY='palco-pro-admin-session-v4';
 const $=id=>document.getElementById(id);
-const state={songs:[],editingId:null,filter:'all',confirmAction:null,lastFileName:'',selectedIds:new Set(),catalogHandle:null,received:[],receivedSelected:new Set(),receivedEditingIndex:null,musicSearchResults:[],musicSearchController:null,musicSearchTimer:null,musicSearchToken:0,bulkMusicSearchResults:[],bulkMusicSearchController:null,bulkMusicSearchToken:0,bulkMusicSelected:new Set(),bulkMusicSearchBusy:false,pdfProcessing:false,pdfBatchBusy:false,pdfIntegrityChecked:false,pdfValidSongIds:new Set(),pdfMissingSongIds:new Set(),pdfBrokenSongIds:new Set(),pdfStatusById:new Map(),pdfOrphanPaths:[],pdfValidPaths:new Set(),pdfDoc:null,pdfPage:1,pdfPageCount:0,pdfRenderToken:0,pdfUrl:'',pdfSwipeStartX:0,pdfSwipeStartY:0,pdfSwipeTracking:false,pdfNativeFrame:false,localPdfPreviewSongId:'',localPdfPreviewDataUrl:'',autoPdfGenerating:false};
+const state={songs:[],editingId:null,filter:'all',confirmAction:null,lastFileName:'',selectedIds:new Set(),catalogHandle:null,received:[],receivedSelected:new Set(),receivedEditingIndex:null,musicSearchResults:[],musicSearchController:null,musicSearchTimer:null,musicSearchToken:0,bulkMusicSearchResults:[],bulkMusicSearchController:null,bulkMusicSearchToken:0,bulkMusicSelected:new Set(),bulkMusicSearchBusy:false,pdfProcessing:false,pdfBatchBusy:false,pdfBatchJob:null,pdfBatchStartedAt:'',pdfIntegrityChecked:false,pdfValidSongIds:new Set(),pdfMissingSongIds:new Set(),pdfBrokenSongIds:new Set(),pdfStatusById:new Map(),pdfOrphanPaths:[],pdfValidPaths:new Set(),pdfDoc:null,pdfPage:1,pdfPageCount:0,pdfRenderToken:0,pdfUrl:'',pdfSwipeStartX:0,pdfSwipeStartY:0,pdfSwipeTracking:false,pdfNativeFrame:false,localPdfPreviewSongId:'',localPdfPreviewDataUrl:'',autoPdfGenerating:false};
 const els={
  authCard:$('authCard'),adminPanel:$('adminPanel'),loginInput:$('loginInput'),passwordInput:$('passwordInput'),showPassword:$('showPasswordToggle'),loginBtn:$('loginBtn'),authStatus:$('authStatus'),logoutBtn:$('logoutBtn'),refreshIndexBtn:$('refreshIndexBtn'), refreshCatalog:$('refreshCatalogBtn'),missingPdfProgress:$('missingPdfProgress'),pdfCatalogCounter:$('pdfCatalogCounter'),pdfStatTotal:$('pdfStatTotal'),pdfStatMissing:$('pdfStatMissing'),pdfStatBroken:$('pdfStatBroken'),pdfStatEligible:$('pdfStatEligible'),pdfPanelStatus:$('pdfPanelStatus'),pdfCatalogList:$('pdfCatalogList'),pdfMissingSongsList:$('pdfMissingSongsList'),pdfMissingCounter:$('pdfMissingCounter'),pdfLinkedCounter:$('pdfLinkedCounter'),refreshPdfPanelBtn:$('refreshPdfPanelBtn'),generateMissingPdfsBtn:$('generateMissingPdfsBtn'),deleteOrphanCatalogPdfsBtn:$('deleteOrphanCatalogPdfsBtn'),
  songTitle:$('songTitle'),songArtist:$('songArtist'),songStyle:$('songStyle'),musicSearchQuery:$('musicSearchQuery'),searchMusicBtn:$('searchMusicBtn'),openBulkMusicSearchBtn:$('openBulkMusicSearchBtn'),closeBulkMusicSearchBtn:$('closeBulkMusicSearchBtn'),bulkMusicSearchPanel:$('bulkMusicSearchPanel'),bulkMusicSearchBtn:$('bulkMusicSearchBtn'),bulkMusicSearchStatus:$('bulkMusicSearchStatus'),bulkMusicSelectionActions:$('bulkMusicSelectionActions'),bulkMusicSelectionCount:$('bulkMusicSelectionCount'),selectAllBulkMusicBtn:$('selectAllBulkMusicBtn'),clearBulkMusicSelectionBtn:$('clearBulkMusicSelectionBtn'),addSelectedBulkMusicBtn:$('addSelectedBulkMusicBtn'),bulkMusicSearchResults:$('bulkMusicSearchResults'),musicSearchStatus:$('musicSearchStatus'),musicSearchResults:$('musicSearchResults'),musicSearchSelected:$('musicSearchSelected'),songNote:$('songNote'),songLyrics:$('songLyrics'),selectSongPdfBtn:$('selectSongPdfBtn'),songPdfStatus:$('songPdfStatus'),viewSongPdfBtn:$('viewSongPdfBtn'),formTitle:$('formTitle'),formSubtitle:$('formSubtitle'),editingBadge:$('editingBadge'),saveSong:$('saveSongBtn'),cancelEdit:$('cancelEditBtn'),formStatus:$('formStatus'),
@@ -993,6 +993,27 @@ function renderPdfPanel(){
     els.pdfCatalogList.appendChild(row);
   }
 }
+const PDF_BATCH_STORAGE_KEY='palco-pro-pdf-batch-v2';
+function savePdfBatchJob(job){
+  state.pdfBatchJob=job||null;
+  try{
+    if(job)localStorage.setItem(PDF_BATCH_STORAGE_KEY,JSON.stringify(job));
+    else localStorage.removeItem(PDF_BATCH_STORAGE_KEY);
+  }catch(_){ }
+}
+function loadPdfBatchJob(){
+  try{
+    const raw=localStorage.getItem(PDF_BATCH_STORAGE_KEY);
+    if(!raw)return null;
+    const job=JSON.parse(raw);
+    if(!job||!Array.isArray(job.pendingIds)||!Array.isArray(job.failedIds))return null;
+    state.pdfBatchJob=job;
+    return job;
+  }catch(_){return null}
+}
+function clearPdfBatchJob(){savePdfBatchJob(null);state.pdfBatchStartedAt='';}
+function uniqueIds(values){return [...new Set((Array.isArray(values)?values:[]).map(v=>String(v)).filter(Boolean))]}
+
 function setPdfBatchProgress(message,visible=true){if(!els.missingPdfProgress)return;els.missingPdfProgress.classList.toggle('hidden',!visible);els.missingPdfProgress.innerHTML=visible?message:'';}
 function updatePdfPanelStatus(message,type=''){if(!els.pdfPanelStatus)return;els.pdfPanelStatus.textContent=message||'';els.pdfPanelStatus.className=`status-line ${type?'status-'+type:''}`;}
 function askDeleteOrphanCatalogPdfs(){
@@ -1022,76 +1043,116 @@ function askDeleteOrphanCatalogPdfs(){
 async function generateMissingCatalogPdfs(){
   if(state.pdfBatchBusy)return;
   try{
-    // Sempre atualiza a integridade antes de montar a fila. Assim,
-    // somente músicas que realmente não possuem PDF físico válido entram nela.
-    await fetchPdfIntegrityStatus({silent:true});
+    if(!state.pdfIntegrityChecked)await fetchPdfIntegrityStatus({silent:true});
   }catch(error){
     updatePdfPanelStatus('❌ '+(error?.message||'Não foi possível verificar os PDFs antes da geração.'),'error');
     showToast('Não foi possível verificar os PDFs atuais.','error');
     return;
   }
 
-  // A fila é criada uma única vez. A execução abaixo usa um FOR normal
-  // com await: o próximo PDF NÃO começa enquanto o anterior não terminar.
-  const missing=Array.from(new Map(
-    state.songs
-      .filter(song=>!songHasValidPdf(song)&&!!normalize(song.lyrics||song.letra))
-      .map(song=>[String(song.id),song])
-  ).values());
+  const missingNow=state.songs.filter(song=>!songHasValidPdf(song)&&!!normalize(song.lyrics||song.letra));
   const withoutLyrics=state.songs.filter(song=>!songHasValidPdf(song)&&!normalize(song.lyrics||song.letra)).length;
+  const existingJob=loadPdfBatchJob();
+  const existingPending=new Set(uniqueIds([...(existingJob?.pendingIds||[]), ...(existingJob?.currentId?[existingJob.currentId]:[])]));
+  const hasResumableJob=!!existingJob && (existingPending.size>0 || (existingJob.failedIds||[]).length>0);
 
-  if(!missing.length){
+  let initialIds;
+  if(hasResumableJob){
+    const currentAndPending=uniqueIds([existingJob.currentId||'',...(existingJob.pendingIds||[]),...(existingJob.failedIds||[])]);
+    const stillMissing=new Map(missingNow.map(song=>[String(song.id),song]));
+    initialIds=currentAndPending.filter(id=>stillMissing.has(id));
+    // Inclui qualquer nova pendência que tenha surgido desde a interrupção.
+    for(const song of missingNow){if(!initialIds.includes(String(song.id)))initialIds.push(String(song.id));}
+  }else{
+    initialIds=missingNow.map(song=>String(song.id));
+  }
+
+  if(!initialIds.length){
+    clearPdfBatchJob();
     setPdfBatchProgress(`✅ Nenhuma música com letra e sem PDF válido foi encontrada.${withoutLyrics?` ${withoutLyrics} estão sem letra e não podem ser geradas automaticamente.`:''}`);
     updatePdfPanelStatus('✅ Nenhum PDF pendente para gerar.','success');
     renderPdfPanel();
     return;
   }
 
-  els.confirmTitle.textContent='Gerar PDFs pendentes';
-  els.confirmBody.innerHTML=`<div class="confirm-text">Foram encontradas <strong>${missing.length} música${missing.length===1?'':'s'}</strong> no catálogo sem PDF físico válido e com letra cadastrada.<br><br>Uma referência quebrada também será considerada pendente e receberá um novo PDF. As músicas que já possuem PDF físico válido não serão alteradas.${withoutLyrics?`<br><br>${withoutLyrics} música${withoutLyrics===1?'':'s'} sem letra serão ignoradas.`:''}<br><br><strong>A geração será feita uma música por vez.</strong> O próximo PDF só começará depois que o anterior terminar de ser gerado e salvo.<br><br>Deseja gerar os PDFs agora?</div>`;
-  els.confirmBtn.textContent='Sim, gerar PDFs pendentes';
-
+  els.confirmTitle.textContent=hasResumableJob?'Continuar geração de PDFs':'Gerar PDFs pendentes';
+  els.confirmBody.innerHTML=`<div class="confirm-text">${hasResumableJob?'Existe uma geração de PDFs que foi interrompida. O processo continuará a partir das músicas ainda pendentes, mantendo a regra de <strong>uma música por vez</strong>.':'Foram encontradas <strong>'+initialIds.length+' músicas</strong> no catálogo sem PDF físico válido e com letra cadastrada.'}<br><br>O sistema vai gerar, salvar e confirmar cada PDF antes de iniciar o próximo. Músicas que já possuem PDF físico válido não serão alteradas.${withoutLyrics?`<br><br>${withoutLyrics} música${withoutLyrics===1?'':'s'} sem letra serão ignoradas.`:''}<br><br>Deseja iniciar/continuar?</div>`;
+  els.confirmBtn.textContent=hasResumableJob?'Sim, continuar':'Sim, gerar PDFs pendentes';
   state.confirmAction=async()=>{
     closeConfirm();
     state.pdfBatchBusy=true;
-    let ok=0,fail=0;
+    state.pdfBatchStartedAt=existingJob?.startedAt||new Date().toISOString();
+    const job={
+      version:2,
+      startedAt:state.pdfBatchStartedAt,
+      total:initialIds.length,
+      currentId:'',
+      pendingIds:uniqueIds(initialIds),
+      failedIds:uniqueIds(existingJob?.failedIds||[]).filter(id=>initialIds.includes(id)),
+      completedIds:[]
+    };
+    savePdfBatchJob(job);
     if(els.generateMissingPdfsBtn)els.generateMissingPdfsBtn.disabled=true;
+    let ok=0,fail=0;
+    const totalAtStart=job.pendingIds.length;
+
     try{
-      for(let i=0;i<missing.length;i++){
-        const song=state.songs.find(x=>String(x.id)===String(missing[i].id));
+      while(job.pendingIds.length){
+        const songId=String(job.pendingIds[0]);
+        job.currentId=songId;
+        job.pendingIds.shift();
+        savePdfBatchJob(job);
+
+        const song=state.songs.find(x=>String(x.id)===songId);
         if(!song)continue;
 
-        // Não inicia o item seguinte antes de TODA a promessa desta música
-        // terminar. Cada tentativa também espera a anterior terminar.
-        setPdfBatchProgress(`<strong>Gerando PDF ${i+1}/${missing.length}</strong><br>⏳ ${escapeHtml(song.title)} — ${escapeHtml(song.artist||'Sem artista')}<br><span>Gerando e salvando este PDF…</span>`);
-        updatePdfPanelStatus(`⏳ Processando ${i+1}/${missing.length}: ${song.title}`,'warn');
-
-        let done=false;
-        for(let tentativa=1;tentativa<=2&&!done;tentativa++){
-          done=await generatePdfForCatalogSong(song.id,{silent:true});
-          if(!done&&tentativa<2){
-            setPdfBatchProgress(`<strong>Gerando PDF ${i+1}/${missing.length}</strong><br>⚠️ Falha na primeira tentativa de ${escapeHtml(song.title)}.<br>🔄 Tentando novamente antes de passar para a próxima…`);
-            await sleep(800);
-          }
+        // Se o PDF apareceu entre a auditoria e este item, não gere novamente.
+        if(state.pdfIntegrityChecked&&songHasValidPdf(song)){
+          job.currentId='';
+          job.failedIds=job.failedIds.filter(id=>id!==songId);
+          job.completedIds.push(songId);
+          savePdfBatchJob(job);
+          ok++;
+          continue;
         }
 
-        if(done)ok++;else fail++;
+        const processed=ok+fail+job.failedIds.filter(id=>initialIds.includes(id)).length;
+        const remainingBefore=Math.max(0,totalAtStart-(ok+fail));
+        setPdfBatchProgress(`<strong>Gerando PDFs — 1 por vez:</strong><br><strong>${escapeHtml(song.title)}</strong> — ${escapeHtml(song.artist||'Sem artista')}<br><span>Concluídos nesta execução: ${ok} · Falhas: ${fail} · Restantes na fila: ${job.pendingIds.length+1}</span>`);
+        updatePdfPanelStatus(`⏳ Gerando PDF ${ok+fail+1} de ${totalAtStart}: ${song.title}`,'warn');
 
-        // Somente depois que a geração/salvamento desta música terminou
-        // atualizamos a interface e liberamos a próxima da fila.
+        const done=await generatePdfForCatalogSong(songId,{silent:true,retryAttempts:3});
+        job.currentId='';
+        if(done){
+          ok++;
+          job.failedIds=job.failedIds.filter(id=>id!==songId);
+          job.completedIds.push(songId);
+          savePdfBatchJob(job);
+        }else{
+          fail++;
+          if(!job.failedIds.includes(songId))job.failedIds.push(songId);
+          savePdfBatchJob(job);
+        }
+
         renderPdfPanel();
-        setPdfBatchProgress(`<strong>Gerando PDFs:</strong> ${i+1}/${missing.length}<br>✅ ${ok} concluído${ok===1?'':'s'} · ❌ ${fail} falha${fail===1?'':'s'} · ${missing.length-i-1} restante${missing.length-i-1===1?'':'s'}`);
-        await sleep(250);
+        setPdfBatchProgress(`<strong>Geração em andamento:</strong> ${ok+fail}/${totalAtStart}<br>✅ ${ok} concluído${ok===1?'':'s'} · ❌ ${fail} falha${fail===1?'':'s'} · ⏳ ${job.pendingIds.length} restante${job.pendingIds.length===1?'':'s'}<br>${escapeHtml(song.title)} — ${done?'concluído':'falhou; a fila continuará'}`);
       }
 
+      // Auditoria final: somente itens que realmente ficaram válidos são concluídos.
       resetPdfIntegrity();
       await fetchPdfIntegrityStatus({silent:true});
-      setPdfBatchProgress(`<strong>Processo concluído:</strong> ✅ ${ok} PDF${ok===1?'':'s'} gerado${ok===1?'':'s'}${fail?` · ❌ ${fail} falha${fail===1?'':'s'}`:''}.${withoutLyrics?` ${withoutLyrics} sem letra.`:''}`);
-      updatePdfPanelStatus(`✅ ${ok} PDFs gerados${fail?` e ${fail} falharam`:''}.`,'success');
+      const stillMissing=state.songs.filter(song=>!songHasValidPdf(song)&&!!normalize(song.lyrics||song.letra));
+      const realFailures=job.failedIds.filter(id=>stillMissing.some(song=>String(song.id)===String(id)));
+      if(!realFailures.length)clearPdfBatchJob();else savePdfBatchJob({...job,pendingIds:[],currentId:'',failedIds:realFailures});
+
+      setPdfBatchProgress(`<strong>Processo concluído:</strong> ✅ ${ok} PDF${ok===1?'':'s'} gerado${ok===1?'':'s'}${realFailures.length?` · ❌ ${realFailures.length} ficou${realFailures.length===1?'':'aram'} pendente${realFailures.length===1?'':'s'} para nova tentativa`:''}.${withoutLyrics?` ${withoutLyrics} sem letra.`:''}`);
+      updatePdfPanelStatus(`✅ Geração concluída: ${ok} PDF${ok===1?'':'s'} gerado${ok===1?'':'s'}${realFailures.length?` e ${realFailures.length} pendente${realFailures.length===1?'':'s'}`:''}.`,'success');
       showToast(`Geração concluída: ${ok} PDF${ok===1?'':'s'} gerado${ok===1?'':'s'}.`,'success');
     }catch(error){
-      updatePdfPanelStatus('❌ '+(error?.message||'A geração dos PDFs encontrou um erro.'),'error');
-      showToast('A geração dos PDFs encontrou um erro.','error');
+      // O checkpoint permanece gravado para que o processo possa ser retomado.
+      updatePdfPanelStatus('❌ '+(error?.message||'A geração dos PDFs encontrou um erro. O checkpoint foi preservado.'),'error');
+      setPdfBatchProgress(`<strong>Processo interrompido.</strong><br>${escapeHtml(error?.message||'Erro desconhecido')}<br>O progresso concluído foi preservado. Clique novamente em “Gerar PDFs pendentes” para continuar.`);
+      showToast('A geração foi interrompida; o progresso foi preservado.','error');
     }finally{
       state.pdfBatchBusy=false;
       if(els.generateMissingPdfsBtn)els.generateMissingPdfsBtn.disabled=false;
@@ -2137,26 +2198,82 @@ async function uploadCatalogPdfFile(songId,file){
   }catch(error){setStatus('Não foi possível salvar o PDF: '+(error.name==='AbortError'?'tempo limite excedido.':error.message),'error');showToast('Erro ao salvar PDF.','error');return false}
   finally{state.pdfProcessing=false;if(els.refreshCatalog){els.refreshCatalog.disabled=false;els.refreshCatalog.textContent=original}pendingPdfSongId=null}
 }
+async function fetchPdfSaveWithRetry(payload,maxAttempts=3){
+  let lastError=null;
+  for(let attempt=1;attempt<=maxAttempts;attempt++){
+    try{
+      const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)},120000);
+      if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível salvar o PDF.');
+      return data;
+    }catch(error){
+      lastError=error;
+      if(attempt<maxAttempts){
+        const waitMs=Math.min(8000,1500*attempt);
+        await new Promise(resolve=>setTimeout(resolve,waitMs));
+      }
+    }
+  }
+  throw lastError||new Error('Não foi possível salvar o PDF.');
+}
+
 async function generatePdfForCatalogSong(songId,options={}){
   const song=state.songs.find(s=>String(s.id)===String(songId));
   if(!song)return false;
-  if(state.pdfIntegrityChecked && songHasValidPdf(song)){if(!options?.silent)showToast('Esta música já possui PDF físico válido.','error');return false;}
+  if(state.pdfIntegrityChecked && songHasValidPdf(song)){
+    if(!options?.silent)showToast('Esta música já possui PDF físico válido.','error');
+    return false;
+  }
   const lyrics=sanitizeLyrics(song.lyrics||song.letra);
-  if(!lyrics){if(!options?.silent)showToast('Esta música não possui letra cadastrada.','error');return false;}
+  if(!lyrics){
+    if(!options?.silent)showToast('Esta música não possui letra cadastrada.','error');
+    return false;
+  }
+
   state.pdfProcessing=true;
+  const attempts=Math.max(1,Math.min(3,Number(options?.retryAttempts)||3));
+  let lastError=null;
   try{
-    const generated=await generateAutomaticLyricsPdf(song.title,song.artist,lyrics);
-    const pdfDataUrl=await fileToDataUrl(generated);
-    const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveSongPdf',songId:song.id,title:song.title,artist:song.artist,pdfData:pdfDataUrl,pdfFileName:generated.name})},30000);
-    if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível salvar o PDF.');
-    song.pdfUrl=data.pdfUrl||'';song.pdfFileName=data.pdfFileName||generated.name;song.pdfMimeType='application/pdf';
-    localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs.map(normalizeSong)));await persist().catch(()=>{});
-    if(state.pdfIntegrityChecked){state.pdfValidSongIds.add(String(song.id));state.pdfMissingSongIds.delete(String(song.id));state.pdfBrokenSongIds.delete(String(song.id));state.pdfStatusById.delete(String(song.id));}
-    state.localPdfPreviewSongId=song.id;state.localPdfPreviewDataUrl=pdfDataUrl;renderCatalog();renderPdfPanel();
-    if(!options?.silent)showToast('✅ PDF gerado e adicionado ao catálogo.','success');
-    return true;
-  }catch(error){if(!options?.silent)showToast('Não foi possível gerar o PDF: '+(error?.message||'erro desconhecido'),'error');return false}
-  finally{state.pdfProcessing=false}
+    for(let attempt=1;attempt<=attempts;attempt++){
+      try{
+        // Geração visual: usa exatamente o gerador aprovado anteriormente.
+        const generated=await generateAutomaticLyricsPdf(song.title,song.artist,lyrics);
+        const pdfDataUrl=await fileToDataUrl(generated);
+        const data=await fetchPdfSaveWithRetry({
+          action:'saveSongPdf',
+          songId:song.id,
+          title:song.title,
+          artist:song.artist,
+          pdfData:pdfDataUrl,
+          pdfFileName:generated.name
+        },3);
+
+        song.pdfUrl=data.pdfUrl||'';
+        song.pdfFileName=data.pdfFileName||generated.name;
+        song.pdfMimeType='application/pdf';
+        localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs.map(normalizeSong)));
+        await persist().catch(()=>{});
+        if(state.pdfIntegrityChecked){
+          state.pdfValidSongIds.add(String(song.id));
+          state.pdfMissingSongIds.delete(String(song.id));
+          state.pdfBrokenSongIds.delete(String(song.id));
+          state.pdfStatusById.delete(String(song.id));
+        }
+        state.localPdfPreviewSongId=song.id;
+        state.localPdfPreviewDataUrl=pdfDataUrl;
+        renderCatalog();
+        renderPdfPanel();
+        if(!options?.silent)showToast('✅ PDF gerado e adicionado ao catálogo.','success');
+        return true;
+      }catch(error){
+        lastError=error;
+        if(attempt<attempts){
+          await new Promise(resolve=>setTimeout(resolve,Math.min(10000,2000*attempt)));
+        }
+      }
+    }
+    if(!options?.silent)showToast('Não foi possível gerar o PDF: '+(lastError?.message||'erro desconhecido'),'error');
+    return false;
+  }finally{state.pdfProcessing=false}
 }
 
 async function uploadCatalogPdf(file){return uploadCatalogPdfFile(pendingPdfSongId,file)}
@@ -2804,6 +2921,7 @@ function init(){
  document.addEventListener('keydown',e=>{if(els.pdfViewerScreen?.classList.contains('open')){if(e.key==='Escape')closePdfViewer();else if(e.key==='ArrowLeft')changeAdminPdfPage(-1);else if(e.key==='ArrowRight')changeAdminPdfPage(1);return}if(e.key==='Escape'){closeDetail();closeConfirm();closeStyleModal();closeReceivedEditor()}});
  if(sessionStorage.getItem(SESSION_KEY)==='1'){els.authCard.classList.add('hidden');els.adminPanel.classList.remove('hidden');loadLocal().then(()=>fetchPdfIntegrityStatus({silent:true})).catch(()=>renderPdfPanel())}else{els.loginInput.focus()}
 }
+loadPdfBatchJob();
 init();
 })();
 </script>
@@ -2832,7 +2950,7 @@ init();
       }
     } catch (_) {}
     try {
-      const registration=await navigator.serviceWorker.register('./sw.js?v=20260918-3',{scope:'./'});
+      const registration=await navigator.serviceWorker.register('./sw.js?v=20260918-4',{scope:'./'});
       await registration.update().catch(()=>{});
     } catch (_) {}
   });
