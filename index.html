@@ -1965,7 +1965,7 @@ async function uploadCatalogPdfFile(songId,file){
     state.localPdfPreviewSongId=song.id;state.localPdfPreviewDataUrl=processedDataUrl;
     if(els.refreshCatalog)els.refreshCatalog.textContent='Enviando PDF...';
     const pdfData=processedDataUrl;
-    const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveSongPdf',songId:song.id,title:song.title,artist:song.artist,pdfData,pdfFileName:processed.name})},30000);
+    const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveSongPdf',songId:song.id,id:song.id,title:song.title,musica:song.title,nome:song.title,songTitle:song.title,artist:song.artist,artista:song.artist,interprete:song.artist,songArtist:song.artist,pdfData,pdfFileName:processed.name})},30000);
     if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível salvar o PDF.');
     song.pdfUrl=data.pdfUrl||'';song.pdfFileName=data.pdfFileName||processed.name;resetPdfIntegrity();localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs.map(normalizeSong)));renderCatalog();
     setStatus('✅ PDF processado e salvo para '+song.title+'.','success');showToast(processed.detectedWatermarks?'PDF salvo com a marca Palco Pro.':'PDF salvo.','success');return true;
@@ -1991,7 +1991,7 @@ async function generatePdfForCatalogSong(songId,options={}){
     const pdfDataUrl=await fileToDataUrl(generated);
     for(let attempt=1;attempt<=attempts;attempt++){
       try{
-        const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveSongPdf',songId:song.id,id:song.id,title:song.title,musica:song.title,artist:song.artist,artista:song.artist,lyrics:lyrics,letra:lyrics,pdfData:pdfDataUrl,pdfFileName:generated.name})},120000);
+        const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveSongPdf',songId:song.id,id:song.id,title:song.title,musica:song.title,nome:song.title,songTitle:song.title,artist:song.artist,artista:song.artist,interprete:song.artist,songArtist:song.artist,lyrics:lyrics,letra:lyrics,lyric:lyrics,pdfData:pdfDataUrl,pdfFileName:generated.name})},120000);
         if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível salvar o PDF.');
         song.pdfUrl=data.pdfUrl||'';
         song.pdfFileName=data.pdfFileName||generated.name;
