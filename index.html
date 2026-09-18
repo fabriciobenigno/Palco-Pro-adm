@@ -496,7 +496,7 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
               <div id="musicSearchSelected" class="music-search-selected hidden"></div>
               <div id="bulkMusicSearchPanel" class="bulk-music-search-panel hidden">
                 <div class="bulk-music-search-title">✨ Sugestões para o catálogo</div>
-                <div class="bulk-music-search-help">Não é preciso digitar nada. A pesquisa automática amplia a descoberta por <strong>todos os principais estilos e períodos da música brasileira</strong>, dando um bônus para músicas populares sem ficar limitada a elas. Até <strong>300 faixas são efetivamente conferidas por rodada</strong>, e só entram sugestões com título, artista, estilo e letra completos. Músicas já presentes no catálogo são excluídas, inclusive em outras interpretações, pela comparação da letra.</div>
+                <div class="bulk-music-search-help">Não é preciso digitar nada. A pesquisa automática amplia a descoberta por <strong>todos os principais estilos e períodos da música brasileira</strong>, dando um bônus para músicas populares sem ficar limitada a elas. Até <strong>300 sugestões válidas podem ser encontradas por rodada</strong>, e só entram sugestões com título, artista, estilo e letra completos. Músicas já presentes no catálogo são excluídas, inclusive em outras interpretações, pela comparação da letra.</div>
                 <div class="bulk-music-search-actions">
                   <button id="bulkMusicSearchBtn" type="button" class="btn btn-primary btn-small">✨ Gerar novas sugestões</button>
                   <button id="closeBulkMusicSearchBtn" type="button" class="btn btn-secondary btn-small">Fechar sugestões</button>
@@ -1103,6 +1103,7 @@ function lyricSimilarity(a,b){
   const union=a.shingles.size+b.shingles.size-intersection;
   return{exact:false,intersection,jaccard:union?intersection/union:0,containment:intersection/Math.max(1,smaller.size)};
 }
+function catalogHasArtistTitle(index,titleKey,artistKey){const bucket=index?.titleMap?.get(titleKey);if(!bucket)return false;for(const i of bucket){if(index.entries[i]?.artistKey===artistKey)return true;}return false;}
 function buildCatalogSuggestionDuplicateIndex(){
   const index={titleMap:new Map(),shingleMap:new Map(),entries:[]};
   (state.songs||[]).forEach(song=>{
@@ -1253,41 +1254,45 @@ async function searchCatalogSuggestions(){
     };
     await Promise.all(Array.from({length:sourceConcurrency},()=>sourceWorker()));
     if(token!==state.bulkMusicSearchToken||controller.signal.aborted)return;
-    const allCandidates=buildCatalogSuggestionCandidateMap(chart,genreResults).filter(candidate=>{if(!candidate.sourceStyles.length)return false;const titleKey=normalizeSuggestionText(candidate.trackName),artistKey=normalizeSuggestionText(candidate.artistName);return !(catalogIndex.titleMap.get(titleKey)||[]).some(i=>catalogIndex.entries[i]?.artistKey===artistKey);});
+    const allCandidates=buildCatalogSuggestionCandidateMap(chart,genreResults).filter(candidate=>{if(!candidate.sourceStyles.length&&candidate.chartRank==null)return false;const titleKey=normalizeSuggestionText(candidate.trackName),artistKey=normalizeSuggestionText(candidate.artistName);return !catalogHasArtistTitle(catalogIndex,titleKey,artistKey);});
     const candidates=diversifyCatalogSuggestionCandidates(allCandidates);
     let checked=0,excluded=0,found=0,missedLyrics=0;
     const extraEntries=[];
-    const MAX_CANDIDATES_TO_CHECK=300;
-    const lyricConcurrency=4;
+    const TARGET_SUGGESTIONS=300;
+    const MAX_CANDIDATES_TO_CHECK=Math.min(candidates.length,6000);
+    const lyricConcurrency=6;
     let nextCandidate=0;
     const processCandidate=async()=>{
       while(true){
         if(token!==state.bulkMusicSearchToken||controller.signal.aborted)return;
+        if(found>=TARGET_SUGGESTIONS)return;
         const idx=nextCandidate++;
-        if(idx>=candidates.length||idx>=MAX_CANDIDATES_TO_CHECK)return;
+        if(idx>=MAX_CANDIDATES_TO_CHECK)return;
         const candidate=candidates[idx];
         checked++;
         const titleKey=normalizeSuggestionText(candidate.trackName),artistKey=normalizeSuggestionText(candidate.artistName);
-        const exactArtistTitle=(catalogIndex.titleMap.get(titleKey)||[]).some(i=>catalogIndex.entries[i]?.artistKey===artistKey);
+        const exactArtistTitle=catalogHasArtistTitle(catalogIndex,titleKey,artistKey);
         if(exactArtistTitle){excluded++;continue;}
         let lyrics='';
         try{lyrics=await fetchLyricsForCatalogSuggestion(candidate);}catch(_){lyrics='';}
         if(!lyrics){missedLyrics++;continue;}
         const enriched={...candidate,lyrics,suggestionStyle:candidate.suggestionStyle||candidate.primaryGenreName||'Música brasileira'};
+        if(found>=TARGET_SUGGESTIONS)continue;
         if(candidateMatchesCatalog(enriched,catalogIndex,extraEntries)){excluded++;continue;}
         const entry={song:{title:enriched.trackName,artist:enriched.artistName,lyrics:enriched.lyrics},titleKey,artistKey,signature:buildLyricsSignature(enriched.lyrics)};
         extraEntries.push(entry);
+        if(found>=TARGET_SUGGESTIONS)continue;
         state.bulkMusicSearchResults.push(enriched);
         found++;
         renderBulkMusicSearchResults();
-        if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`Encontradas ${found} sugestões válidas • ${excluded} excluídas • ${missedLyrics} sem letra • ${checked}/${Math.min(MAX_CANDIDATES_TO_CHECK,candidates.length)} faixas conferidas.`;
+        if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`Encontradas ${found}/${TARGET_SUGGESTIONS} sugestões válidas • ${excluded} excluídas • ${missedLyrics} sem letra • ${checked}/${MAX_CANDIDATES_TO_CHECK} candidatas conferidas.`;
       }
     };
     await Promise.all(Array.from({length:lyricConcurrency},()=>processCandidate()));
     if(token!==state.bulkMusicSearchToken||controller.signal.aborted)return;
     if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=found
-      ? `✅ ${found} sugestões válidas encontradas. Foram conferidas ${checked} faixas; ${excluded} foram excluídas por já estarem no catálogo ou por terem letra suficientemente semelhante. ${missedLyrics} ficaram de fora por não terem letra completa disponível.`
-      : `Nenhuma sugestão nova foi encontrada nesta rodada. Foram conferidas ${checked} faixas e ${excluded} coincidências com o catálogo foram excluídas${missedLyrics?`; ${missedLyrics} ficaram sem letra completa.`:''}`;
+      ? `✅ ${found} sugestões válidas encontradas${found>=TARGET_SUGGESTIONS?' — limite de 300 atingido.':'.'} Foram conferidas ${checked} candidatas; ${excluded} foram excluídas por já estarem no catálogo ou por terem letra suficientemente semelhante. ${missedLyrics} ficaram de fora por não terem letra completa disponível.`
+      : `Nenhuma sugestão nova foi encontrada nesta rodada. Foram conferidas ${checked} candidatas e ${excluded} coincidências com o catálogo foram excluídas${missedLyrics?`; ${missedLyrics} ficaram sem letra completa.`:''}`;
   }catch(error){
     if(error?.name==='AbortError')return;
     if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent='Não foi possível gerar as sugestões agora: '+(error?.message||'erro desconhecido')+'.';
