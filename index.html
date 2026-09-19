@@ -537,7 +537,7 @@ html,body{overflow-x:hidden!important;overflow-y:auto!important;height:auto!impo
               <div id="musicSearchSelected" class="music-search-selected hidden"></div>
               <div id="bulkMusicSearchPanel" class="bulk-music-search-panel hidden">
                 <div class="bulk-music-search-title">✨ Sugestões para o catálogo</div>
-                <div class="bulk-music-search-help">A pesquisa é focada em música brasileira e pode ser direcionada por <strong>estilo</strong> e/ou <strong>artista</strong> antes da busca. Ela retorna até <strong>200 sugestões cadastráveis</strong>, com letra e metadados completos, e elimina músicas já existentes e repetições por título ou letra. A rodada continua pesquisando até reunir <strong>200 sugestões válidas</strong>, sempre exigindo título, artista, estilo e letra completos. Músicas já existentes no catálogo são excluídas pelo título mesmo com outro intérprete e por comparação forte da letra, incluindo covers, regravações e pequenas variações. Resultados também são deduplicados entre si. Você pode definir Estilo e/ou Artista antes da pesquisa. Depois, o campo Filtrar resultados permite refinar as sugestões encontradas por título, artista ou letra. O cadastro em massa não gera nem anexa PDFs automaticamente.</div>
+                <div class="bulk-music-search-help">A pesquisa é focada em música brasileira e pode ser direcionada por <strong>estilo</strong> e/ou <strong>artista</strong> antes da busca. Ela retorna até <strong>200 sugestões cadastráveis</strong>, com letra e metadados completos, e elimina músicas que já sejam duplicadas pelo conjunto título + artista ou pelas demais regras de repetição por letra. A rodada continua pesquisando até reunir <strong>200 sugestões válidas</strong>, sempre exigindo título, artista, estilo e letra completos. <strong>O mesmo título pode aparecer mais de uma vez quando os artistas são diferentes.</strong> Para o mesmo título, somente o mesmo artista é tratado como duplicidade de identidade; as demais regras de repetição por letra continuam valendo nos casos em que o título também é diferente. Resultados também são deduplicados entre si por título + artista. Você pode definir Estilo e/ou Artista antes da pesquisa. Depois, o campo Filtrar resultados permite refinar as sugestões encontradas por título, artista ou letra. O cadastro em massa não gera nem anexa PDFs automaticamente.</div>
                 <div class="bulk-music-search-actions">
                   <button id="bulkMusicSearchBtn" type="button" class="btn btn-primary btn-small">🔎 Pesquisar 200 sugestões</button>
                   <button id="closeBulkMusicSearchBtn" type="button" class="btn btn-secondary btn-small">Fechar sugestões</button>
@@ -1291,10 +1291,29 @@ function buildDuplicateIndexFromSongs(songs){
   return index;
 }
 function candidateMatchesCatalog(candidate,index,extraEntries=[]){
-  const titleKey=normalizeSuggestionText(candidate.trackName),candidateSig=buildLyricsSignature(candidate.lyrics),possible=new Set();
+  const titleKey=normalizeSuggestionText(candidate.trackName);
+  const artistKey=normalizeSuggestionText(candidate.artistName);
+  const candidateSig=buildLyricsSignature(candidate.lyrics),possible=new Set();
   (index.titleMap.get(titleKey)||[]).forEach(i=>possible.add(i));
   candidateSig.shingles.forEach(shingle=>(index.shingleMap.get(shingle)||[]).forEach(i=>possible.add(i)));
-  const checkEntry=entry=>{if(!entry)return false;if(titleKey&&entry.titleKey===titleKey)return true;const sim=lyricSimilarity(candidateSig,entry.signature);if(sim.exact)return true;if(sim.significantIntersection>=18&&sim.significantContainment>=0.68)return true;if(sim.intersection>=8&&(sim.containment>=0.65||sim.jaccard>=0.5))return true;if(sim.intersection>=5&&sim.containment>=0.82&&Math.min(candidateSig.shingles.size,entry.signature.shingles.size)<=12)return true;if(sim.tokenContainment>=0.92&&sim.tokenIntersection>=20)return true;return false;};
+  const checkEntry=entry=>{
+    if(!entry)return false;
+    const sameTitle=!!titleKey&&entry.titleKey===titleKey;
+    const sameArtist=entry.artistKey===artistKey;
+    // Mesmo título + artista diferente é uma música válida e não deve ser
+    // tratada como duplicata. Essa exceção vale também para a checagem por letra
+    // neste caso, para permitir versões de artistas diferentes.
+    if(sameTitle){
+      return sameArtist;
+    }
+    const sim=lyricSimilarity(candidateSig,entry.signature);
+    if(sim.exact)return true;
+    if(sim.significantIntersection>=18&&sim.significantContainment>=0.68)return true;
+    if(sim.intersection>=8&&(sim.containment>=0.65||sim.jaccard>=0.5))return true;
+    if(sim.intersection>=5&&sim.containment>=0.82&&Math.min(candidateSig.shingles.size,entry.signature.shingles.size)<=12)return true;
+    if(sim.tokenContainment>=0.92&&sim.tokenIntersection>=20)return true;
+    return false;
+  };
   for(const entryIndex of possible){if(checkEntry(index.entries[entryIndex]))return true;}
   for(const entry of extraEntries){if(checkEntry(entry))return true;}
   return false;
@@ -1496,6 +1515,8 @@ async function searchCatalogSuggestions(){
 
   const candidateQueue=[];
   const queuedKeys=new Set();
+  // A identidade da fila é título + artista. O mesmo título com outro artista
+  // continua podendo aparecer e ser validado como uma entrada distinta.
   const queuedTitleKeys=new Set();
   const titleInFlight=new Set();
   const enqueueFromResults=(items,meta={})=>{
@@ -1511,12 +1532,15 @@ async function searchCatalogSuggestions(){
       // Filtros da própria pesquisa: aqui a música é barrada antes da consulta da letra.
       if(selectedStyle&&!bulkMusicStyleMatches(sourceStyle,selectedStyle))return;
       if(selectedArtist&&!bulkMusicArtistMatches(candidate.artistName,selectedArtist))return;
-      // Se o mesmo título já está no catálogo, não importa o intérprete: não entra.
-      if((catalogIndex?.titleMap?.get(titleKey)||[]).length){excluded++;return;}
-      // Dentro da própria rodada, mantém apenas uma candidata por título para que covers/regravações
-      // não ocupem duas posições. Se a primeira falhar por falta de letra, a próxima poderá assumir.
-      if(queuedTitleKeys.has(titleKey))return;
-      queuedTitleKeys.add(titleKey);
+      // Título igual com artista diferente é permitido. O bloqueio por identidade
+      // considera título + artista; as demais regras de duplicidade continuam em candidateMatchesCatalog().
+      const existingTitleBucket=catalogIndex?.titleMap?.get(titleKey)||[];
+      if(existingTitleBucket.some(i=>catalogIndex.entries[i]?.artistKey===artistKey)){excluded++;return;}
+      // Dentro da própria rodada, mantém apenas uma candidata por título + artista.
+      // Assim, o mesmo título pode aparecer para artistas diferentes.
+      const identityKey=titleKey+'|'+artistKey;
+      if(queuedTitleKeys.has(identityKey))return;
+      queuedTitleKeys.add(identityKey);
       queuedKeys.add(key);
       local.push(candidate);
     });
@@ -1533,7 +1557,7 @@ async function searchCatalogSuggestions(){
   const processOne=async(candidate)=>{
     if(stopped||token!==state.bulkMusicSearchToken)return;
     const candidateKey=normalizeSuggestionText(candidate.trackName)+'|'+normalizeSuggestionText(candidate.artistName);
-    const candidateTitleKey=normalizeSuggestionText(candidate.trackName);
+    const candidateTitleKey=normalizeSuggestionText(candidate.trackName)+'|'+normalizeSuggestionText(candidate.artistName);
     if(titleInFlight.has(candidateTitleKey)){
       queuedKeys.delete(candidateKey);
       queuedTitleKeys.delete(candidateTitleKey);
@@ -2646,9 +2670,11 @@ function getDuplicateGroups(){
   const groups=new Map();
   (state.songs||[]).forEach((song,index)=>{
     const title=normalizeDuplicateText(song?.title);
+    const artist=normalizeDuplicateText(song?.artist);
     const lyrics=normalizeDuplicateText(song?.lyrics);
     if(!title||!lyrics)return;
-    const key=title+'\u001f'+lyrics;
+    // Mesmo título com artistas diferentes não é duplicata.
+    const key=title+'\u001f'+artist+'\u001f'+lyrics;
     if(!groups.has(key))groups.set(key,[]);
     groups.get(key).push({song,index});
   });
@@ -2677,7 +2703,7 @@ function askRemoveDuplicates(){
   }).join('');
   const more=groups.length>8?`<div style="opacity:.7;margin-top:6px">+ ${groups.length-8} grupo${groups.length-8===1?'':'s'} de duplicatas.</div>`:'';
   els.confirmTitle.textContent='Remover músicas copiadas';
-  els.confirmBody.innerHTML=`<div class="confirm-text">Encontrei <strong>${duplicateCount} música${duplicateCount===1?'':'s'} duplicada${duplicateCount===1?'':'s'}</strong> em <strong>${groups.length} grupo${groups.length===1?'':'s'}</strong> com o mesmo nome e a mesma letra, considerando diferenças de acentos, espaços e pontuação.<br><br>${preview}${more}<br><strong>Será mantida uma versão de cada música, priorizando a que possui PDF válido e depois a que está ativa.</strong></div>`;
+  els.confirmBody.innerHTML=`<div class="confirm-text">Encontrei <strong>${duplicateCount} música${duplicateCount===1?'':'s'} duplicada${duplicateCount===1?'':'s'}</strong> em <strong>${groups.length} grupo${groups.length===1?'':'s'}</strong> com o mesmo nome, artista e letra, considerando diferenças de acentos, espaços e pontuação.<br><br>${preview}${more}<br><strong>Será mantida uma versão de cada música, priorizando a que possui PDF válido e depois a que está ativa.</strong></div>`;
   els.confirmBtn.textContent='Remover copiadas';
   state.confirmAction=async()=>{
     const currentGroups=getDuplicateGroups();const removeIds=new Set();
