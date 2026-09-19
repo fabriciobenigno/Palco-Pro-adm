@@ -857,7 +857,7 @@ function saveCatalogCacheSafely(songs){
   }
 }
 async function persist(){const payload=JSON.stringify(state.songs.map(normalizeSong),null,2);const cache=saveCatalogCacheSafely(state.songs);if(!cache.ok&&els.catalogStatus){els.catalogStatus.textContent=cache.quota?'Catálogo maior que o limite do armazenamento local. Mantendo o catálogo em memória e sincronizando pelo servidor.':'Não foi possível atualizar o cache local: '+(cache.error?.message||'erro desconhecido');els.catalogStatus.className='status-line status-warn'}if(state.catalogHandle){try{const writable=await state.catalogHandle.createWritable();await writable.write(payload);await writable.close();els.fileStatus.textContent='catalogo.json sincronizado';els.fileStatus.className='badge'}catch(error){els.catalogStatus.textContent='Alteração local salva, mas não foi possível escrever no catalogo.json: '+error.message;els.catalogStatus.className='status-line status-warn'}}}
-async function publishCatalogToServer(options={}){if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='COLE_AQUI_A_MESMA_URL_DO_APPS_SCRIPT_DO_INDEX_PRINCIPAL'){return {sucesso:false,mensagem:'URL do Apps Script não configurada.'}}try{const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveCatalog',catalogo:state.songs.map(normalizeSong),allowCatalogShrink:!!options.allowCatalogShrink})},20000);if(!data?.sucesso)throw new Error(data?.mensagem||'Falha ao publicar o catálogo.');return data}catch(error){return {sucesso:false,mensagem:error.name==='AbortError'?'Tempo limite excedido na comunicação com o Apps Script.':error.message}}}
+async function publishCatalogToServer(options={}){if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='COLE_AQUI_A_MESMA_URL_DO_APPS_SCRIPT_DO_INDEX_PRINCIPAL'){return {sucesso:false,mensagem:'URL do Apps Script não configurada.'}}try{const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveCatalog',catalogo:state.songs.map(normalizeSong),allowCatalogShrink:!!options.allowCatalogShrink,requireComplete:!!options.requireComplete})},20000);if(!data?.sucesso)throw new Error(data?.mensagem||'Falha ao publicar o catálogo.');return data}catch(error){return {sucesso:false,mensagem:error.name==='AbortError'?'Tempo limite excedido na comunicação com o Apps Script.':error.message}}}
 function parseCatalogPayload(parsed){const arr=Array.isArray(parsed)?parsed:(Array.isArray(parsed?.catalogo)?parsed.catalogo:(Array.isArray(parsed?.songs)?parsed.songs:null));if(!arr)throw new Error('O catálogo recebido não contém uma lista de músicas.');return arr.map(normalizeSong)}
 async function fetchCatalogFromUrl(url){const response=await fetch(url+'?ts='+Date.now(),{cache:'no-store',headers:{Accept:'application/json'}});if(!response.ok)throw new Error('HTTP '+response.status);const parsed=await response.json();const arr=parseCatalogPayload(parsed);if(!arr.length)throw new Error('O catálogo retornou 0 músicas.');return arr}
 async function loadMainCatalog(){
@@ -1825,9 +1825,9 @@ async function addSelectedBulkMusic(){
   let duplicates=0;
   for(const item of candidates){
     const title=normalize(item.trackName),artist=normalize(item.artistName),lyrics=formatFetchedLyrics(item.lyrics);
-    const style=normalize(item.suggestionStyle||item.style||item.primaryGenreName)||inferCatalogSuggestionStyle(item,item.sources||item.sourceStyles||[])||'Música brasileira';
-    // Para ser considerada cadastrável, a música precisa obrigatoriamente de título, artista e letra.
-    // O estilo é preenchido automaticamente quando a fonte não o informa.
+    const style=normalize(item.suggestionStyle||item.style||item.primaryGenreName)||inferCatalogSuggestionStyle(item,item.sources||item.sourceStyles||[]);
+    // No cadastro em massa, somente entram músicas com título, artista, estilo e letra completa.
+    // Nenhum estilo fictício é criado quando as fontes não informam/classificam a música.
     if(!title||!artist||!style||!lyrics)continue;
     if(candidateMatchesCatalog({trackName:title,artistName:artist,lyrics},duplicateIndex,seenEntries)){duplicates++;continue;}
     pending.push({id:makeId(),title,artist,style,note:'',lyrics,pdfUrl:'',pdfFileName:'',active:true});
@@ -1909,7 +1909,7 @@ async function addSelectedBulkMusic(){
       }
       if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`Salvando ${novos.length} música${novos.length===1?'':'s'} no catálogo principal...`;
 
-      const publicado=await publishCatalogToServer();
+      const publicado=await publishCatalogToServer({requireComplete:true});
       if(!publicado?.sucesso){
         if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent='As músicas foram salvas neste dispositivo, mas não foi possível sincronizar o catálogo principal: '+(publicado?.mensagem||'erro desconhecido')+'.';
         showToast('Falha na sincronização do lote.','error');
