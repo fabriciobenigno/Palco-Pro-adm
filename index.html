@@ -879,7 +879,21 @@ async function processPdfFileToFile(file){
 
 function showToast(message,type='success'){els.toast.textContent=message;els.toast.className=`toast show ${type}`;clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>els.toast.classList.remove('show'),2200)}
 function setStatus(message,type=''){if(els.formStatus){els.formStatus.textContent=message||'';els.formStatus.className=`status-line ${type?'status-'+type:''}`}if(els.catalogStatus){els.catalogStatus.textContent=message||'';els.catalogStatus.className=`status-line ${type?'status-'+type:''}`}}
-async function persist(){const payload=JSON.stringify(state.songs.map(normalizeSong),null,2);localStorage.setItem(CATALOG_KEY,payload);if(state.catalogHandle){try{const writable=await state.catalogHandle.createWritable();await writable.write(payload);await writable.close();els.fileStatus.textContent='catalogo.json sincronizado';els.fileStatus.className='badge'}catch(error){els.catalogStatus.textContent='Alteração local salva, mas não foi possível escrever no catalogo.json: '+error.message;els.catalogStatus.className='status-line status-warn'}}}
+function saveCatalogCacheSafely(songs){
+  const payload=JSON.stringify((Array.isArray(songs)?songs:[]).map(normalizeSong));
+  try{
+    localStorage.setItem(CATALOG_KEY,payload);
+    return {ok:true,quota:false};
+  }catch(error){
+    if(error?.name==='QuotaExceededError'||error?.code===22){
+      try{localStorage.removeItem(CATALOG_KEY)}catch(_){ }
+      try{localStorage.setItem(CATALOG_KEY+'_meta',JSON.stringify({count:Array.isArray(songs)?songs.length:0,updatedAt:Date.now()}))}catch(_){ }
+      return {ok:false,quota:true,error};
+    }
+    return {ok:false,quota:false,error};
+  }
+}
+async function persist(){const payload=JSON.stringify(state.songs.map(normalizeSong),null,2);const cache=saveCatalogCacheSafely(state.songs);if(!cache.ok&&els.catalogStatus){els.catalogStatus.textContent=cache.quota?'Catálogo maior que o limite do armazenamento local. Mantendo o catálogo em memória e sincronizando pelo servidor.':'Não foi possível atualizar o cache local: '+(cache.error?.message||'erro desconhecido');els.catalogStatus.className='status-line status-warn'}if(state.catalogHandle){try{const writable=await state.catalogHandle.createWritable();await writable.write(payload);await writable.close();els.fileStatus.textContent='catalogo.json sincronizado';els.fileStatus.className='badge'}catch(error){els.catalogStatus.textContent='Alteração local salva, mas não foi possível escrever no catalogo.json: '+error.message;els.catalogStatus.className='status-line status-warn'}}}
 async function publishCatalogToServer(options={}){if(!APPS_SCRIPT_URL||APPS_SCRIPT_URL==='COLE_AQUI_A_MESMA_URL_DO_APPS_SCRIPT_DO_INDEX_PRINCIPAL'){return {sucesso:false,mensagem:'URL do Apps Script não configurada.'}}try{const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveCatalog',catalogo:state.songs.map(normalizeSong),allowCatalogShrink:!!options.allowCatalogShrink})},20000);if(!data?.sucesso)throw new Error(data?.mensagem||'Falha ao publicar o catálogo.');return data}catch(error){return {sucesso:false,mensagem:error.name==='AbortError'?'Tempo limite excedido na comunicação com o Apps Script.':error.message}}}
 function parseCatalogPayload(parsed){const arr=Array.isArray(parsed)?parsed:(Array.isArray(parsed?.catalogo)?parsed.catalogo:(Array.isArray(parsed?.songs)?parsed.songs:null));if(!arr)throw new Error('O catálogo recebido não contém uma lista de músicas.');return arr.map(normalizeSong)}
 async function fetchCatalogFromUrl(url){const response=await fetch(url+'?ts='+Date.now(),{cache:'no-store',headers:{Accept:'application/json'}});if(!response.ok)throw new Error('HTTP '+response.status);const parsed=await response.json();const arr=parseCatalogPayload(parsed);if(!arr.length)throw new Error('O catálogo retornou 0 músicas.');return arr}
@@ -892,7 +906,7 @@ async function loadMainCatalog(){
       const arr=await fetchCatalogFromUrl(url);
       if(previousCount>=300&&arr.length<Math.floor(previousCount*0.6)){throw new Error(`Resposta rejeitada por segurança: ${arr.length} músicas contra ${previousCount} na cópia conhecida.`)}
       state.songs=arr;
-      localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs));
+      saveCatalogCacheSafely(state.songs);
       state.catalogHandle=null;
       if(els.fileStatus){els.fileStatus.textContent=`Catálogo carregado (${arr.length} músicas)`;els.fileStatus.className='badge'}
       renderCatalog();
@@ -905,7 +919,7 @@ async function loadMainCatalog(){
       const arr=parseCatalogPayload(data);
       if(!arr.length)throw new Error('O Apps Script retornou 0 músicas.');
       if(previousCount>=300&&arr.length<Math.floor(previousCount*0.6))throw new Error(`Resposta rejeitada por segurança: ${arr.length} músicas contra ${previousCount} na cópia conhecida.`);
-      state.songs=arr;localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs));state.catalogHandle=null;if(els.fileStatus){els.fileStatus.textContent=`Catálogo carregado pelo Apps Script (${arr.length} músicas)`;els.fileStatus.className='badge'}renderCatalog();return;
+      state.songs=arr;saveCatalogCacheSafely(state.songs);state.catalogHandle=null;if(els.fileStatus){els.fileStatus.textContent=`Catálogo carregado pelo Apps Script (${arr.length} músicas)`;els.fileStatus.className='badge'}renderCatalog();return;
     }catch(error){errors.push('Apps Script: '+(error?.message||'erro'))}
   }
   throw new Error('Não foi possível carregar o catálogo por nenhuma fonte. '+errors.join(' | '));
@@ -1366,7 +1380,7 @@ function diversifyCatalogSuggestionCandidates(candidates){
   return ordered;
 }
 function sleep(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
-function itunesSearchJsonp(term,limit=200){
+function itunesSearchJsonp(term,limit=200,offset=0){
   return new Promise((resolve,reject)=>{
     const callbackName='__palcoItunes_'+Date.now()+'_'+Math.random().toString(36).slice(2,9);
     const script=document.createElement('script');
@@ -1375,7 +1389,7 @@ function itunesSearchJsonp(term,limit=200){
     const timer=setTimeout(()=>{if(settled)return;cleanup();reject(new Error('tempo esgotado na consulta musical'));},15000);
     window[callbackName]=data=>{cleanup();resolve(data||{});};
     script.onerror=()=>{cleanup();reject(new Error('não foi possível consultar a base musical'));};
-    script.src='https://itunes.apple.com/search?term='+encodeURIComponent(term)+'&media=music&entity=song&limit='+Math.min(200,Math.max(1,limit))+'&country=BR&lang=pt_br&callback='+encodeURIComponent(callbackName);
+    script.src='https://itunes.apple.com/search?term='+encodeURIComponent(term)+'&media=music&entity=song&limit='+Math.min(200,Math.max(1,limit))+'&offset='+Math.max(0,Number(offset)||0)+'&country=BR&lang=pt_br&callback='+encodeURIComponent(callbackName);
     document.head.appendChild(script);
   });
 }
@@ -1428,7 +1442,7 @@ async function searchCatalogSuggestions(){
   state.bulkMusicSearchResults=[];
   state.bulkMusicSelected.clear();
   renderBulkMusicSearchResults();
-  if(els.bulkMusicSearchBtn){els.bulkMusicSearchBtn.disabled=true;els.bulkMusicSearchBtn.textContent='Buscando até 200 sugestões válidas...';}
+  if(els.bulkMusicSearchBtn){els.bulkMusicSearchBtn.disabled=true;els.bulkMusicSearchBtn.textContent='Buscando até 200 músicas cadastráveis...';}
   if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent='Atualizando o catálogo antes da busca...';
 
   // Usa o catálogo já carregado no ADM como referência imediata para não
@@ -1442,7 +1456,7 @@ async function searchCatalogSuggestions(){
         const remotoArr=parseCatalogPayload(remoto);
         if(remotoArr.length){
           state.songs=remotoArr;
-          localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs));
+          saveCatalogCacheSafely(state.songs);
           renderCatalog();
         }
       }
@@ -1546,7 +1560,7 @@ async function searchCatalogSuggestions(){
   const updateStatus=(phase='')=>{
     if(!els.bulkMusicSearchStatus||token!==state.bulkMusicSearchToken)return;
     const suffix=phase?` • ${phase}`:'';
-    els.bulkMusicSearchStatus.textContent=`Encontradas ${found}/${TARGET_SUGGESTIONS} sugestões válidas • ${discovered} músicas descobertas • ${checked} verificadas • ${excluded} excluídas do catálogo/letra • ${missedLyrics} sem letra${failedLookups?` • ${failedLookups} consultas com falha`:''}${suffix}`;
+    els.bulkMusicSearchStatus.textContent=`Cadastráveis ${found}/${TARGET_SUGGESTIONS} • ${discovered} candidatas descobertas • ${checked} verificadas • ${excluded} excluídas por duplicidade • ${missedLyrics} sem letra${failedLookups?` • ${failedLookups} consultas com falha`:''}${suffix}`;
   };
 
   const processOne=async(candidate)=>{
@@ -1582,6 +1596,15 @@ async function searchCatalogSuggestions(){
       style:candidate.suggestionStyle,
       suggestionStyle:candidate.suggestionStyle||candidate.primaryGenreName||'Música brasileira'
     };
+    // Como as letras são validadas em paralelo, confira novamente o contador
+    // imediatamente antes de aceitar a candidata para nunca ultrapassar 200.
+    if(found>=TARGET_SUGGESTIONS){
+      stopped=true;
+      queuedKeys.delete(candidateKey);
+      queuedTitleKeys.delete(candidateTitleKey);
+      titleInFlight.delete(candidateTitleKey);
+      return;
+    }
     if(candidateMatchesCatalog(enriched,catalogIndex,extraEntries)){
       excluded++;
       queuedKeys.delete(candidateKey);
@@ -1710,45 +1733,93 @@ async function searchCatalogSuggestions(){
     if(found<TARGET_SUGGESTIONS){
       let groups=[...genreQueries,...artistQueries.map(x=>({q:x.q,label:`Artista: ${x.label}`,style:x.style}))];
       if(selectedArtist){
+        const styleSuffix=selectedStyle?` ${selectedStyle}`:'';
         const exact=artistQueries.filter(x=>normalizeSuggestionText(x.q)===normalizeSuggestionText(selectedArtist));
-        groups=exact.length?exact.map(x=>({q:x.q,label:`Artista: ${x.label}`,style:x.style})): [{q:selectedArtist+(selectedStyle?' '+selectedStyle:''),label:`Artista: ${selectedArtist}`,style:selectedStyle||'Música brasileira'}];
+        const baseStyle=selectedStyle||(exact[0]?.style||'Música brasileira');
+        const variants=[
+          selectedArtist,
+          `${selectedArtist} músicas`,
+          `${selectedArtist} sucessos`,
+          `${selectedArtist} clássicos`,
+          `${selectedArtist} melhores músicas`,
+          `${selectedArtist} ${selectedStyle||''}`.trim(),
+          `${selectedArtist} anos 1980`,
+          `${selectedArtist} anos 1990`,
+          `${selectedArtist} anos 2000`,
+          `${selectedArtist} anos 2010`,
+          `${selectedArtist} anos 2020`
+        ];
+        groups=[...new Map(variants.filter(Boolean).map(q=>[normalizeSuggestionText(q),{q:q+styleSuffix,label:`Artista: ${selectedArtist} • ${q}`,style:baseStyle}])).values()];
       }
       if(selectedStyle){
-        groups=groups.filter(group=>bulkMusicStyleMatches(group.style,selectedStyle));
+        groups=groups.filter(group=>bulkMusicStyleMatches(group.style,selectedStyle)||normalizeSuggestionText(group.q).includes(normalizeSuggestionText(selectedStyle)));
       }
       if(!groups.length){
-        groups=[{q:(selectedArtist||'música brasileira')+(selectedStyle?' '+selectedStyle:''),label:[selectedArtist?'Artista: '+selectedArtist:'',selectedStyle?'Estilo: '+selectedStyle:''].filter(Boolean).join(' • ')||'Música brasileira',style:selectedStyle||'Música brasileira'}];
+        const base=(selectedArtist||selectedStyle||'música brasileira');
+        groups=[{q:base+(selectedStyle&&!normalizeSuggestionText(base).includes(normalizeSuggestionText(selectedStyle))?' '+selectedStyle:''),label:[selectedArtist?'Artista: '+selectedArtist:'',selectedStyle?'Estilo: '+selectedStyle:''].filter(Boolean).join(' • ')||'Música brasileira',style:selectedStyle||'Música brasileira'}];
       }
       let completedGroups=0;
-      for(let start=0;start<groups.length&&!stopped;start+=GROUP_WORKERS){
-        if(token!==state.bulkMusicSearchToken)return;
-        const wave=groups.slice(start,start+GROUP_WORKERS);
-        await Promise.all(wave.map(async(group)=>{
-          if(stopped||token!==state.bulkMusicSearchToken)return;
-          let data=null;
-          try{
-            data=await itunesSearchJsonp(group.q,200);
-          }catch(_){
-            failedLookups++;
-            data={results:[]};
-          }
-          if(stopped||token!==state.bulkMusicSearchToken)return;
-          const items=Array.isArray(data?.results)?data.results:[];
-          enqueueFromResults(items,{source:group.label,style:group.style});
-          completedGroups++;
-          updateStatus(`${completedGroups}/${groups.length} fontes pesquisadas — resultados aparecendo em paralelo`);
-          await drainQueue();
-        }));
+      const nextOffsetByGroup=new Map();
+      const exhaustedGroups=new Set();
+      const runGroupPage=async(group)=>{
+        if(stopped||token!==state.bulkMusicSearchToken)return false;
+        const groupKey=normalizeSuggestionText(group.q);
+        const offset=nextOffsetByGroup.get(groupKey)||0;
+        if(offset>=2000){exhaustedGroups.add(groupKey);return false;}
+        let data=null;
+        try{
+          data=await itunesSearchJsonp(group.q,200,offset);
+        }catch(_){
+          failedLookups++;
+          exhaustedGroups.add(groupKey);
+          return false;
+        }
+        if(stopped||token!==state.bulkMusicSearchToken)return false;
+        const items=Array.isArray(data?.results)?data.results:[];
+        if(!items.length){exhaustedGroups.add(groupKey);return false;}
+        enqueueFromResults(items,{source:(offset?group.label+` • página ${Math.floor(offset/200)+1}`:group.label),style:group.style});
+        nextOffsetByGroup.set(groupKey,offset+items.length);
+        if(items.length<200)exhaustedGroups.add(groupKey);
+        return true;
+      };
+
+      // Primeiro ciclo: cada consulta recebe uma página e os resultados válidos
+      // começam a aparecer imediatamente. Só buscamos páginas adicionais quando
+      // ainda não chegamos às 200 músicas realmente cadastráveis.
+      while(!stopped&&token===state.bulkMusicSearchToken){
+        const available=groups.filter(group=>!exhaustedGroups.has(normalizeSuggestionText(group.q)));
+        if(!available.length)break;
+        for(let start=0;start<available.length&&!stopped;start+=GROUP_WORKERS){
+          const wave=available.slice(start,start+GROUP_WORKERS);
+          await Promise.all(wave.map(async(group)=>{
+            await runGroupPage(group);
+            completedGroups++;
+            updateStatus(`${completedGroups} consultas executadas — resultados aparecendo em paralelo`);
+            await drainQueue();
+          }));
+          if(found>=TARGET_SUGGESTIONS){stopped=true;break;}
+        }
+        await drainQueue();
         if(found>=TARGET_SUGGESTIONS){stopped=true;break;}
+        // Se a primeira página não foi suficiente, a próxima rodada pagina as
+        // mesmas consultas para continuar procurando até completar 200 válidas.
+        const before=found;
+        const moreAvailable=groups.some(group=>!exhaustedGroups.has(normalizeSuggestionText(group.q)));
+        if(!moreAvailable)break;
+        if(before===found){
+          // Ainda podemos ter resultados sem letra nas páginas seguintes; não
+          // encerramos por falta de progresso em uma única rodada.
+          await sleep(120);
+        }
       }
       await drainQueue();
     }
 
     if(token!==state.bulkMusicSearchToken)return;
     if(found>=TARGET_SUGGESTIONS){
-      if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`✅ ${found}/${TARGET_SUGGESTIONS} sugestões válidas encontradas. A busca foi encerrada somente depois de fechar 200 resultados válidos.`;
+      if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`✅ ${found}/${TARGET_SUGGESTIONS} músicas cadastráveis encontradas. A busca só foi encerrada ao atingir 200 registros com título, artista e letra válidos.`;
     }else{
-      if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`ℹ️ A rodada terminou com ${found}/${TARGET_SUGGESTIONS} sugestões válidas após consultar as fontes disponíveis. Você pode pesquisar novamente com outro estilo ou artista.`;
+      if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`ℹ️ Foram encontradas ${found}/${TARGET_SUGGESTIONS} músicas cadastráveis após esgotar as consultas e páginas disponíveis para este filtro. A busca só termina antes de 200 quando não existem mais resultados disponíveis para validar.`;
     }
   }catch(error){
     if(token!==state.bulkMusicSearchToken)return;
@@ -1786,8 +1857,11 @@ async function addSelectedBulkMusic(){
   const pending=[];
   let duplicates=0;
   for(const item of candidates){
-    const title=normalize(item.trackName),artist=normalize(item.artistName),style=normalize(item.suggestionStyle||item.style||item.primaryGenreName),lyrics=formatFetchedLyrics(item.lyrics);
-    if(!title||!artist||!style||!lyrics)continue;
+    const title=normalize(item.trackName),artist=normalize(item.artistName),lyrics=formatFetchedLyrics(item.lyrics);
+    const style=normalize(item.suggestionStyle||item.style||item.primaryGenreName)||inferCatalogSuggestionStyle(item,item.sources||item.sourceStyles||[])||'Música brasileira';
+    // Para ser considerada cadastrável, a música precisa obrigatoriamente de título, artista e letra.
+    // O estilo é preenchido automaticamente quando a fonte não o informa.
+    if(!title||!artist||!lyrics)continue;
     if(candidateMatchesCatalog({trackName:title,artistName:artist,lyrics},duplicateIndex,seenEntries)){duplicates++;continue;}
     pending.push({id:makeId(),title,artist,style,note:'',lyrics,pdfUrl:'',pdfFileName:'',active:true});
     seenEntries.push({song:{title,artist,lyrics},titleKey:normalizeSuggestionText(title),artistKey:normalizeSuggestionText(artist),signature:buildLyricsSignature(lyrics)});
@@ -1861,8 +1935,11 @@ async function addSelectedBulkMusic(){
       // Soma os novos registros ao catálogo completo; nunca reduz o catálogo
       // para o tamanho do lote de sugestões.
       state.songs=[...novos,...baseCatalogo];
-      localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs.map(normalizeSong)));
+      const cacheResult=saveCatalogCacheSafely(state.songs);
       renderCatalog();
+      if(cacheResult.quota&&els.bulkMusicSearchStatus){
+        els.bulkMusicSearchStatus.textContent=`⚠️ ${novos.length} música${novos.length===1?'':'s'} preparadas. O armazenamento local atingiu o limite, então o catálogo será mantido em memória e sincronizado pelo servidor.`;
+      }
       if(els.bulkMusicSearchStatus)els.bulkMusicSearchStatus.textContent=`Salvando ${novos.length} música${novos.length===1?'':'s'} no catálogo principal...`;
 
       const publicado=await publishCatalogToServer();
@@ -2145,7 +2222,7 @@ async function saveSong(){
  try{
   if(editing){const idx=state.songs.findIndex(s=>s.id===state.editingId);if(idx<0)throw new Error('Música em edição não encontrada.');state.songs[idx]={...state.songs[idx],title,artist,style,note,lyrics}}
   else state.songs.unshift({id:makeId(),title,artist,style,note,lyrics,active:true,pdfUrl:'',pdfFileName:''});
-  localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs.map(normalizeSong)));renderCatalog();
+  saveCatalogCacheSafely(state.songs);renderCatalog();
   setStatus('Alteração salva no dispositivo. Sincronizando catálogo principal...');
   const publicado=await publishCatalogToServer();
   if(!publicado.sucesso){setStatus('Foi salvo neste dispositivo, mas não foi sincronizado com o catálogo principal: '+publicado.mensagem,'error');showToast('Falha na sincronização.','error');return}
@@ -2175,7 +2252,7 @@ async function uploadCatalogPdfFile(songId,file){
     const pdfData=processedDataUrl;
     const data=await fetchJson(APPS_SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'saveSongPdf',songId:song.id,id:song.id,title:song.title,musica:song.title,nome:song.title,songTitle:song.title,artist:song.artist,artista:song.artist,interprete:song.artist,songArtist:song.artist,pdfData,pdfFileName:processed.name})},30000);
     if(!data?.sucesso)throw new Error(data?.mensagem||'Não foi possível salvar o PDF.');
-    song.pdfUrl=data.pdfUrl||'';song.pdfFileName=data.pdfFileName||processed.name;resetPdfIntegrity();localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs.map(normalizeSong)));renderCatalog();
+    song.pdfUrl=data.pdfUrl||'';song.pdfFileName=data.pdfFileName||processed.name;resetPdfIntegrity();saveCatalogCacheSafely(state.songs);renderCatalog();
     setStatus('✅ PDF processado e salvo para '+song.title+'.','success');showToast(processed.detectedWatermarks?'PDF salvo com a marca Palco Pro.':'PDF salvo.','success');return true;
   }catch(error){setStatus('Não foi possível salvar o PDF: '+(error.name==='AbortError'?'tempo limite excedido.':error.message),'error');showToast('Erro ao salvar PDF.','error');return false}
   finally{state.pdfProcessing=false;if(els.refreshCatalog){els.refreshCatalog.disabled=false;els.refreshCatalog.textContent=original}pendingPdfSongId=null}
@@ -2209,7 +2286,7 @@ async function generatePdfForCatalogSong(songId,options={}){
           state.pdfIntegrity.missingIds.delete(String(song.id));
           state.pdfIntegrity.brokenIds.delete(String(song.id));
         }
-        localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs.map(normalizeSong)));
+        saveCatalogCacheSafely(state.songs);
         state.localPdfPreviewSongId=song.id;
         state.localPdfPreviewDataUrl=pdfDataUrl;
         if(!silent){renderCatalog();showToast('✅ PDF gerado e adicionado ao catálogo.','success');}
@@ -2666,7 +2743,7 @@ function askRemoveDuplicates(){
 function openStyleModal(){if(!state.selectedIds.size){showToast('Selecione pelo menos uma música.','error');return}els.bulkStyleInput.value='';els.styleModal.classList.add('active');setTimeout(()=>els.bulkStyleInput.focus(),50)}
 function closeStyleModal(){els.styleModal.classList.remove('active');els.bulkStyleInput.value=''}
 function continueStyleChange(){const style=normalize(els.bulkStyleInput.value);if(!style){showToast('Informe o novo estilo.','error');els.bulkStyleInput.focus();return}closeStyleModal();const count=state.selectedIds.size;els.confirmTitle.textContent='Confirmar alteração de estilo';els.confirmBody.innerHTML=`<div class="confirm-text">Você quer mudar todas essas <strong>${count} música${count===1?'':'s'}</strong> para o estilo <strong>${escapeHtml(style)}</strong>?</div>`;els.confirmBtn.textContent='Sim, mudar estilo';state.confirmAction=async()=>{state.songs=state.songs.map(song=>state.selectedIds.has(song.id)?{...song,style}:song);state.selectedIds.clear();await persist();const publicado=await publishCatalogToServer();renderCatalog();closeConfirm();if(!publicado.sucesso){setStatus('Alteração salva localmente, mas não foi publicada: '+publicado.mensagem,'error');showToast('Falha ao publicar catálogo.','error');return}setStatus('✅ Estilo das músicas selecionadas atualizado.','success');showToast('Estilo alterado com sucesso.','success')};els.confirmModal.classList.add('active')}
-async function linkCatalog(){if(!window.showOpenFilePicker){showToast('Seu navegador não permite vínculo direto do arquivo. Use o Chrome ou Edge.','error');return}try{const [handle]=await window.showOpenFilePicker({multiple:false,types:[{description:'Arquivo JSON',accept:{'application/json':['.json']}}]});const file=await handle.getFile();if(file.name.toLowerCase()!=='catalogo.json'){showToast('Selecione o arquivo catalogo.json.','error');return}const parsed=JSON.parse(await file.text());const arr=Array.isArray(parsed)?parsed:(Array.isArray(parsed?.songs)?parsed.songs:null);if(!arr)throw new Error('O JSON precisa conter uma lista de músicas.');state.catalogHandle=handle;state.songs=arr.map(normalizeSong);localStorage.setItem(CATALOG_KEY,JSON.stringify(state.songs));renderCatalog();clearForm();els.fileStatus.textContent='catalogo.json vinculado';els.fileStatus.className='badge';setStatus('✅ catalogo.json vinculado. As próximas alterações serão gravadas nele.','success');showToast('catalogo.json vinculado.','success');}catch(error){if(error?.name!=='AbortError'){setStatus('Não foi possível vincular o catalogo.json: '+error.message,'error');showToast('Erro ao vincular catálogo.','error')}}}
+async function linkCatalog(){if(!window.showOpenFilePicker){showToast('Seu navegador não permite vínculo direto do arquivo. Use o Chrome ou Edge.','error');return}try{const [handle]=await window.showOpenFilePicker({multiple:false,types:[{description:'Arquivo JSON',accept:{'application/json':['.json']}}]});const file=await handle.getFile();if(file.name.toLowerCase()!=='catalogo.json'){showToast('Selecione o arquivo catalogo.json.','error');return}const parsed=JSON.parse(await file.text());const arr=Array.isArray(parsed)?parsed:(Array.isArray(parsed?.songs)?parsed.songs:null);if(!arr)throw new Error('O JSON precisa conter uma lista de músicas.');state.catalogHandle=handle;state.songs=arr.map(normalizeSong);saveCatalogCacheSafely(state.songs);renderCatalog();clearForm();els.fileStatus.textContent='catalogo.json vinculado';els.fileStatus.className='badge';setStatus('✅ catalogo.json vinculado. As próximas alterações serão gravadas nele.','success');showToast('catalogo.json vinculado.','success');}catch(error){if(error?.name!=='AbortError'){setStatus('Não foi possível vincular o catalogo.json: '+error.message,'error');showToast('Erro ao vincular catálogo.','error')}}}
 function setFilter(filter){state.filter=filter;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===filter));renderCatalog()}
 async function toggleActive(id){const s=state.songs.find(x=>x.id===id);if(!s)return;s.active=!s.active;await persist();const publicado=await publishCatalogToServer();renderCatalog();if(!publicado.sucesso){setStatus('Alteração salva localmente, mas não foi publicada: '+publicado.mensagem,'error');showToast('Falha ao publicar catálogo.','error');return}setStatus(`✅ ${s.title} foi ${s.active?'ativada':'desativada'} no catálogo principal.`,'success');showToast(s.active?'Música ativada.':'Música desativada.','success')}
 function showLyrics(id){const s=state.songs.find(x=>x.id===id);if(!s)return;els.detailTitle.textContent=s.title;els.detailBody.innerHTML=`<div class="detail-block"><label>Artista</label><div>${escapeHtml(s.artist||'Sem artista')}</div></div><div class="detail-block"><label>Estilo</label><div>${escapeHtml(s.style||'Sem estilo')}</div></div><div class="detail-block"><label>Status</label><div>${s.active?'Ativa — aparece em Sugestões':'Inativa — não aparece em Sugestões'}</div></div><div class="detail-block"><label>Letra completa</label><div>${escapeHtml(s.lyrics||'Sem letra')}</div></div>`;els.detailModal.classList.add('active')}
